@@ -12,14 +12,16 @@ public class ReviewService : IReviewService
     private readonly IReviewCommentRepository _commentRepo;
     private readonly IBookingRepository _bookingRepo;
     private readonly IMapper _mapper;
+    private readonly IReviewHubNotifier _notifier;
 
     public ReviewService(IReviewRepository reviewRepo, IReviewCommentRepository commentRepo,
-        IBookingRepository bookingRepo, IMapper mapper)
+        IBookingRepository bookingRepo, IMapper mapper, IReviewHubNotifier notifier)
     {
         _reviewRepo = reviewRepo;
         _commentRepo = commentRepo;
         _bookingRepo = bookingRepo;
         _mapper = mapper;
+        _notifier = notifier;
     }
 
     public async Task<ServiceResult<ReviewDto>> CreateReviewAsync(CreateReviewDto dto, string userId, CancellationToken ct = default)
@@ -55,7 +57,11 @@ public class ReviewService : IReviewService
         await _reviewRepo.AddAsync(review, ct);
         var reviews = await _reviewRepo.GetByRoomWithCommentsAsync(dto.RoomId, ct);
         var created = reviews.First(r => r.Id == review.Id);
-        return ServiceResult<ReviewDto>.Success(_mapper.Map<ReviewDto>(created));
+        
+        var reviewDto = _mapper.Map<ReviewDto>(created);
+        await _notifier.ReviewCreated(reviewDto);
+
+        return ServiceResult<ReviewDto>.Success(reviewDto);
     }
 
     public async Task<ServiceResult<ReviewDto>> UpdateReviewAsync(UpdateReviewDto dto, string userId, CancellationToken ct = default)
@@ -74,7 +80,11 @@ public class ReviewService : IReviewService
 
         var reviews = await _reviewRepo.GetByRoomWithCommentsAsync(review.RoomId, ct);
         var updated = reviews.First(r => r.Id == review.Id);
-        return ServiceResult<ReviewDto>.Success(_mapper.Map<ReviewDto>(updated));
+        
+        var reviewDto = _mapper.Map<ReviewDto>(updated);
+        await _notifier.ReviewUpdated(reviewDto);
+
+        return ServiceResult<ReviewDto>.Success(reviewDto);
     }
 
     public async Task<ServiceResult> DeleteReviewAsync(int id, string userId, bool isAdmin, CancellationToken ct = default)
@@ -87,6 +97,9 @@ public class ReviewService : IReviewService
         review.IsDeleted = true;
         review.UpdatedAt = DateTime.UtcNow;
         await _reviewRepo.UpdateAsync(review, ct);
+
+        await _notifier.ReviewDeleted(id, review.RoomId);
+
         return ServiceResult.Success();
     }
 
@@ -121,7 +134,11 @@ public class ReviewService : IReviewService
         var reviews = await _reviewRepo.GetByRoomWithCommentsAsync(review.RoomId, ct);
         var parentReview = reviews.First(r => r.Id == dto.ReviewId);
         var createdComment = parentReview.Comments.First(c => c.Id == comment.Id);
-        return ServiceResult<ReviewCommentDto>.Success(_mapper.Map<ReviewCommentDto>(createdComment));
+        
+        var commentDto = _mapper.Map<ReviewCommentDto>(createdComment);
+        await _notifier.CommentAdded(commentDto);
+
+        return ServiceResult<ReviewCommentDto>.Success(commentDto);
     }
 
     public async Task<ServiceResult> DeleteCommentAsync(int id, string userId, bool isAdmin, CancellationToken ct = default)
@@ -134,6 +151,9 @@ public class ReviewService : IReviewService
         comment.IsDeleted = true;
         comment.UpdatedAt = DateTime.UtcNow;
         await _commentRepo.UpdateAsync(comment, ct);
+
+        await _notifier.CommentDeleted(id, comment.ReviewId);
+
         return ServiceResult.Success();
     }
 }

@@ -49,8 +49,18 @@ public class EditModel(IRoomService roomService) : PageModel
         RoomTypes = await roomService.GetRoomTypesAsync();
         if (!ModelState.IsValid) return Page();
 
-        var dto = new UpdateRoomDto(Input.Id, Input.Name, Input.RoomTypeId, Input.PricePerNight,
-            Input.MaxOccupancy, Input.Description, Input.ImageUrl, Input.Amenities, Input.IsAvailable);
+        var dto = new UpdateRoomDto 
+        { 
+            Id = Input.Id, 
+            Name = Input.Name, 
+            RoomTypeId = Input.RoomTypeId, 
+            PricePerNight = Input.PricePerNight, 
+            MaxOccupancy = Input.MaxOccupancy, 
+            Description = Input.Description, 
+            ImageUrl = Input.ImageUrl, 
+            Amenities = Input.Amenities, 
+            IsAvailable = Input.IsAvailable 
+        };
         var result = await roomService.UpdateRoomAsync(dto);
 
         if (result.IsSuccess)

@@ -64,4 +64,36 @@ public class DetailModel(
         var roomIdStr = Request.Query["id"];
         return RedirectToPage(new { id = roomIdStr.FirstOrDefault() ?? "0" });
     }
+
+    public async Task<IActionResult> OnPostDeleteReviewAsync(int reviewId)
+    {
+        if (!User.Identity!.IsAuthenticated)
+            return RedirectToPage("/Account/Login");
+
+        var userId = userManager.GetUserId(User)!;
+        var isAdmin = User.IsInRole("Admin") || User.IsInRole("Staff");
+        var result = await reviewService.DeleteReviewAsync(reviewId, userId, isAdmin);
+
+        if (!result.IsSuccess)
+            TempData["Error"] = result.ErrorMessage;
+
+        var roomIdStr = Request.Query["id"];
+        return RedirectToPage(new { id = roomIdStr.FirstOrDefault() ?? "0" });
+    }
+
+    public async Task<IActionResult> OnPostDeleteCommentAsync(int commentId)
+    {
+        if (!User.Identity!.IsAuthenticated)
+            return RedirectToPage("/Account/Login");
+
+        var userId = userManager.GetUserId(User)!;
+        var isAdmin = User.IsInRole("Admin") || User.IsInRole("Staff");
+        var result = await reviewService.DeleteCommentAsync(commentId, userId, isAdmin);
+
+        if (!result.IsSuccess)
+            TempData["Error"] = result.ErrorMessage;
+
+        var roomIdStr = Request.Query["id"];
+        return RedirectToPage(new { id = roomIdStr.FirstOrDefault() ?? "0" });
+    }
 }

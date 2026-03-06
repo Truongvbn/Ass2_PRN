@@ -17,7 +17,8 @@ public class ConfirmationModel(
 
     public async Task OnGetAsync(int id)
     {
-        var result = await bookingService.GetBookingByIdAsync(id);
+        var userId = User.IsInRole("Admin") || User.IsInRole("Staff") ? null : userManager.GetUserId(User);
+        var result = await bookingService.GetBookingByIdAsync(id, userId);
         if (result.IsSuccess)
             Booking = result.Data;
     }

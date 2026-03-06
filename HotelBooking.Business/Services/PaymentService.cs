@@ -10,12 +10,14 @@ public class PaymentService : IPaymentService
 {
     private readonly IPaymentRepository _paymentRepo;
     private readonly IBookingRepository _bookingRepo;
+    private readonly IBookingService _bookingService;
     private readonly IMapper _mapper;
 
-    public PaymentService(IPaymentRepository paymentRepo, IBookingRepository bookingRepo, IMapper mapper)
+    public PaymentService(IPaymentRepository paymentRepo, IBookingRepository bookingRepo, IBookingService bookingService, IMapper mapper)
     {
         _paymentRepo = paymentRepo;
         _bookingRepo = bookingRepo;
+        _bookingService = bookingService;
         _mapper = mapper;
     }
 
@@ -47,9 +49,7 @@ public class PaymentService : IPaymentService
         await _paymentRepo.AddAsync(payment, ct);
 
         // Auto-confirm booking after payment
-        booking.Status = BookingStatus.Confirmed;
-        booking.UpdatedAt = DateTime.UtcNow;
-        await _bookingRepo.UpdateAsync(booking, ct);
+        await _bookingService.ConfirmBookingAsync(booking.Id, ct);
 
         return ServiceResult<PaymentDto>.Success(_mapper.Map<PaymentDto>(payment));
     }

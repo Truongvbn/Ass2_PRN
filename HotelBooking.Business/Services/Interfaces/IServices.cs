@@ -15,7 +15,7 @@ public interface IRoomService
 public interface IBookingService
 {
     Task<ServiceResult<BookingDto>> CreateBookingAsync(CreateBookingDto dto, string userId, CancellationToken ct = default);
-    Task<ServiceResult<BookingDto>> GetBookingByIdAsync(int id, CancellationToken ct = default);
+    Task<ServiceResult<BookingDto>> GetBookingByIdAsync(int id, string? userId = null, CancellationToken ct = default);
     Task<ServiceResult<IReadOnlyList<BookingDto>>> GetUserBookingsAsync(string userId, CancellationToken ct = default);
     Task<ServiceResult<IReadOnlyList<BookingDto>>> GetAllBookingsAsync(CancellationToken ct = default);
     Task<ServiceResult> ConfirmBookingAsync(int id, CancellationToken ct = default);

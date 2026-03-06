@@ -12,6 +12,10 @@ public interface IRoomRepository : IRepository<Room>
     Task<Room?> GetWithDetailsAsync(int id, CancellationToken ct = default);
 }
 
+public interface IRoomTypeRepository : IRepository<RoomType>
+{
+}
+
 public interface IBookingRepository : IRepository<Booking>
 {
     Task<bool> HasOverlappingBookingAsync(int roomId, DateTime checkIn, DateTime checkOut, int? excludeBookingId = null, CancellationToken ct = default);

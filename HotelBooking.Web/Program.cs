@@ -36,6 +36,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 // ── Repositories (Data Layer) ──
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IReviewCommentRepository, ReviewCommentRepository>();
@@ -52,6 +53,11 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IAiAssistantService, MockAiAssistantService>();
+
+// ── SignalR Notifiers ──
+builder.Services.AddScoped<IBookingHubNotifier, BookingHubNotifier>();
+builder.Services.AddScoped<IReviewHubNotifier, ReviewHubNotifier>();
+builder.Services.AddScoped<ITicketHubNotifier, TicketHubNotifier>();
 
 // ── SignalR ──
 builder.Services.AddSignalR();

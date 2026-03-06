@@ -9,12 +9,14 @@ namespace HotelBooking.Business.Services;
 public class RoomService : IRoomService
 {
     private readonly IRoomRepository _roomRepo;
+    private readonly IRoomTypeRepository _roomTypeRepo;
     private readonly IReviewRepository _reviewRepo;
     private readonly IMapper _mapper;
 
-    public RoomService(IRoomRepository roomRepo, IReviewRepository reviewRepo, IMapper mapper)
+    public RoomService(IRoomRepository roomRepo, IRoomTypeRepository roomTypeRepo, IReviewRepository reviewRepo, IMapper mapper)
     {
         _roomRepo = roomRepo;
+        _roomTypeRepo = roomTypeRepo;
         _reviewRepo = reviewRepo;
         _mapper = mapper;
     }
@@ -95,7 +97,7 @@ public class RoomService : IRoomService
 
     public async Task<IReadOnlyList<RoomTypeDto>> GetRoomTypesAsync(CancellationToken ct = default)
     {
-        var types = await _roomRepo.FindAsync(_ => true, ct); // Use RoomType repo ideally
-        return []; // This will be replaced with proper impl
+        var types = await _roomTypeRepo.GetAllAsync(ct);
+        return _mapper.Map<IReadOnlyList<RoomTypeDto>>(types);
     }
 }

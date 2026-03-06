@@ -42,6 +42,11 @@ public class RoomRepository : Repository<Room>, IRoomRepository
             .FirstOrDefaultAsync(r => r.Id == id, ct);
 }
 
+public class RoomTypeRepository : Repository<RoomType>, IRoomTypeRepository
+{
+    public RoomTypeRepository(HotelDbContext context) : base(context) { }
+}
+
 public class BookingRepository : Repository<Booking>, IBookingRepository
 {
     public BookingRepository(HotelDbContext context) : base(context) { }
@@ -96,7 +101,7 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
     }
 
     public async Task<bool> HasUserReviewedRoomAsync(string userId, int roomId, CancellationToken ct = default)
-        => await DbSet.AnyAsync(r => r.UserId == userId && r.RoomId == roomId, ct);
+        => await DbSet.AnyAsync(r => r.UserId == userId && r.RoomId == roomId && !r.IsDeleted, ct);
 }
 
 public class ReviewCommentRepository : Repository<ReviewComment>, IReviewCommentRepository

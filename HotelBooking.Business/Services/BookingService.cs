@@ -11,12 +11,14 @@ public class BookingService : IBookingService
     private readonly IBookingRepository _bookingRepo;
     private readonly IRoomRepository _roomRepo;
     private readonly IMapper _mapper;
+    private readonly IBookingHubNotifier _notifier;
 
-    public BookingService(IBookingRepository bookingRepo, IRoomRepository roomRepo, IMapper mapper)
+    public BookingService(IBookingRepository bookingRepo, IRoomRepository roomRepo, IMapper mapper, IBookingHubNotifier notifier)
     {
         _bookingRepo = bookingRepo;
         _roomRepo = roomRepo;
         _mapper = mapper;
+        _notifier = notifier;
     }
 
     public async Task<ServiceResult<BookingDto>> CreateBookingAsync(CreateBookingDto dto, string userId, CancellationToken ct = default)
@@ -31,7 +33,7 @@ public class BookingService : IBookingService
 
         // Validate room
         var room = await _roomRepo.GetByIdAsync(dto.RoomId, ct);
-        if (room is null || !room.IsAvailable)
+        if (room is null || room.IsDeleted || !room.IsAvailable)
             return ServiceResult<BookingDto>.Failure("Room is not available", "ROOM_UNAVAILABLE");
         if (dto.NumberOfGuests > room.MaxOccupancy)
             return ServiceResult<BookingDto>.Failure($"Room max occupancy is {room.MaxOccupancy}", "EXCEEDS_OCCUPANCY");
@@ -59,13 +61,27 @@ public class BookingService : IBookingService
 
         await _bookingRepo.AddAsync(booking, ct);
         var created = await _bookingRepo.GetWithDetailsAsync(booking.Id, ct);
-        return ServiceResult<BookingDto>.Success(_mapper.Map<BookingDto>(created!));
+        var bookingDto = _mapper.Map<BookingDto>(created!);
+
+        await _notifier.BookingCreated(bookingDto);
+
+        return ServiceResult<BookingDto>.Success(bookingDto);
     }
 
-    public async Task<ServiceResult<BookingDto>> GetBookingByIdAsync(int id, CancellationToken ct = default)
+    public async Task<ServiceResult<BookingDto>> GetBookingByIdAsync(int id, string? userId = null, CancellationToken ct = default)
     {
         var booking = await _bookingRepo.GetWithDetailsAsync(id, ct);
         if (booking is null) return ServiceResult<BookingDto>.Failure("Booking not found", "NOT_FOUND");
+        
+        if (userId is null)
+        {
+            // Admin/Staff fetching (no constraint applied)
+        }
+        else if (booking.UserId != userId)
+        {
+            return ServiceResult<BookingDto>.Failure("You do not have permission to view this booking", "FORBIDDEN");
+        }
+
         return ServiceResult<BookingDto>.Success(_mapper.Map<BookingDto>(booking));
     }
 
@@ -91,6 +107,9 @@ public class BookingService : IBookingService
         booking.Status = BookingStatus.Confirmed;
         booking.UpdatedAt = DateTime.UtcNow;
         await _bookingRepo.UpdateAsync(booking, ct);
+        
+        await _notifier.BookingStatusChanged(id, BookingStatus.Confirmed.ToString());
+        
         return ServiceResult.Success();
     }
 
@@ -98,12 +117,18 @@ public class BookingService : IBookingService
     {
         var booking = await _bookingRepo.GetByIdAsync(id, ct);
         if (booking is null) return ServiceResult.Failure("Booking not found", "NOT_FOUND");
+        if (booking.UserId != userId)
+            return ServiceResult.Failure("You can only cancel your own bookings", "FORBIDDEN");
+        
         if (booking.Status is not (BookingStatus.Pending or BookingStatus.Confirmed))
             return ServiceResult.Failure("Only pending or confirmed bookings can be cancelled", "INVALID_STATE");
 
         booking.Status = BookingStatus.Cancelled;
         booking.UpdatedAt = DateTime.UtcNow;
         await _bookingRepo.UpdateAsync(booking, ct);
+
+        await _notifier.BookingCancelled(id);
+
         return ServiceResult.Success();
     }
 
@@ -117,6 +142,9 @@ public class BookingService : IBookingService
         booking.Status = BookingStatus.Completed;
         booking.UpdatedAt = DateTime.UtcNow;
         await _bookingRepo.UpdateAsync(booking, ct);
+
+        await _notifier.BookingStatusChanged(id, BookingStatus.Completed.ToString());
+
         return ServiceResult.Success();
     }
 }

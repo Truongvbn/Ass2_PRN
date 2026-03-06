@@ -10,11 +10,13 @@ public class TicketService : ITicketService
 {
     private readonly ITicketRepository _ticketRepo;
     private readonly IMapper _mapper;
+    private readonly ITicketHubNotifier _notifier;
 
-    public TicketService(ITicketRepository ticketRepo, IMapper mapper)
+    public TicketService(ITicketRepository ticketRepo, IMapper mapper, ITicketHubNotifier notifier)
     {
         _ticketRepo = ticketRepo;
         _mapper = mapper;
+        _notifier = notifier;
     }
 
     public async Task<ServiceResult<TicketDto>> CreateTicketAsync(CreateTicketDto dto, string userId, CancellationToken ct = default)
@@ -42,7 +44,11 @@ public class TicketService : ITicketService
         // Re-fetch with includes
         var tickets = await _ticketRepo.GetByUserAsync(userId, ct);
         var created = tickets.First(t => t.Id == ticket.Id);
-        return ServiceResult<TicketDto>.Success(_mapper.Map<TicketDto>(created));
+
+        var ticketDto = _mapper.Map<TicketDto>(created);
+        await _notifier.TicketCreated(ticketDto);
+
+        return ServiceResult<TicketDto>.Success(ticketDto);
     }
 
     public async Task<ServiceResult<TicketDto>> GetTicketByIdAsync(int id, CancellationToken ct = default)
@@ -84,6 +90,15 @@ public class TicketService : ITicketService
             ticket.Status = TicketStatus.InProgress;
         ticket.UpdatedAt = DateTime.UtcNow;
         await _ticketRepo.UpdateAsync(ticket, ct);
+
+        // Fetch staff name for broadcast
+        var updatedTickets = await _ticketRepo.GetActiveTicketsAsync(ct);
+        var assignName = updatedTickets.FirstOrDefault(t => t.Id == ticketId)?.AssignedTo?.FullName ?? "Staff";
+
+        await _notifier.TicketAssigned(ticketId, assignName);
+        if (ticket.Status == TicketStatus.InProgress)
+            await _notifier.TicketStatusChanged(ticketId, "InProgress");
+
         return ServiceResult.Success();
     }
 
@@ -114,6 +129,12 @@ public class TicketService : ITicketService
         if (targetStatus == TicketStatus.Closed)
             ticket.ClosedAt = DateTime.UtcNow;
         await _ticketRepo.UpdateAsync(ticket, ct);
+
+        if (targetStatus == TicketStatus.Closed)
+            await _notifier.TicketClosed(ticketId);
+        else
+            await _notifier.TicketStatusChanged(ticketId, targetStatus.ToString());
+
         return ServiceResult.Success();
     }
 }
