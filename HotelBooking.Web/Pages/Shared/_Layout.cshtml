@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — Grand Azure Hotel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="nav-brand" href="/">
+                <i class="fas fa-hotel"></i>
+                <span>Grand Azure</span>
+            </a>
+            <div class="nav-links">
+                <a href="/Rooms" class="nav-link"><i class="fas fa-door-open"></i> Rooms</a>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <a href="/Booking" class="nav-link"><i class="fas fa-calendar-check"></i> My Bookings</a>
+                    <a href="/Tickets" class="nav-link"><i class="fas fa-headset"></i> Support</a>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
+                    {
+                        <a href="/Admin/Rooms" class="nav-link nav-admin"><i class="fas fa-cog"></i> Admin</a>
+                    }
+                    <div class="nav-user">
+                        <span class="nav-user-name">
+                            <i class="fas fa-user-circle"></i>
+                            @UserManager.GetUserAsync(User).Result?.FullName
+                        </span>
+                        <form method="post" asp-page="/Account/Logout" class="nav-logout-form">
+                            <button type="submit" class="nav-link btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <a href="/Account/Login" class="nav-link"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    <a href="/Account/Register" class="nav-link btn-register"><i class="fas fa-user-plus"></i> Register</a>
+                }
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        @RenderBody()
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3><i class="fas fa-hotel"></i> Grand Azure Hotel</h3>
+                <p>Where luxury meets comfort</p>
+            </div>
+            <div class="footer-links">
+                <a href="/Rooms">Rooms & Suites</a>
+                <a href="/Reviews">Guest Reviews</a>
+                <a href="/Tickets">Support</a>
+            </div>
+            <div class="footer-contact">
+                <p><i class="fas fa-phone"></i> +84 123 456 789</p>
+                <p><i class="fas fa-envelope"></i> info@grandazure.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Grand Azure Hotel. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,215 @@
+@page
+@model HotelBooking.Web.Pages.Rooms.DetailModel
+@{
+    ViewData["Title"] = Model.Room?.Name ?? "Room Detail";
+}
+
+@if (Model.Room == null)
+{
+    <div class="page-container">
+        <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Room not found.</div>
+        <a href="/Rooms" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to Rooms</a>
+    </div>
+}
+else
+{
+    var room = Model.Room;
+    <div class="room-detail">
+        <div class="room-detail-hero">
+            <img src="@room.ImageUrl" alt="@room.Name" onerror="this.src='/images/hotel-default.jpg'" />
+            <div class="room-detail-hero-overlay">
+                <div class="room-detail-badge @(room.IsAvailable ? "badge-available" : "badge-unavailable")">
+                    @(room.IsAvailable ? "Available" : "Unavailable")
+                </div>
+                <h1>@room.Name</h1>
+                <p class="room-type-label">@room.RoomTypeName</p>
+            </div>
+        </div>
+
+        <div class="room-detail-body">
+            <div class="room-detail-main">
+                <div class="detail-section">
+                    <h2>About this Room</h2>
+                    <p>@room.Description</p>
+                </div>
+
+                <div class="detail-section">
+                    <h2>Amenities</h2>
+                    <div class="amenities-grid">
+                        @foreach (var amenity in (room.Amenities ?? "").Split(',', System.StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            <div class="amenity-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>@amenity.Trim()</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="room-stats">
+                        <div class="room-stat">
+                            <i class="fas fa-users"></i>
+                            <div>
+                                <strong>Max Occupancy</strong>
+                                <span>@room.MaxOccupancy guests</span>
+                            </div>
+                        </div>
+                        <div class="room-stat">
+                            <i class="fas fa-star text-gold"></i>
+                            <div>
+                                <strong>Rating</strong>
+                                <span>@(room.AverageRating > 0 ? room.AverageRating.ToString("0.0") + $" ({room.ReviewCount} reviews)" : "No reviews yet")</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Section -->
+                <div class="detail-section" id="reviews-section">
+                    <h2>Guest Reviews</h2>
+                    <div id="reviews-container">
+                        @foreach (var review in Model.Reviews)
+                        {
+                            <div class="review-card" id="review-@review.Id">
+                                <div class="review-header">
+                                    <div class="review-user">
+                                        <i class="fas fa-user-circle"></i>
+                                        <strong>@review.UserName</strong>
+                                    </div>
+                                    <div class="review-rating">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="fas fa-star @(i <= review.Rating ? "text-gold" : "text-muted")"></i>
+                                        }
+                                    </div>
+                                    <small class="review-date">@review.CreatedAt.ToString("MMM dd, yyyy")</small>
+                                </div>
+                                <p class="review-content">@review.Content</p>
+                                <div class="review-comments">
+                                    @foreach (var comment in review.Comments)
+                                    {
+                                        <div class="comment" id="comment-@comment.Id">
+                                            <i class="fas fa-reply"></i>
+                                            <strong>@comment.UserName</strong>: @comment.Content
+                                            <small>@comment.CreatedAt.ToString("MMM dd")</small>
+                                        </div>
+                                    }
+                                </div>
+                                @if (SignInManager.IsSignedIn(User))
+                                {
+                                    <form method="post" asp-page-handler="AddComment" class="comment-form">
+                                        <input type="hidden" name="reviewId" value="@review.Id" />
+                                        <div class="comment-input-row">
+                                            <input type="text" name="content" class="form-control" placeholder="Add a comment..." required />
+                                            <button type="submit" class="btn btn-sm btn-outline">Post</button>
+                                        </div>
+                                    </form>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    @if (SignInManager.IsSignedIn(User) && Model.CanReview)
+                    {
+                        <div class="write-review">
+                            <h3>Write a Review</h3>
+                            <form method="post" asp-page-handler="CreateReview">
+                                <input type="hidden" name="roomId" value="@room.Id" />
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                                <div class="form-group">
+                                    <label>Rating</label>
+                                    <div class="star-rating-input">
+                                        @for (int i = 5; i >= 1; i--)
+                                        {
+                                            <input type="radio" id="star@i" name="rating" value="@i" required />
+                                            <label for="star@i"><i class="fas fa-star"></i></label>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <textarea name="content" class="form-control" rows="4"
+                                              placeholder="Share your experience..." required minlength="10" maxlength="2000"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i> Submit Review
+                                </button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="room-detail-sidebar">
+                <div class="booking-widget" id="room-availability-@room.Id">
+                    <div class="booking-widget-price">
+                        <span class="price-amount">$@room.PricePerNight.ToString("N0")</span>
+                        <span class="price-per">per night</span>
+                    </div>
+
+                    @if (SignInManager.IsSignedIn(User) && room.IsAvailable)
+                    {
+                        <a href="/Booking/Create?roomId=@room.Id" class="btn btn-primary btn-full btn-lg">
+                            <i class="fas fa-calendar-plus"></i> Book Now
+                        </a>
+                    }
+                    else if (!SignInManager.IsSignedIn(User))
+                    {
+                        <a href="/Account/Login?returnUrl=/Rooms/Detail?id=@room.Id" class="btn btn-primary btn-full">
+                            <i class="fas fa-sign-in-alt"></i> Login to Book
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="unavailable-notice">
+                            <i class="fas fa-clock"></i> This room is currently unavailable
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                    {
+                        <div class="alert alert-success mt-2">@Model.SuccessMessage</div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger mt-2">@Model.ErrorMessage</div>
+                    }
+                </div>
+
+                <!-- AI Chat Widget -->
+                <div class="ai-chat-widget">
+                    <h4><i class="fas fa-robot"></i> AI Concierge</h4>
+                    <div id="ai-chat-messages" class="ai-messages">
+                        <div class="ai-message ai-bubble">Hi! Ask me anything about this room.</div>
+                    </div>
+                    <div class="ai-input-row">
+                        <input type="text" id="ai-question" class="form-control" placeholder="Ask a question..." />
+                        <button onclick="askAI(@room.Id)" class="btn btn-sm btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/signalr-review.js"></script>
+    <script>
+    async function askAI(roomId) {
+        const q = document.getElementById('ai-question').value.trim();
+        if (!q) return;
+        const msgs = document.getElementById('ai-chat-messages');
+        msgs.innerHTML += `<div class="ai-message user-bubble">${q}</div>`;
+        document.getElementById('ai-question').value = '';
+        const res = await fetch(`/api/ai/answer?question=${encodeURIComponent(q)}&roomId=${roomId}`);
+        const data = await res.json();
+        msgs.innerHTML += `<div class="ai-message ai-bubble">${data.answer || 'Sorry, I could not answer that.'}</div>`;
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+    document.getElementById('ai-question')?.addEventListener('keydown', e => {
+        if (e.key === 'Enter') askAI(@(Model.Room?.Id ?? 0));
+    });
+    </script>
+}

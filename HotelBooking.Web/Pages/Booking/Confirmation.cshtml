@@ -1,0 +1,57 @@
+@page
+@model HotelBooking.Web.Pages.Booking.ConfirmationModel
+@{
+    ViewData["Title"] = "Booking Confirmed";
+}
+
+<div class="page-container confirmation-page">
+    @if (Model.Booking != null)
+    {
+        <div class="confirmation-card">
+            <div class="confirmation-icon"><i class="fas fa-check-circle"></i></div>
+            <h1>Booking Confirmed!</h1>
+            <p class="confirmation-subtitle">Your reservation has been successfully placed.</p>
+
+            <div class="booking-summary">
+                <div class="summary-row">
+                    <span class="label">Room</span>
+                    <span class="value">@Model.Booking.RoomName</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">Check-In</span>
+                    <span class="value">@Model.Booking.CheckIn.ToString("MMMM dd, yyyy")</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">Check-Out</span>
+                    <span class="value">@Model.Booking.CheckOut.ToString("MMMM dd, yyyy")</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">Guests</span>
+                    <span class="value">@Model.Booking.NumberOfGuests</span>
+                </div>
+                <div class="summary-row highlight">
+                    <span class="label">Total</span>
+                    <span class="value">$@Model.Booking.TotalPrice.ToString("N2")</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">Status</span>
+                    <span class="value"><span class="badge badge-@Model.Booking.Status.ToLower()">@Model.Booking.Status</span></span>
+                </div>
+            </div>
+
+            <div class="confirmation-actions">
+                <a href="/Booking/MyBookings" class="btn btn-primary">
+                    <i class="fas fa-list"></i> View My Bookings
+                </a>
+                <a href="/Rooms" class="btn btn-outline">
+                    <i class="fas fa-bed"></i> Browse More Rooms
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">Booking not found.</div>
+        <a href="/Booking/MyBookings" class="btn btn-outline">My Bookings</a>
+    }
+</div>

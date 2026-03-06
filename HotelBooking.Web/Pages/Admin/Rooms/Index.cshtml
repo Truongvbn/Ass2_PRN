@@ -1,0 +1,70 @@
+@page
+@model HotelBooking.Web.Pages.Admin.Rooms.IndexModel
+@{
+    ViewData["Title"] = "Admin — Rooms";
+}
+
+<div class="page-container">
+    <div class="page-header-row">
+        <div class="page-header">
+            <h1><i class="fas fa-cog"></i> Room Management</h1>
+            <p>Admin panel — manage all rooms</p>
+        </div>
+        <a href="/Admin/Rooms/Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Room
+        </a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-@(Model.IsError ? "danger" : "success")">@Model.Message</div>
+    }
+
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Price/Night</th>
+                    <th>Occupancy</th>
+                    <th>Rating</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var room in Model.Rooms)
+                {
+                    <tr>
+                        <td>@room.Id</td>
+                        <td>@room.Name</td>
+                        <td>@room.RoomTypeName</td>
+                        <td>$@room.PricePerNight.ToString("N0")</td>
+                        <td>@room.MaxOccupancy</td>
+                        <td>
+                            <i class="fas fa-star text-gold"></i>
+                            @(room.AverageRating > 0 ? room.AverageRating.ToString("0.0") : "—")
+                        </td>
+                        <td>
+                            <span class="badge badge-@(room.IsAvailable ? "available" : "unavailable")">
+                                @(room.IsAvailable ? "Available" : "Unavailable")
+                            </span>
+                        </td>
+                        <td class="actions-cell">
+                            <a href="/Admin/Rooms/Edit?id=@room.Id" class="btn btn-sm btn-outline">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="post" asp-page-handler="Delete"
+                                  onsubmit="return confirm('Delete this room?')" class="inline-form">
+                                <input type="hidden" name="roomId" value="@room.Id" />
+                                <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

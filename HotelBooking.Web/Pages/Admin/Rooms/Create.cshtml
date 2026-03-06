@@ -1,0 +1,73 @@
+@page
+@model HotelBooking.Web.Pages.Admin.Rooms.CreateModel
+@{
+    ViewData["Title"] = "Admin — Add Room";
+}
+
+<div class="page-container">
+    <div class="page-header">
+        <a href="/Admin/Rooms" class="back-link"><i class="fas fa-arrow-left"></i> Room Management</a>
+        <h1><i class="fas fa-plus-circle"></i> Add New Room</h1>
+    </div>
+
+    <div class="form-card">
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+
+        <form method="post">
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.Name">Room Name</label>
+                    <input asp-for="Input.Name" class="form-control" placeholder="e.g. Presidential Suite" />
+                    <span asp-validation-for="Input.Name" class="field-error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.RoomTypeId">Room Type</label>
+                    <select asp-for="Input.RoomTypeId" class="form-control">
+                        @foreach (var rt in Model.RoomTypes)
+                        {
+                            <option value="@rt.Id">@rt.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.PricePerNight">Price Per Night ($)</label>
+                    <input asp-for="Input.PricePerNight" type="number" class="form-control" placeholder="e.g. 200" min="0" />
+                    <span asp-validation-for="Input.PricePerNight" class="field-error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.MaxOccupancy">Max Occupancy</label>
+                    <input asp-for="Input.MaxOccupancy" type="number" class="form-control" placeholder="e.g. 2" min="1" />
+                    <span asp-validation-for="Input.MaxOccupancy" class="field-error"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.ImageUrl">Image URL</label>
+                <input asp-for="Input.ImageUrl" class="form-control" placeholder="https://..." />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.Amenities">Amenities (comma-separated)</label>
+                <input asp-for="Input.Amenities" class="form-control" placeholder="WiFi, Pool, Spa, Mini Bar" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.Description">Description</label>
+                <textarea asp-for="Input.Description" class="form-control" rows="4"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Room</button>
+                <a href="/Admin/Rooms" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

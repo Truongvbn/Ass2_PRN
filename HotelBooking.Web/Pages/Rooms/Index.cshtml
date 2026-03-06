@@ -1,0 +1,91 @@
+@page
+@model HotelBooking.Web.Pages.Rooms.IndexModel
+@{
+    ViewData["Title"] = "Rooms & Suites";
+}
+
+<div class="page-header">
+    <h1><i class="fas fa-door-open"></i> Rooms &amp; Suites</h1>
+    <p>Find your perfect stay from our curated collection</p>
+</div>
+
+<section class="room-search-bar">
+    <form method="get" class="search-form">
+        <div class="search-row">
+            <div class="search-group">
+                <label><i class="fas fa-bed"></i> Room Type</label>
+                <select asp-for="RoomTypeId" class="form-control">
+                    <option value="">All Types</option>
+                    @foreach (var rt in Model.RoomTypes)
+                    {
+                        <option value="@rt.Id">@rt.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="search-group">
+                <label><i class="fas fa-users"></i> Guests</label>
+                <input asp-for="MinOccupancy" type="number" class="form-control" placeholder="e.g. 2" min="1" />
+            </div>
+            <div class="search-group">
+                <label><i class="fas fa-calendar"></i> Check In</label>
+                <input asp-for="CheckIn" type="date" class="form-control" />
+            </div>
+            <div class="search-group">
+                <label><i class="fas fa-calendar"></i> Check Out</label>
+                <input asp-for="CheckOut" type="date" class="form-control" />
+            </div>
+            <div class="search-group">
+                <label><i class="fas fa-dollar-sign"></i> Max Price</label>
+                <input asp-for="MaxPrice" type="number" class="form-control" placeholder="e.g. 500" min="0" />
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
+    </form>
+</section>
+
+<div id="rooms-availability-banner" class="availability-banner hidden"></div>
+
+<div class="rooms-grid" id="rooms-grid">
+    @foreach (var room in Model.Rooms)
+    {
+        <div class="room-card" id="room-@room.Id">
+            <div class="room-image">
+                <img src="@room.ImageUrl" alt="@room.Name" onerror="this.src='/images/hotel-default.jpg'" />
+                <div class="room-badge @(room.IsAvailable ? "badge-available" : "badge-unavailable")">
+                    @(room.IsAvailable ? "Available" : "Unavailable")
+                </div>
+            </div>
+            <div class="room-info">
+                <div class="room-type">@room.RoomTypeName</div>
+                <h3 class="room-name">@room.Name</h3>
+                <div class="room-meta">
+                    <span><i class="fas fa-users"></i> @room.MaxOccupancy guests</span>
+                    <span class="room-rating">
+                        <i class="fas fa-star text-gold"></i>
+                        @(room.AverageRating > 0 ? room.AverageRating.ToString("0.0") : "New")
+                    </span>
+                </div>
+                <div class="room-price">
+                    <span class="price-amount">$@room.PricePerNight.ToString("N0")</span>
+                    <span class="price-per">/night</span>
+                </div>
+                <a href="/Rooms/Detail?id=@room.Id" class="btn btn-outline btn-full">
+                    <i class="fas fa-eye"></i> View Details
+                </a>
+            </div>
+        </div>
+    }
+    @if (!Model.Rooms.Any())
+    {
+        <div class="empty-state">
+            <i class="fas fa-search"></i>
+            <p>No rooms found for your criteria. Try adjusting your search.</p>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/signalr-booking.js"></script>
+}

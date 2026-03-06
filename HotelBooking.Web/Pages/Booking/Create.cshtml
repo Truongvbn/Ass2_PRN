@@ -1,0 +1,97 @@
+@page
+@model HotelBooking.Web.Pages.Booking.CreateModel
+@{
+    ViewData["Title"] = "Book Room";
+}
+
+<div class="page-container">
+    <div class="booking-form-page">
+        <div class="booking-form-main">
+            <div class="page-header">
+                <a href="/Rooms/Detail?id=@Model.RoomId" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Room
+                </a>
+                <h1><i class="fas fa-calendar-plus"></i> Book Your Stay</h1>
+            </div>
+
+            @if (Model.Room != null)
+            {
+                <div class="booking-room-preview">
+                    <img src="@Model.Room.ImageUrl" alt="@Model.Room.Name" />
+                    <div>
+                        <div class="room-type-label">@Model.Room.RoomTypeName</div>
+                        <h2>@Model.Room.Name</h2>
+                        <p><i class="fas fa-users"></i> Up to @Model.Room.MaxOccupancy guests</p>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> @Model.ErrorMessage</div>
+                }
+
+                <form method="post">
+                    <input type="hidden" asp-for="Input.RoomId" />
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label asp-for="Input.CheckIn"><i class="fas fa-calendar"></i> Check-In Date</label>
+                            <input asp-for="Input.CheckIn" type="date" class="form-control"
+                                   min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                            <span asp-validation-for="Input.CheckIn" class="field-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.CheckOut"><i class="fas fa-calendar"></i> Check-Out Date</label>
+                            <input asp-for="Input.CheckOut" type="date" class="form-control"
+                                   min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" required />
+                            <span asp-validation-for="Input.CheckOut" class="field-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Input.NumberOfGuests"><i class="fas fa-users"></i> Number of Guests</label>
+                        <input asp-for="Input.NumberOfGuests" type="number" class="form-control"
+                               min="1" max="@Model.Room.MaxOccupancy" value="1" required />
+                        <span asp-validation-for="Input.NumberOfGuests" class="field-error"></span>
+                    </div>
+
+                    <div class="price-estimate" id="price-estimate">
+                        <div class="price-label">Estimated Total</div>
+                        <div class="price-formula">
+                            $@Model.Room.PricePerNight.ToString("N0") × <span id="nights-count">1</span> nights
+                        </div>
+                        <div class="price-total" id="total-price">$@Model.Room.PricePerNight.ToString("N0")</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full btn-lg">
+                        <i class="fas fa-check"></i> Confirm Booking
+                    </button>
+                </form>
+            }
+            else
+            {
+                <div class="alert alert-danger">Room not found or unavailable.</div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+    const pricePerNight = @(Model.Room?.PricePerNight ?? 0);
+    function updatePrice() {
+        const ci = document.querySelector('[name="Input.CheckIn"]').value;
+        const co = document.querySelector('[name="Input.CheckOut"]').value;
+        if (ci && co) {
+            const nights = Math.round((new Date(co) - new Date(ci)) / 86400000);
+            if (nights > 0) {
+                document.getElementById('nights-count').textContent = nights;
+                document.getElementById('total-price').textContent = '$' + (pricePerNight * nights).toLocaleString();
+            }
+        }
+    }
+    document.querySelector('[name="Input.CheckIn"]')?.addEventListener('change', updatePrice);
+    document.querySelector('[name="Input.CheckOut"]')?.addEventListener('change', updatePrice);
+    </script>
+}

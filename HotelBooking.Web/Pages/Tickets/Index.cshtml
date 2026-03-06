@@ -1,0 +1,98 @@
+@page
+@model HotelBooking.Web.Pages.Tickets.IndexModel
+@{
+    ViewData["Title"] = "Support Tickets";
+}
+
+<div class="page-container">
+    <div class="page-header-row">
+        <div class="page-header">
+            <h1><i class="fas fa-headset"></i> Support Tickets</h1>
+            <p>Track the status of your requests</p>
+        </div>
+        <a href="/Tickets/Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Ticket
+        </a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-@(Model.IsError ? "danger" : "success")">@Model.Message</div>
+    }
+
+    <div id="tickets-container">
+        @if (!Model.Tickets.Any())
+        {
+            <div class="empty-state">
+                <i class="fas fa-ticket-alt"></i>
+                <p>No support tickets yet.</p>
+                <a href="/Tickets/Create" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Open a Ticket
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="tickets-list">
+                @foreach (var ticket in Model.Tickets)
+                {
+                    <div class="ticket-card" id="ticket-@ticket.Id">
+                        <div class="ticket-header">
+                            <div class="ticket-meta">
+                                <span class="ticket-id">#@ticket.Id</span>
+                                <span class="badge badge-category">@ticket.Category</span>
+                                <span class="badge badge-priority-@ticket.Priority.ToLower()">@ticket.Priority</span>
+                            </div>
+                            <span class="badge badge-status-@ticket.Status.ToLower()">@ticket.Status</span>
+                        </div>
+                        <h3 class="ticket-subject">@ticket.Subject</h3>
+                        <p class="ticket-desc">@(ticket.Description.Length > 120 ? ticket.Description[..120] + "..." : ticket.Description)</p>
+                        <div class="ticket-footer">
+                            @if (ticket.AssignedToName != null)
+                            {
+                                <span><i class="fas fa-user-tie"></i> Assigned to @ticket.AssignedToName</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted"><i class="fas fa-clock"></i> Awaiting assignment</span>
+                            }
+                            <span><i class="fas fa-calendar"></i> @ticket.CreatedAt.ToString("MMM dd, yyyy")</span>
+
+                            @if (ticket.Status == "Resolved" || ticket.Status == "InProgress")
+                            {
+                                <form method="post" asp-page-handler="UpdateStatus" class="inline-form">
+                                    <input type="hidden" name="ticketId" value="@ticket.Id" />
+                                    @if (ticket.Status == "Resolved")
+                                    {
+                                        <input type="hidden" name="newStatus" value="Closed" />
+                                        <button type="submit" class="btn btn-sm btn-success">
+                                            <i class="fas fa-check"></i> Mark Closed
+                                        </button>
+                                        <input type="hidden" name="newStatus2" value="Open" />
+                                        <button type="submit" formaction="?handler=Reopen" class="btn btn-sm btn-outline">
+                                            <i class="fas fa-redo"></i> Reopen
+                                        </button>
+                                    }
+                                </form>
+                            }
+                            @if (ticket.Status == "Open")
+                            {
+                                <form method="post" asp-page-handler="UpdateStatus" class="inline-form">
+                                    <input type="hidden" name="ticketId" value="@ticket.Id" />
+                                    <input type="hidden" name="newStatus" value="Closed" />
+                                    <button type="submit" class="btn btn-sm btn-outline btn-sm-danger">
+                                        <i class="fas fa-times"></i> Close
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/signalr-ticket.js"></script>
+}

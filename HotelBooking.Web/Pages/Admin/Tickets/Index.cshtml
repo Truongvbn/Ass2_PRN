@@ -1,0 +1,79 @@
+@page
+@model HotelBooking.Web.Pages.Admin.Tickets.IndexModel
+@{
+    ViewData["Title"] = "Admin — Tickets";
+}
+
+<div class="page-container">
+    <div class="page-header">
+        <h1><i class="fas fa-headset"></i> Support Ticket Management</h1>
+        <p>Manage and respond to customer support requests</p>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-@(Model.IsError ? "danger" : "success")">@Model.Message</div>
+    }
+
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Customer</th>
+                    <th>Category</th>
+                    <th>Subject</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Assigned To</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in Model.Tickets)
+                {
+                    <tr id="ticket-row-@t.Id">
+                        <td>@t.Id</td>
+                        <td>@t.UserName</td>
+                        <td><span class="badge badge-category">@t.Category</span></td>
+                        <td>@t.Subject</td>
+                        <td><span class="badge badge-priority-@t.Priority.ToLower()">@t.Priority</span></td>
+                        <td><span class="badge badge-status-@t.Status.ToLower()">@t.Status</span></td>
+                        <td>@(t.AssignedToName ?? "Unassigned")</td>
+                        <td>@t.CreatedAt.ToString("MMM dd")</td>
+                        <td class="actions-cell">
+                            @if (t.AssignedToName == null && (t.Status == "Open"))
+                            {
+                                <form method="post" asp-page-handler="Assign" class="inline-form">
+                                    <input type="hidden" name="ticketId" value="@t.Id" />
+                                    <button class="btn btn-sm btn-outline"><i class="fas fa-user-plus"></i> Assign Me</button>
+                                </form>
+                            }
+                            @if (t.Status == "Open" || t.Status == "InProgress")
+                            {
+                                <form method="post" asp-page-handler="UpdateStatus" class="inline-form">
+                                    <input type="hidden" name="ticketId" value="@t.Id" />
+                                    @if (t.Status == "Open")
+                                    {
+                                        <input type="hidden" name="newStatus" value="InProgress" />
+                                        <button class="btn btn-sm btn-primary"><i class="fas fa-play"></i> Start</button>
+                                    }
+                                    else
+                                    {
+                                        <input type="hidden" name="newStatus" value="Resolved" />
+                                        <button class="btn btn-sm btn-success"><i class="fas fa-check"></i> Resolve</button>
+                                    }
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/signalr-ticket.js"></script>
+}

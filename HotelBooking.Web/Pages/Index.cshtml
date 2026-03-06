@@ -1,0 +1,65 @@
+﻿@page
+@model HotelBooking.Web.Pages.IndexModel
+@{
+    ViewData["Title"] = "Luxury Hotel Experience";
+}
+
+<div class="hero">
+    <div class="hero-content">
+        <p class="hero-eyebrow">Welcome to Grand Azure</p>
+        <h1 class="hero-title">Where Luxury<br>Meets Comfort</h1>
+        <p class="hero-subtitle">Experience world-class hospitality in the heart of the city.</p>
+        <div class="hero-actions">
+            <a href="/Rooms" class="btn btn-primary btn-hero">
+                <i class="fas fa-search"></i> Explore Rooms
+            </a>
+            @if (!SignInManager.IsSignedIn(User))
+            {
+                <a href="/Account/Register" class="btn btn-outline-light btn-hero">
+                    <i class="fas fa-user-plus"></i> Join Us
+                </a>
+            }
+        </div>
+    </div>
+    <div class="hero-scroll-hint">
+        <i class="fas fa-chevron-down"></i>
+    </div>
+</div>
+
+<section class="section-features">
+    <div class="section-container">
+        <h2 class="section-title">Why Choose Grand Azure?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-star"></i></div>
+                <h3>5-Star Experience</h3>
+                <p>Award-winning luxury service tailored to your every need.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-wifi"></i></div>
+                <h3>Premium Amenities</h3>
+                <p>High-speed WiFi, spa, pool, and fine dining all in one place.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-concierge-bell"></i></div>
+                <h3>24/7 Concierge</h3>
+                <p>Our dedicated staff is always available to assist you around the clock.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>Secure Booking</h3>
+                <p>Book with confidence — flexible cancellation and secure payment.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-cta">
+    <div class="section-container">
+        <h2>Ready to Experience Luxury?</h2>
+        <p>Browse our curated collection of rooms and suites.</p>
+        <a href="/Rooms" class="btn btn-primary btn-lg">
+            <i class="fas fa-bed"></i> View All Rooms
+        </a>
+    </div>
+</section>
