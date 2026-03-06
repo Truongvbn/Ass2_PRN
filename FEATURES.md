@@ -229,12 +229,23 @@ Room ──┬── has ──→ Booking
 |------|----------|----------|
 | **RoomTypes** | 5 | Standard, Deluxe, Suite, Penthouse, Villa |
 | **Rooms** | 20 | Đầy đủ mô tả, giá, tiện nghi, ảnh |
-| **Users** | 3 | admin@hotel.com, staff@hotel.com, customer@hotel.com |
-| **Bookings** | 4 | Nhiều status: Pending, Confirmed, Completed |
-| **Payments** | 3 | Liên kết với bookings |
-| **Reviews** | 2 | Kèm star rating |
-| **Comments** | 3 | Dưới các reviews |
-| **Tickets** | 3 | Open, InProgress, Resolved |
+| **Users** | 5 | admin@hotel.com, staff@hotel.com, customer1->3@hotel.com |
+| **Bookings** | 10 | Nhiều status: Pending, Confirmed, Completed |
+| **Payments** | 10 | Liên kết với bookings |
+| **Reviews** | 15 | Kèm star rating |
+| **Comments** | 17 | Dưới các reviews |
+| **Tickets** | 5 | Open, InProgress, Resolved |
+
+---
+
+## 🧪 E2E Tested & Verified Flows (Thực hiện bởi AI Browser Subagent)
+
+Toàn bộ hệ thống đã được test chéo mô phỏng người dùng thật trên trình duyệt:
+1. **Flow Đặt phòng (Customer + Admin)**: Tìm phòng ➔ Xem giá live ➔ Book ➔ Xác nhận qua Admin ➔ Cập nhật UI qua SignalR. (**Pass ✅**)
+2. **Flow Hỗ trợ (Tickets)**: Mở Ticket ➔ Admin/Staff (Assign to Me) ➔ Cập nhật trạng thái In Progress/Resolved. (**Pass ✅**)
+3. **Flow Đánh giá (Reviews & Comments)**: Khách hàng ở xong để lại Review ➔ Đăng Comment dưới Review (vá lỗi `asp-route-id`). (**Pass ✅**)
+4. **Flow AI Concierge**: Gõ câu hỏi tại giao diện chi tiết phòng ➔ Fetch API ➔ Phản hồi lại bong bóng chat. (**Pass ✅**)
+5. **Admin Quản lý Phòng**: Create / Edit phòng ➔ Áp dụng lưu Database. (**Pass ✅**)
 
 **Mật khẩu tất cả tài khoản:** `Hotel@123`
 

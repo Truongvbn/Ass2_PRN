@@ -62,8 +62,9 @@ builder.Services.AddScoped<ITicketHubNotifier, TicketHubNotifier>();
 // ── SignalR ──
 builder.Services.AddSignalR();
 
-// ── Razor Pages ──
+// ── Razor Pages & Controllers ──
 builder.Services.AddRazorPages();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -82,6 +83,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapRazorPages();
+app.MapControllers();
 
 // ── SignalR Hub Endpoints ──
 app.MapHub<BookingHub>("/hubs/booking");

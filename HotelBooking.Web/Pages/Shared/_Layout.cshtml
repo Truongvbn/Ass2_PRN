@@ -20,7 +20,7 @@
                 <a href="/Rooms" class="nav-link"><i class="fas fa-door-open"></i> Rooms</a>
                 @if (SignInManager.IsSignedIn(User))
                 {
-                    <a href="/Booking" class="nav-link"><i class="fas fa-calendar-check"></i> My Bookings</a>
+                    <a href="/Booking/MyBookings" class="nav-link"><i class="fas fa-calendar-check"></i> My Bookings</a>
                     <a href="/Tickets" class="nav-link"><i class="fas fa-headset"></i> Support</a>
                     @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
                     {

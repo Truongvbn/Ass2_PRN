@@ -88,7 +88,7 @@ else
                                     <small class="review-date">@review.CreatedAt.ToString("MMM dd, yyyy")</small>
                                     @if (currentUserId == await UserManager.FindByNameAsync(review.UserName).ContinueWith(t => t.Result?.Id) || isAdminOrStaff)
                                     {
-                                        <form method="post" asp-page-handler="DeleteReview" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this review?');">
+                                        <form method="post" asp-page-handler="DeleteReview" asp-route-id="@room.Id" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this review?');">
                                             <input type="hidden" name="reviewId" value="@review.Id" />
                                             <button type="submit" class="btn btn-sm btn-danger ml-2" title="Delete Review"><i class="fas fa-trash"></i></button>
                                         </form>
@@ -107,7 +107,7 @@ else
                                                 </div>
                                                 @if (currentUserId == await UserManager.FindByNameAsync(comment.UserName).ContinueWith(t => t.Result?.Id) || isAdminOrStaff)
                                                 {
-                                                    <form method="post" asp-page-handler="DeleteComment" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                                                    <form method="post" asp-page-handler="DeleteComment" asp-route-id="@room.Id" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this comment?');">
                                                         <input type="hidden" name="commentId" value="@comment.Id" />
                                                         <button type="submit" class="btn btn-sm text-danger" title="Delete Comment"><i class="fas fa-times"></i></button>
                                                     </form>
@@ -118,7 +118,7 @@ else
                                 </div>
                                 @if (SignInManager.IsSignedIn(User))
                                 {
-                                    <form method="post" asp-page-handler="AddComment" class="comment-form">
+                                    <form method="post" asp-page-handler="AddComment" asp-route-id="@room.Id" class="comment-form">
                                         <input type="hidden" name="reviewId" value="@review.Id" />
                                         <div class="comment-input-row">
                                             <input type="text" name="content" class="form-control" placeholder="Add a comment..." required />
