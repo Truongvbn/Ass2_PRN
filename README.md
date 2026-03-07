@@ -1,12 +1,12 @@
-# 🏨 Grand Azure Hotel Management System
+# Grand Azure Hotel Management System
 
-A luxurious, full-stack **.NET 10** web application for premium hotel bookings, real-time support, and administrative control.
+A **.NET 10** web application for premium hotel bookings, real-time support, and administrative control.
 
-Built with **N-Tier Architecture** (Data → Business → Web), **ASP.NET Core Razor Pages**, **Entity Framework Core**, **SignalR**, and **AutoMapper**.
+Built with **N-Tier Architecture** (Data -> Business -> Web), **ASP.NET Core Razor Pages**, **Entity Framework Core**, **SignalR**, and **AutoMapper**.
 
 ---
 
-## 📐 Architecture
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -24,21 +24,21 @@ Built with **N-Tier Architecture** (Data → Business → Web), **ASP.NET Core R
 ```
 
 ### Design Patterns
-- **Repository Pattern** — Generic + domain-specific repos
-- **Service Layer** — Business logic with `ServiceResult<T>` return type
-- **DTO Pattern** — Decouples entities from presentation
-- **AutoMapper** — Entity ↔ DTO mapping
-- **Dependency Injection** — All services registered in `Program.cs`
+- **Repository Pattern** - Generic + domain-specific repos
+- **Service Layer** - Business logic with `ServiceResult<T>` return type
+- **DTO Pattern** - Decouples entities from presentation
+- **AutoMapper** - Entity to DTO mapping
+- **Dependency Injection** - All services registered in `Program.cs`
 
 ---
 
-## 🌟 Detailed Features & Flows
+## Detailed Features & Flows
 
-### 1. 🔐 Authentication & Authorization (ASP.NET Identity)
+### 1. Authentication & Authorization (ASP.NET Identity)
 
 **Flow:**
 ```
-Register → Login → Role-based access → Logout
+Register -> Login -> Role-based access -> Logout
 ```
 
 - **3 Roles:** Customer, Staff, Admin
@@ -49,11 +49,11 @@ Register → Login → Role-based access → Logout
 
 ---
 
-### 2. 🛏️ Room Browsing & Search
+### 2. Room Browsing & Search
 
 **Flow:**
 ```
-Home Page → Rooms List (search/filter) → Room Detail (reviews + AI concierge)
+Home Page -> Rooms List (search/filter) -> Room Detail (reviews + AI concierge)
 ```
 
 **Features:**
@@ -66,17 +66,17 @@ Home Page → Rooms List (search/filter) → Room Detail (reviews + AI concierge
 
 **Service Methods:**
 - `SearchRoomsAsync(roomTypeId?, minPrice?, maxPrice?, minOccupancy?, checkIn?, checkOut?)`
-- `GetRoomByIdAsync(id)` — includes average rating + review count
-- `GetRoomTypesAsync()` — for dropdown filters
+- `GetRoomByIdAsync(id)` - includes average rating + review count
+- `GetRoomTypesAsync()` - for dropdown filters
 
 ---
 
-### 3. 📅 Booking Flow
+### 3. Booking Flow
 
 **Flow:**
 ```
-Room Detail → "Book Now" → Login (if needed) → Booking Form → 
-Live Price Calculator → Submit → Confirmation Page → My Bookings
+Room Detail -> "Book Now" -> Login (if needed) -> Booking Form -> 
+Live Price Calculator -> Submit -> Confirmation Page -> My Bookings
 ```
 
 **Features:**
@@ -84,44 +84,44 @@ Live Price Calculator → Submit → Confirmation Page → My Bookings
 - **Guest Count Validation:** Cannot exceed room's `MaxOccupancy`
 - **Date Validation:** Check-in must be today or later, check-out must be after check-in
 - **Overlap Prevention:** Business layer checks for conflicting bookings on the same room
-- **Booking Statuses:** `Pending` → `Confirmed` → `Completed` (or `Cancelled`)
+- **Booking Statuses:** `Pending` -> `Confirmed` -> `Completed` (or `Cancelled`)
 - **My Bookings Page:** Lists all user bookings with status badges, option to cancel pending bookings
 - **SignalR Real-time:** When a booking is created, admin dashboard updates instantly
 
 **Service Methods:**
-- `CreateBookingAsync(dto, userId)` — validates dates, overlap, calculates price
-- `GetUserBookingsAsync(userId)` — customer's booking history
-- `GetAllBookingsAsync()` — admin view of all bookings
-- `ConfirmBookingAsync(id)` — admin confirms a pending booking
-- `CancelBookingAsync(id, userId)` — customer cancels their own booking
-- `CompleteBookingAsync(id)` — admin marks stay as completed
+- `CreateBookingAsync(dto, userId)` - validates dates, overlap, calculates price
+- `GetUserBookingsAsync(userId)` - customer's booking history
+- `GetAllBookingsAsync()` - admin view of all bookings
+- `ConfirmBookingAsync(id)` - admin confirms a pending booking
+- `CancelBookingAsync(id, userId)` - customer cancels their own booking
+- `CompleteBookingAsync(id)` - admin marks stay as completed
 
 ---
 
-### 4. 💳 Payment Processing
+### 4. Payment Processing
 
 **Flow:**
 ```
-Booking Created → Payment Record Auto-generated → Admin Confirms → Payment Marked Paid
+Booking Created -> Payment Record Auto-generated -> Admin Confirms -> Payment Marked Paid
 ```
 
 **Features:**
 - Payment records linked 1:1 with bookings
 - Payment methods: `CreditCard`, `DebitCard`, `BankTransfer`, `Cash`
-- Payment statuses: `Pending` → `Completed` (or `Failed`, `Refunded`)
+- Payment statuses: `Pending` -> `Completed` (or `Failed`, `Refunded`)
 
 **Service Methods:**
-- `ProcessPaymentAsync(dto)` — processes payment for a booking
-- `GetPaymentByBookingAsync(bookingId)` — retrieves payment details
+- `ProcessPaymentAsync(dto)` - processes payment for a booking
+- `GetPaymentByBookingAsync(bookingId)` - retrieves payment details
 
 ---
 
-### 5. ⭐ Reviews & Comments
+### 5. Reviews & Comments
 
 **Flow:**
 ```
-Complete a Stay → Room Detail → Write Review (1-5 stars + text) → 
-Other users see review → Anyone can comment on reviews
+Complete a Stay -> Room Detail -> Write Review (1-5 stars + text) -> 
+Other users see review -> Anyone can comment on reviews
 ```
 
 **Features:**
@@ -133,50 +133,50 @@ Other users see review → Anyone can comment on reviews
 - **SignalR Real-time:** New reviews appear instantly on the room detail page
 
 **Service Methods:**
-- `CreateReviewAsync(dto, userId)` — creates review with rating validation
-- `UpdateReviewAsync(dto, userId)` — user can edit their own review
-- `DeleteReviewAsync(id, userId, isAdmin)` — soft delete (owner or admin)
-- `GetRoomReviewsAsync(roomId)` — all reviews with nested comments
-- `AddCommentAsync(dto, userId)` — add comment to a review
-- `DeleteCommentAsync(id, userId, isAdmin)` — soft delete comment
+- `CreateReviewAsync(dto, userId)` - creates review with rating validation
+- `UpdateReviewAsync(dto, userId)` - user can edit their own review
+- `DeleteReviewAsync(id, userId, isAdmin)` - soft delete (owner or admin)
+- `GetRoomReviewsAsync(roomId)` - all reviews with nested comments
+- `AddCommentAsync(dto, userId)` - add comment to a review
+- `DeleteCommentAsync(id, userId, isAdmin)` - soft delete comment
 
 ---
 
-### 6. 🎫 Support Ticket System
+### 6. Support Ticket System
 
 **Flow (Customer):**
 ```
-Tickets Page → Create Ticket (category + priority + description) → Track Status
+Tickets Page -> Create Ticket (category + priority + description) -> Track Status
 ```
 
 **Flow (Staff/Admin):**
 ```
-Admin Tickets → View Open Tickets → "Assign to Me" → 
-Update Status (Open → InProgress → Resolved → Closed)
+Admin Tickets -> View Open Tickets -> "Assign to Me" -> 
+Update Status (Open -> InProgress -> Resolved -> Closed)
 ```
 
 **Features:**
 - **Categories:** `General`, `Maintenance`, `Housekeeping`, `Billing`, `Complaint`
 - **Priorities:** `Low`, `Medium`, `High`, `Critical`
-- **Status Workflow:** `Open` → `InProgress` → `Resolved` → `Closed`
+- **Status Workflow:** `Open` -> `InProgress` -> `Resolved` -> `Closed`
 - **Self-Assignment:** Staff can "Assign to Me" to take ownership
 - **Status Audit:** `CreatedAt`, `UpdatedAt`, `ClosedAt` timestamps tracked
 - **SignalR Real-time:** Status changes appear instantly for both customer and staff
 
 **Service Methods:**
-- `CreateTicketAsync(dto, userId)` — customer creates ticket
-- `GetUserTicketsAsync(userId)` — customer's own tickets
-- `GetActiveTicketsAsync()` — all non-closed tickets (staff view)
-- `AssignTicketAsync(ticketId, staffId)` — staff assigns themselves
-- `UpdateTicketStatusAsync(ticketId, newStatus, userId, isStaff)` — state transition
+- `CreateTicketAsync(dto, userId)` - customer creates ticket
+- `GetUserTicketsAsync(userId)` - customer's own tickets
+- `GetActiveTicketsAsync()` - all non-closed tickets (staff view)
+- `AssignTicketAsync(ticketId, staffId)` - staff assigns themselves
+- `UpdateTicketStatusAsync(ticketId, newStatus, userId, isStaff)` - state transition
 
 ---
 
-### 7. 🤖 AI Concierge (Recommendation Engine)
+### 7. AI Concierge (Recommendation Engine)
 
 **Flow:**
 ```
-Room Detail Page → AI Widget → Enter budget/preferences → 
+Room Detail Page -> AI Widget -> Enter budget/preferences -> 
 Get personalized room recommendations + AI-generated answers
 ```
 
@@ -186,12 +186,12 @@ Get personalized room recommendations + AI-generated answers
 - Integrated as a floating widget on the Room Detail page
 
 **Service Methods:**
-- `RecommendRoomsAsync(preferences)` — filters and ranks rooms
-- `AnswerQuestionAsync(question, roomId?)` — generates contextual answers
+- `RecommendRoomsAsync(preferences)` - filters and ranks rooms
+- `AnswerQuestionAsync(question, roomId?)` - generates contextual answers
 
 ---
 
-### 8. ⚡ Real-time Updates (SignalR)
+### 8. Real-time Updates (SignalR)
 
 **3 Dedicated SignalR Hubs:**
 
@@ -208,31 +208,31 @@ Get personalized room recommendations + AI-generated answers
 
 ---
 
-### 9. 👑 Admin Panel
+### 9. Admin Panel
 
 **Admin has access to 3 management dashboards:**
 
 #### Admin > Rooms (`/Admin/Rooms`)
 - **List all rooms** with type, price, occupancy, availability status
-- **Create new room** — select type, set price, add amenities, upload image URL
-- **Edit room** — update any field including toggling availability
-- **Delete room** — soft delete (sets `IsDeleted = true`)
+- **Create new room** - select type, set price, add amenities, upload image URL
+- **Edit room** - update any field including toggling availability
+- **Delete room** - soft delete (sets `IsDeleted = true`)
 
 #### Admin > Bookings (`/Admin/Bookings`)
 - **View all bookings** with customer name, room, dates, price, status
-- **Confirm** pending bookings → changes status to `Confirmed`
-- **Complete** confirmed bookings → changes status to `Completed`
+- **Confirm** pending bookings -> changes status to `Confirmed`
+- **Complete** confirmed bookings -> changes status to `Completed`
 - Real-time updates when new bookings arrive
 
 #### Admin > Tickets (`/Admin/Tickets`)
 - **View all active tickets** with priority badges, category, status
-- **Assign to Me** — staff takes ownership of a ticket
-- **Update Status** — transition through the status workflow
+- **Assign to Me** - staff takes ownership of a ticket
+- **Update Status** - transition through the status workflow
 - Shows assigned staff name and timestamps
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -245,7 +245,7 @@ Get personalized room recommendations + AI-generated answers
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 HotelBooking/
@@ -278,7 +278,7 @@ HotelBooking/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
@@ -309,52 +309,52 @@ dotnet run --project HotelBooking.Web
 
 ---
 
-## 🔑 Demo Accounts
+## Demo Accounts
 
 **Password for all:** `Hotel@123`
 
 | Role | Email | Access |
 |------|-------|--------|
-| 👑 Admin | `admin@hotel.com` | Full access: Room CRUD, Booking mgmt, Ticket mgmt |
-| 👷 Staff | `staff@hotel.com` | View bookings, Assign & resolve tickets |
-| 🧳 Customer | `customer@hotel.com` | Browse, Book, Review, Submit tickets |
+| Admin | `admin@hotel.com` | Full access: Room CRUD, Booking mgmt, Ticket mgmt |
+| Staff | `staff@hotel.com` | View bookings, Assign & resolve tickets |
+| Customer | `customer@hotel.com` | Browse, Book, Review, Submit tickets |
 
 ---
 
-## 🧪 Testing SignalR Real-Time
+## Testing SignalR Real-Time
 
-1. **Window 1:** Login as `admin@hotel.com` → Go to **Admin > Bookings**
-2. **Window 2 (Incognito):** Login as `customer@hotel.com` → **Rooms** → Book a room
-3. ⚡ Watch Admin window show a **toast notification** instantly — no refresh!
-4. Admin clicks **Confirm** → Customer's **My Bookings** status updates live
+1. **Window 1:** Login as `admin@hotel.com` -> Go to **Admin > Bookings**
+2. **Window 2 (Incognito):** Login as `customer@hotel.com` -> **Rooms** -> Book a room
+3. Watch Admin window show a **toast notification** instantly - no refresh!
+4. Admin clicks **Confirm** -> Customer's **My Bookings** status updates live
 
 Works for **Bookings**, **Reviews**, and **Support Tickets**.
 
 ---
 
-## 📋 All Page Routes
+## All Page Routes
 
-| Route | Auth | Role | Description |
+| Route | Auth Required | Role | Description |
 |-------|:---:|------|-------------|
-| `/` | ❌ | Any | Home page with hero section |
-| `/Rooms` | ❌ | Any | Browse & filter rooms |
-| `/Rooms/Detail?id=X` | ❌ | Any | Room details + reviews + AI concierge |
-| `/Account/Login` | ❌ | Any | Login form |
-| `/Account/Register` | ❌ | Any | Registration form |
-| `/Booking/Create?roomId=X` | ✅ | Customer | Create booking with live price |
-| `/Booking/Confirmation?id=X` | ✅ | Customer | Booking confirmation details |
-| `/Booking/MyBookings` | ✅ | Customer | View & cancel bookings |
-| `/Tickets` | ✅ | Customer/Staff | View tickets |
-| `/Tickets/Create` | ✅ | Customer | Submit support ticket |
-| `/Admin/Rooms` | ✅ | Admin/Staff | Manage rooms |
-| `/Admin/Rooms/Create` | ✅ | Admin/Staff | Add new room |
-| `/Admin/Rooms/Edit?id=X` | ✅ | Admin/Staff | Edit room details |
-| `/Admin/Bookings` | ✅ | Admin/Staff | Confirm/complete bookings |
-| `/Admin/Tickets` | ✅ | Admin/Staff | Assign & resolve tickets |
+| `/` | No | Any | Home page with hero section |
+| `/Rooms` | No | Any | Browse & filter rooms |
+| `/Rooms/Detail?id=X` | No | Any | Room details + reviews + AI concierge |
+| `/Account/Login` | No | Any | Login form |
+| `/Account/Register` | No | Any | Registration form |
+| `/Booking/Create?roomId=X` | Yes | Customer | Create booking with live price |
+| `/Booking/Confirmation?id=X` | Yes | Customer | Booking confirmation details |
+| `/Booking/MyBookings` | Yes | Customer | View & cancel bookings |
+| `/Tickets` | Yes | Customer/Staff | View tickets |
+| `/Tickets/Create` | Yes | Customer | Submit support ticket |
+| `/Admin/Rooms` | Yes | Admin/Staff | Manage rooms |
+| `/Admin/Rooms/Create` | Yes | Admin/Staff | Add new room |
+| `/Admin/Rooms/Edit?id=X` | yes | Admin/Staff | Edit room details |
+| `/Admin/Bookings` | Yes | Admin/Staff | Confirm/complete bookings |
+| `/Admin/Tickets` | Yes | Admin/Staff | Assign & resolve tickets |
 
 ---
 
-## 🔌 Database
+## Database
 
 Connection string in `appsettings.json`:
 ```json
@@ -369,9 +369,3 @@ Connection string in `appsettings.json`:
 - **Auto-seeded** with roles, 5 users, 5 room types, 20 rooms, 10 bookings, 15 reviews, 17 comments, 5 tickets
 - Uses `rowversion` for optimistic concurrency on Rooms and Bookings
 - Soft delete pattern on Rooms, Reviews, and Comments
-
----
-
-## 📄 License
-
-This project is for educational purposes.
