@@ -38,6 +38,16 @@ public class IndexModel(
         return Page();
     }
 
+    public async Task<IActionResult> OnPostAssignAsync(int ticketId)
+    {
+        var staffId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var result = await ticketService.AssignTicketAsync(ticketId, staffId);
+        Message = result.IsSuccess ? "Ticket assigned to you." : result.ErrorMessage;
+        IsError = !result.IsSuccess;
+        await OnGetAsync();
+        return Page();
+    }
+
     public async Task<IActionResult> OnPostReopenAsync(int ticketId)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;

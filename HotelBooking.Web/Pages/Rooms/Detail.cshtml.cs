@@ -19,6 +19,11 @@ public class DetailModel(
 
     public async Task OnGetAsync(int id)
     {
+        if (TempData.ContainsKey("Error"))
+            ErrorMessage = TempData["Error"]?.ToString();
+        if (TempData.ContainsKey("Success"))
+            SuccessMessage = TempData["Success"]?.ToString();
+
         var roomResult = await roomService.GetRoomByIdAsync(id);
         if (!roomResult.IsSuccess) return;
         Room = roomResult.Data;

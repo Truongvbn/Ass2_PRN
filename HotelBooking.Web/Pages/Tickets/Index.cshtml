@@ -58,32 +58,64 @@
                             }
                             <span><i class="fas fa-calendar"></i> @ticket.CreatedAt.ToString("MMM dd, yyyy")</span>
 
-                            @if (ticket.Status == "Resolved" || ticket.Status == "InProgress")
-                            {
-                                <form method="post" asp-page-handler="UpdateStatus" class="inline-form">
-                                    <input type="hidden" name="ticketId" value="@ticket.Id" />
-                                    @if (ticket.Status == "Resolved")
-                                    {
-                                        <input type="hidden" name="newStatus" value="Closed" />
-                                        <button type="submit" class="btn btn-sm btn-success">
-                                            <i class="fas fa-check"></i> Mark Closed
-                                        </button>
-                                        <input type="hidden" name="newStatus2" value="Open" />
-                                        <button type="submit" formaction="?handler=Reopen" class="btn btn-sm btn-outline">
-                                            <i class="fas fa-redo"></i> Reopen
-                                        </button>
-                                    }
-                                </form>
+                            @{
+                                var isStaff = User.IsInRole("Admin") || User.IsInRole("Staff");
                             }
-                            @if (ticket.Status == "Open")
+                            @if (isStaff)
                             {
-                                <form method="post" asp-page-handler="UpdateStatus" class="inline-form">
-                                    <input type="hidden" name="ticketId" value="@ticket.Id" />
-                                    <input type="hidden" name="newStatus" value="Closed" />
-                                    <button type="submit" class="btn btn-sm btn-outline btn-sm-danger">
-                                        <i class="fas fa-times"></i> Close
-                                    </button>
-                                </form>
+                                @if (ticket.AssignedToName == null && ticket.Status == "Open")
+                                {
+                                    <form method="post" asp-page-handler="Assign" class="inline-form">
+                                        <input type="hidden" name="ticketId" value="@ticket.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline"><i class="fas fa-user-plus"></i> Assign Me</button>
+                                    </form>
+                                }
+                                @if (ticket.Status == "Open" || ticket.Status == "InProgress")
+                                {
+                                    <form method="post" asp-page-handler="UpdateStatus" class="inline-form">
+                                        <input type="hidden" name="ticketId" value="@ticket.Id" />
+                                        @if (ticket.Status == "Open")
+                                        {
+                                            <input type="hidden" name="newStatus" value="InProgress" />
+                                            <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-play"></i> Start</button>
+                                        }
+                                        else
+                                        {
+                                            <input type="hidden" name="newStatus" value="Resolved" />
+                                            <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Resolve</button>
+                                        }
+                                    </form>
+                                }
+                            }
+                            else
+                            {
+                                @if (ticket.Status == "Resolved" || ticket.Status == "InProgress")
+                                {
+                                    <form method="post" asp-page-handler="UpdateStatus" class="inline-form">
+                                        <input type="hidden" name="ticketId" value="@ticket.Id" />
+                                        @if (ticket.Status == "Resolved")
+                                        {
+                                            <input type="hidden" name="newStatus" value="Closed" />
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                <i class="fas fa-check"></i> Mark Closed
+                                            </button>
+                                            <input type="hidden" name="newStatus2" value="Open" />
+                                            <button type="submit" formaction="?handler=Reopen" class="btn btn-sm btn-outline">
+                                                <i class="fas fa-redo"></i> Reopen
+                                            </button>
+                                        }
+                                    </form>
+                                }
+                                @if (ticket.Status == "Open")
+                                {
+                                    <form method="post" asp-page-handler="UpdateStatus" class="inline-form">
+                                        <input type="hidden" name="ticketId" value="@ticket.Id" />
+                                        <input type="hidden" name="newStatus" value="Closed" />
+                                        <button type="submit" class="btn btn-sm btn-outline btn-sm-danger">
+                                            <i class="fas fa-times"></i> Close
+                                        </button>
+                                    </form>
+                                }
                             }
                         </div>
                     </div>
