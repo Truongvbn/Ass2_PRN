@@ -89,6 +89,16 @@ else
                                     <small class="review-date">@review.CreatedAt.ToString("MMM dd, yyyy")</small>
                                     @if (currentUserId != null && (review.UserName == User.Identity?.Name || isAdminOrStaff))
                                     {
+                                        @if (review.UserName == User.Identity?.Name)
+                                        {
+                                            <button type="button" class="btn btn-sm btn-warning ml-2" title="Edit Review"
+                                                    data-review-id="@review.Id"
+                                                    data-review-rating="@review.Rating"
+                                                    data-review-content="@review.Content"
+                                                    onclick="openEditReviewModal(this)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        }
                                         <form method="post" asp-page-handler="DeleteReview" asp-route-id="@room.Id" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this review?');">
                                             <input type="hidden" name="reviewId" value="@review.Id" />
                                             <button type="submit" class="btn btn-sm btn-danger ml-2" title="Delete Review"><i class="fas fa-trash"></i></button>
@@ -215,9 +225,57 @@ else
     </div>
 }
 
+<!-- Edit Review Modal -->
+<div id="edit-review-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+    <div style="background:#fff; max-width:500px; margin:10% auto; padding:2rem; border-radius:8px; position:relative;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3 style="margin:0;"><i class="fas fa-edit"></i> Edit Your Review</h3>
+            <button type="button" onclick="closeEditReviewModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+        </div>
+        <form method="post" asp-page-handler="UpdateReview" asp-route-id="@(Model.Room?.Id ?? 0)">
+            <input type="hidden" id="edit-review-id" name="reviewId" />
+            <div class="form-group">
+                <label>Rating</label>
+                <div class="star-rating-input">
+                    @for (int i = 5; i >= 1; i--)
+                    {
+                        <input type="radio" id="edit-star@i" name="rating" value="@i" required />
+                        <label for="edit-star@i"><i class="fas fa-star"></i></label>
+                    }
+                </div>
+            </div>
+            <div class="form-group">
+                <textarea id="edit-review-content" name="content" class="form-control" rows="4"
+                          placeholder="Update your review..." required minlength="10" maxlength="2000"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+                <button type="button" class="btn btn-outline" onclick="closeEditReviewModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 @section Scripts {
     <script src="~/js/signalr-review.js"></script>
     <script>
+    function openEditReviewModal(btn) {
+        const reviewId = btn.getAttribute('data-review-id');
+        const rating = btn.getAttribute('data-review-rating');
+        const content = btn.getAttribute('data-review-content');
+        document.getElementById('edit-review-id').value = reviewId;
+        document.getElementById('edit-review-content').value = content;
+        const star = document.getElementById('edit-star' + rating);
+        if (star) star.checked = true;
+        document.getElementById('edit-review-modal').style.display = 'block';
+    }
+    function closeEditReviewModal() {
+        document.getElementById('edit-review-modal').style.display = 'none';
+    }
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('edit-review-modal');
+        if (event.target === modal) closeEditReviewModal();
+    });
     async function askAI(roomId) {
         const q = document.getElementById('ai-question').value.trim();
         if (!q) return;

@@ -28,6 +28,15 @@ public class IndexModel(IBookingService bookingService) : PageModel
         return Page();
     }
 
+    public async Task<IActionResult> OnPostCancelAsync(int bookingId)
+    {
+        var result = await bookingService.AdminCancelBookingAsync(bookingId);
+        Message = result.IsSuccess ? "Booking cancelled." : result.ErrorMessage;
+        IsError = !result.IsSuccess;
+        await OnGetAsync();
+        return Page();
+    }
+
     public async Task<IActionResult> OnPostCompleteAsync(int bookingId)
     {
         var result = await bookingService.CompleteBookingAsync(bookingId);

@@ -36,7 +36,7 @@ public class EditModel(IRoomService roomService) : PageModel
             var r = result.Data;
             Input = new InputModel
             {
-                Id = r.Id, Name = r.Name, RoomTypeId = RoomTypes.FirstOrDefault()?.Id ?? 0,
+                Id = r.Id, Name = r.Name, RoomTypeId = r.RoomTypeId,
                 PricePerNight = r.PricePerNight, MaxOccupancy = r.MaxOccupancy,
                 ImageUrl = r.ImageUrl, Amenities = r.Amenities, Description = r.Description,
                 IsAvailable = r.IsAvailable
