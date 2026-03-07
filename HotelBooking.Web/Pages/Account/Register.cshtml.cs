@@ -1,14 +1,11 @@
-using HotelBooking.Data.Entities;
-using Microsoft.AspNetCore.Identity;
+using HotelBooking.Business.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 
 namespace HotelBooking.Web.Pages.Account;
 
-public class RegisterModel(
-    UserManager<ApplicationUser> userManager,
-    SignInManager<ApplicationUser> signInManager) : PageModel
+public class RegisterModel(IAuthService authService) : PageModel
 {
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -35,26 +32,14 @@ public class RegisterModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid) return Page();
-
-        var user = new ApplicationUser
+        var result = await authService.RegisterAsync(Input.Email, Input.Password, Input.FullName);
+        
+        if (result.IsSuccess)
         {
-            UserName = Input.Email,
-            Email = Input.Email,
-            FullName = Input.FullName,
-            PhoneNumber = Input.PhoneNumber
-        };
-
-        var result = await userManager.CreateAsync(user, Input.Password);
-        if (result.Succeeded)
-        {
-            await userManager.AddToRoleAsync(user, "Customer");
-            await signInManager.SignInAsync(user, isPersistent: false);
             return RedirectToPage("/Index");
         }
 
-        foreach (var error in result.Errors)
-            ModelState.AddModelError(string.Empty, error.Description);
+        ModelState.AddModelError(string.Empty, result.ErrorMessage ?? "Registration failed.");
 
         return Page();
     }

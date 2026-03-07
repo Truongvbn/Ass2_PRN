@@ -1,8 +1,7 @@
 using HotelBooking.Business.DTOs;
 using HotelBooking.Business.Services.Interfaces;
-using HotelBooking.Data.Entities;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
@@ -11,8 +10,7 @@ namespace HotelBooking.Web.Pages.Tickets;
 
 [Authorize]
 public class CreateModel(
-    ITicketService ticketService,
-    UserManager<ApplicationUser> userManager) : PageModel
+    ITicketService ticketService) : PageModel
 {
     [BindProperty] public InputModel Input { get; set; } = new();
     public string? ErrorMessage { get; set; }
@@ -30,7 +28,7 @@ public class CreateModel(
     {
         if (!ModelState.IsValid) return Page();
 
-        var userId = userManager.GetUserId(User)!;
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var dto = new CreateTicketDto { Category = Input.Category, Subject = Input.Subject, Description = Input.Description };
         var result = await ticketService.CreateTicketAsync(dto, userId);
 

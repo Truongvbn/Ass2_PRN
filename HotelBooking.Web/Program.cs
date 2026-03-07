@@ -1,3 +1,4 @@
+using HotelBooking.Business;
 using HotelBooking.Business.Mappings;
 using HotelBooking.Business.Services;
 using HotelBooking.Business.Services.Interfaces;
@@ -11,48 +12,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── Data Layer ──
-builder.Services.AddDbContext<HotelDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// ── Identity ──
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-{
-    options.Password.RequiredLength = 6;
-    options.Password.RequireDigit = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireNonAlphanumeric = true;
-    options.SignIn.RequireConfirmedAccount = false;
-})
-.AddEntityFrameworkStores<HotelDbContext>()
-.AddDefaultTokenProviders();
-
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.LoginPath = "/Account/Login";
-    options.AccessDeniedPath = "/Account/AccessDenied";
-    options.ExpireTimeSpan = TimeSpan.FromDays(7);
-});
-
-// ── Repositories (Data Layer) ──
-builder.Services.AddScoped<IRoomRepository, RoomRepository>();
-builder.Services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
-builder.Services.AddScoped<IBookingRepository, BookingRepository>();
-builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
-builder.Services.AddScoped<IReviewCommentRepository, ReviewCommentRepository>();
-builder.Services.AddScoped<ITicketRepository, TicketRepository>();
-builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-
-// ── AutoMapper ──
-builder.Services.AddAutoMapper(typeof(MappingProfile));
-
-// ── Services (Business Layer) ──
-builder.Services.AddScoped<IRoomService, RoomService>();
-builder.Services.AddScoped<IBookingService, BookingService>();
-builder.Services.AddScoped<IReviewService, ReviewService>();
-builder.Services.AddScoped<ITicketService, TicketService>();
-builder.Services.AddScoped<IPaymentService, PaymentService>();
-builder.Services.AddScoped<IAiAssistantService, MockAiAssistantService>();
+// ── Business & Data Layers ──
+builder.Services.AddBusinessLayer(builder.Configuration);
 
 // ── SignalR Notifiers ──
 builder.Services.AddScoped<IBookingHubNotifier, BookingHubNotifier>();

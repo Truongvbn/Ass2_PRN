@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="HotelBooking.Business/HotelBooking.Business.csproj" />
   <Project Path="HotelBooking.Data/HotelBooking.Data.csproj" />
+  <Project Path="HotelBooking.Tests/HotelBooking.Tests.csproj" />
   <Project Path="HotelBooking.Web/HotelBooking.Web.csproj" />
 </Solution>

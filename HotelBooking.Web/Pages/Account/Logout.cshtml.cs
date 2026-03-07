@@ -1,15 +1,14 @@
-using HotelBooking.Data.Entities;
-using Microsoft.AspNetCore.Identity;
+using HotelBooking.Business.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace HotelBooking.Web.Pages.Account;
 
-public class LogoutModel(SignInManager<ApplicationUser> signInManager) : PageModel
+public class LogoutModel(IAuthService authService) : PageModel
 {
     public async Task<IActionResult> OnPostAsync()
     {
-        await signInManager.SignOutAsync();
+        await authService.LogoutAsync();
         return RedirectToPage("/Index");
     }
 }

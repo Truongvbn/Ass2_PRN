@@ -1,7 +1,6 @@
 using HotelBooking.Business.DTOs;
 using HotelBooking.Business.Services.Interfaces;
-using HotelBooking.Data.Entities;
-using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -10,8 +9,7 @@ namespace HotelBooking.Web.Pages.Rooms;
 public class DetailModel(
     IRoomService roomService,
     IReviewService reviewService,
-    IBookingService bookingService,
-    UserManager<ApplicationUser> userManager) : PageModel
+    IBookingService bookingService) : PageModel
 {
     public RoomDto? Room { get; set; }
     public IReadOnlyList<ReviewDto> Reviews { get; set; } = [];
@@ -30,7 +28,7 @@ public class DetailModel(
 
         if (User.Identity?.IsAuthenticated == true)
         {
-            var userId = userManager.GetUserId(User)!;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var bookingsResult = await bookingService.GetUserBookingsAsync(userId);
             CanReview = bookingsResult.IsSuccess &&
                         bookingsResult.Data!.Any(b => b.RoomId == id && b.Status == "Completed");
@@ -42,7 +40,7 @@ public class DetailModel(
         if (!User.Identity!.IsAuthenticated)
             return RedirectToPage("/Account/Login");
 
-        var userId = userManager.GetUserId(User)!;
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await reviewService.CreateReviewAsync(
             new CreateReviewDto { RoomId = roomId, Rating = rating, Content = content }, userId);
 
@@ -57,7 +55,7 @@ public class DetailModel(
         if (!User.Identity!.IsAuthenticated)
             return RedirectToPage("/Account/Login");
 
-        var userId = userManager.GetUserId(User)!;
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         await reviewService.AddCommentAsync(new CreateReviewCommentDto { ReviewId = reviewId, Content = content }, userId);
 
         // Get roomId for redirect — find which room the review belongs to
@@ -70,7 +68,7 @@ public class DetailModel(
         if (!User.Identity!.IsAuthenticated)
             return RedirectToPage("/Account/Login");
 
-        var userId = userManager.GetUserId(User)!;
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var isAdmin = User.IsInRole("Admin") || User.IsInRole("Staff");
         var result = await reviewService.DeleteReviewAsync(reviewId, userId, isAdmin);
 
@@ -86,7 +84,7 @@ public class DetailModel(
         if (!User.Identity!.IsAuthenticated)
             return RedirectToPage("/Account/Login");
 
-        var userId = userManager.GetUserId(User)!;
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var isAdmin = User.IsInRole("Admin") || User.IsInRole("Staff");
         var result = await reviewService.DeleteCommentAsync(commentId, userId, isAdmin);
 

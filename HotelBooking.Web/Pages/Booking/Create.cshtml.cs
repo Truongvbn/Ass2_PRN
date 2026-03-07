@@ -1,8 +1,7 @@
 using HotelBooking.Business.DTOs;
 using HotelBooking.Business.Services.Interfaces;
-using HotelBooking.Data.Entities;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
@@ -12,8 +11,7 @@ namespace HotelBooking.Web.Pages.Booking;
 [Authorize]
 public class CreateModel(
     IRoomService roomService,
-    IBookingService bookingService,
-    UserManager<ApplicationUser> userManager) : PageModel
+    IBookingService bookingService) : PageModel
 {
     public RoomDto? Room { get; set; }
     public string? ErrorMessage { get; set; }
@@ -53,7 +51,7 @@ public class CreateModel(
 
         if (!ModelState.IsValid) return Page();
 
-        var userId = userManager.GetUserId(User)!;
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var dto = new CreateBookingDto { RoomId = Input.RoomId, CheckIn = Input.CheckIn, CheckOut = Input.CheckOut, NumberOfGuests = Input.NumberOfGuests };
         var result = await bookingService.CreateBookingAsync(dto, userId);
 

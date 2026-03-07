@@ -1,12 +1,11 @@
-using HotelBooking.Data.Entities;
-using Microsoft.AspNetCore.Identity;
+using HotelBooking.Business.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 
 namespace HotelBooking.Web.Pages.Account;
 
-public class LoginModel(SignInManager<ApplicationUser> signInManager) : PageModel
+public class LoginModel(IAuthService authService) : PageModel
 {
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -35,10 +34,9 @@ public class LoginModel(SignInManager<ApplicationUser> signInManager) : PageMode
         returnUrl ??= Url.Content("~/");
         if (!ModelState.IsValid) return Page();
 
-        var result = await signInManager.PasswordSignInAsync(
-            Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+        var result = await authService.LoginAsync(Input.Email, Input.Password, Input.RememberMe);
 
-        if (result.Succeeded)
+        if (result.IsSuccess)
             return LocalRedirect(returnUrl);
 
         ModelState.AddModelError(string.Empty, "Invalid email or password.");

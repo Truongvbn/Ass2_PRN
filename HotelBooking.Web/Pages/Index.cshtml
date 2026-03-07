@@ -13,7 +13,7 @@
             <a href="/Rooms" class="btn btn-primary btn-hero">
                 <i class="fas fa-search"></i> Explore Rooms
             </a>
-            @if (!SignInManager.IsSignedIn(User))
+            @if (User.Identity?.IsAuthenticated != true)
             {
                 <a href="/Account/Register" class="btn btn-outline-light btn-hero">
                     <i class="fas fa-user-plus"></i> Join Us

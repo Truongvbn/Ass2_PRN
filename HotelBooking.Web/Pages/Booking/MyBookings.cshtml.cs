@@ -1,8 +1,7 @@
 using HotelBooking.Business.DTOs;
 using HotelBooking.Business.Services.Interfaces;
-using HotelBooking.Data.Entities;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -10,8 +9,7 @@ namespace HotelBooking.Web.Pages.Booking;
 
 [Authorize]
 public class MyBookingsModel(
-    IBookingService bookingService,
-    UserManager<ApplicationUser> userManager) : PageModel
+    IBookingService bookingService) : PageModel
 {
     public IReadOnlyList<BookingDto> Bookings { get; set; } = [];
     public string? Message { get; set; }
@@ -19,14 +17,14 @@ public class MyBookingsModel(
 
     public async Task OnGetAsync()
     {
-        var userId = userManager.GetUserId(User)!;
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await bookingService.GetUserBookingsAsync(userId);
         if (result.IsSuccess) Bookings = result.Data!;
     }
 
     public async Task<IActionResult> OnPostCancelAsync(int bookingId)
     {
-        var userId = userManager.GetUserId(User)!;
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var result = await bookingService.CancelBookingAsync(bookingId, userId);
         Message = result.IsSuccess ? "Booking cancelled successfully." : result.ErrorMessage;
         IsError = !result.IsSuccess;

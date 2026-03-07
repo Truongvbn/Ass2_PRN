@@ -18,7 +18,7 @@
             </a>
             <div class="nav-links">
                 <a href="/Rooms" class="nav-link"><i class="fas fa-door-open"></i> Rooms</a>
-                @if (SignInManager.IsSignedIn(User))
+                @if (User.Identity?.IsAuthenticated == true)
                 {
                     <a href="/Booking/MyBookings" class="nav-link"><i class="fas fa-calendar-check"></i> My Bookings</a>
                     <a href="/Tickets" class="nav-link"><i class="fas fa-headset"></i> Support</a>
@@ -29,7 +29,7 @@
                     <div class="nav-user">
                         <span class="nav-user-name">
                             <i class="fas fa-user-circle"></i>
-                            @UserManager.GetUserAsync(User).Result?.FullName
+                            @User.Identity?.Name
                         </span>
                         <form method="post" asp-page="/Account/Logout" class="nav-logout-form">
                             <button type="submit" class="nav-link btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
