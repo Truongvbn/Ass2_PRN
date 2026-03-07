@@ -62,10 +62,29 @@ public class DetailModel(
 
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         await reviewService.AddCommentAsync(new CreateReviewCommentDto { ReviewId = reviewId, Content = content }, userId);
+        TempData["Success"] = "Comment added successfully.";
 
         // Get roomId for redirect — find which room the review belongs to
-        var roomIdStr = Request.Query["id"];
-        return RedirectToPage(new { id = roomIdStr.FirstOrDefault() ?? "0" });
+        return RedirectToPage(new { id = GetRoomId() });
+    }
+
+    private string GetRoomId() => Request.Query["id"].FirstOrDefault() ?? "0";
+
+    public async Task<IActionResult> OnPostUpdateReviewAsync(int reviewId, int rating, string content)
+    {
+        if (!User.Identity!.IsAuthenticated)
+            return RedirectToPage("/Account/Login");
+
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var result = await reviewService.UpdateReviewAsync(
+            new UpdateReviewDto { Id = reviewId, Rating = rating, Content = content }, userId);
+
+        if (!result.IsSuccess)
+            TempData["Error"] = result.ErrorMessage;
+        else
+            TempData["Success"] = "Review updated successfully.";
+
+        return RedirectToPage(new { id = GetRoomId() });
     }
 
     public async Task<IActionResult> OnPostDeleteReviewAsync(int reviewId)
@@ -80,8 +99,7 @@ public class DetailModel(
         if (!result.IsSuccess)
             TempData["Error"] = result.ErrorMessage;
 
-        var roomIdStr = Request.Query["id"];
-        return RedirectToPage(new { id = roomIdStr.FirstOrDefault() ?? "0" });
+        return RedirectToPage(new { id = GetRoomId() });
     }
 
     public async Task<IActionResult> OnPostDeleteCommentAsync(int commentId)
@@ -96,7 +114,6 @@ public class DetailModel(
         if (!result.IsSuccess)
             TempData["Error"] = result.ErrorMessage;
 
-        var roomIdStr = Request.Query["id"];
-        return RedirectToPage(new { id = roomIdStr.FirstOrDefault() ?? "0" });
+        return RedirectToPage(new { id = GetRoomId() });
     }
 }

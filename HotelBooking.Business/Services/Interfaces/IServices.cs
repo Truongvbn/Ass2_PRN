@@ -20,6 +20,7 @@ public interface IBookingService
     Task<ServiceResult<IReadOnlyList<BookingDto>>> GetAllBookingsAsync(CancellationToken ct = default);
     Task<ServiceResult> ConfirmBookingAsync(int id, CancellationToken ct = default);
     Task<ServiceResult> CancelBookingAsync(int id, string userId, CancellationToken ct = default);
+    Task<ServiceResult> AdminCancelBookingAsync(int id, CancellationToken ct = default);
     Task<ServiceResult> CompleteBookingAsync(int id, CancellationToken ct = default);
 }
 

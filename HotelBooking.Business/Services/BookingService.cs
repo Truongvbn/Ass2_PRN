@@ -132,6 +132,23 @@ public class BookingService : IBookingService
         return ServiceResult.Success();
     }
 
+    public async Task<ServiceResult> AdminCancelBookingAsync(int id, CancellationToken ct = default)
+    {
+        var booking = await _bookingRepo.GetByIdAsync(id, ct);
+        if (booking is null) return ServiceResult.Failure("Booking not found", "NOT_FOUND");
+
+        if (booking.Status is not (BookingStatus.Pending or BookingStatus.Confirmed))
+            return ServiceResult.Failure("Only pending or confirmed bookings can be cancelled", "INVALID_STATE");
+
+        booking.Status = BookingStatus.Cancelled;
+        booking.UpdatedAt = DateTime.UtcNow;
+        await _bookingRepo.UpdateAsync(booking, ct);
+
+        await _notifier.BookingCancelled(id);
+
+        return ServiceResult.Success();
+    }
+
     public async Task<ServiceResult> CompleteBookingAsync(int id, CancellationToken ct = default)
     {
         var booking = await _bookingRepo.GetByIdAsync(id, ct);

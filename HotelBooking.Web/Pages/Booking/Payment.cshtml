@@ -1,0 +1,100 @@
+@page
+@model HotelBooking.Web.Pages.Booking.PaymentModel
+@{
+    ViewData["Title"] = "Complete Payment";
+}
+
+<div class="page-container">
+    <div class="page-header">
+        <a href="/Booking/MyBookings" class="back-link"><i class="fas fa-arrow-left"></i> My Bookings</a>
+        <h1><i class="fas fa-credit-card"></i> Complete Payment</h1>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    @if (Model.Booking != null)
+    {
+        <div class="payment-layout">
+            <div class="payment-summary-card">
+                <h2><i class="fas fa-receipt"></i> Booking Summary</h2>
+                <div class="summary-row">
+                    <span class="label">Room</span>
+                    <span class="value">@Model.Booking.RoomName</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">Type</span>
+                    <span class="value">@Model.Booking.RoomTypeName</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">Check-In</span>
+                    <span class="value">@Model.Booking.CheckIn.ToString("MMMM dd, yyyy")</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">Check-Out</span>
+                    <span class="value">@Model.Booking.CheckOut.ToString("MMMM dd, yyyy")</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">Nights</span>
+                    <span class="value">@((Model.Booking.CheckOut - Model.Booking.CheckIn).Days)</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">Guests</span>
+                    <span class="value">@Model.Booking.NumberOfGuests</span>
+                </div>
+                <div class="summary-row highlight">
+                    <span class="label">Total Amount</span>
+                    <span class="value">$@Model.Booking.TotalPrice.ToString("N2")</span>
+                </div>
+            </div>
+
+            <div class="payment-form-card">
+                <h2><i class="fas fa-lock"></i> Payment Details</h2>
+                <form method="post">
+                    <input type="hidden" asp-for="BookingId" />
+
+                    <div class="form-group">
+                        <label>Payment Method</label>
+                        <div class="payment-methods">
+                            <label class="payment-method-option">
+                                <input type="radio" asp-for="Method" value="CreditCard" checked />
+                                <span class="payment-method-card">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Credit Card</span>
+                                </span>
+                            </label>
+                            <label class="payment-method-option">
+                                <input type="radio" asp-for="Method" value="DebitCard" />
+                                <span class="payment-method-card">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Debit Card</span>
+                                </span>
+                            </label>
+                            <label class="payment-method-option">
+                                <input type="radio" asp-for="Method" value="BankTransfer" />
+                                <span class="payment-method-card">
+                                    <i class="fas fa-university"></i>
+                                    <span>Bank Transfer</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="payment-secure-notice">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Your payment is secure and encrypted</span>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg btn-full">
+                            <i class="fas fa-lock"></i> Pay $@Model.Booking.TotalPrice.ToString("N2")
+                        </button>
+                        <a href="/Booking/MyBookings" class="btn btn-outline">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+</div>
