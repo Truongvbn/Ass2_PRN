@@ -63,7 +63,7 @@ public class BookingServiceTests
 
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.ErrorMessage.Should().Be("Room is already booked for these dates.");
+        result.ErrorMessage.Should().Be("Room is already booked for these dates");
     }
 
     [Fact]
@@ -76,8 +76,9 @@ public class BookingServiceTests
         _mockBookingRepo.Setup(r => r.HasOverlappingBookingAsync(1, dto.CheckIn, dto.CheckOut)).ReturnsAsync(false);
 
         // Capture saved booking
-        Booking savedBooking = null;
-        _mockBookingRepo.Setup(r => r.AddAsync(It.IsAny<Booking>())).Callback<Booking>(b => savedBooking = b);
+        Booking? savedBooking = null;
+        _mockBookingRepo.Setup(r => r.AddAsync(It.IsAny<Booking>(), It.IsAny<CancellationToken>()))
+            .Callback<Booking, CancellationToken>((b, _) => savedBooking = b);
 
         // Act
         var result = await _service.CreateBookingAsync(dto, "user-1");
