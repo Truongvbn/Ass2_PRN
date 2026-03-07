@@ -66,6 +66,6 @@ public class TicketServiceTests
 
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.ErrorMessage.Should().Be("Cannot assign a closed ticket.");
+        result.ErrorMessage.Should().Be("Cannot assign a closed ticket");
     }
 }
