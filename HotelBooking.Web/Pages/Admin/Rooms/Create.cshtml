@@ -17,6 +17,26 @@
         }
 
         <form method="post">
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Input.HotelId">Hotel</label>
+                        <select asp-for="Input.HotelId" class="form-control">
+                            @foreach (var h in Model.Hotels)
+                            {
+                                <option value="@h.Id">@h.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Input.HotelId" class="field-error"></span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <input type="hidden" asp-for="Input.HotelId" />
+            }
+
             <div class="form-row">
                 <div class="form-group">
                     <label asp-for="Input.Name">Room Name</label>

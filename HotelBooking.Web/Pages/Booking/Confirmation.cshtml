@@ -3,9 +3,14 @@
 @{
     ViewData["Title"] = "Booking Confirmed";
     var successMessage = TempData["SuccessMessage"]?.ToString();
+    var errorMessage = TempData["ErrorMessage"]?.ToString();
 }
 
 <div class="page-container confirmation-page">
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
     @if (!string.IsNullOrEmpty(successMessage))
     {
         <div class="alert alert-success">@successMessage</div>
@@ -13,9 +18,48 @@
     @if (Model.Booking != null)
     {
         <div class="confirmation-card">
-            <div class="confirmation-icon"><i class="fas fa-check-circle"></i></div>
-            <h1>Booking Confirmed!</h1>
-            <p class="confirmation-subtitle">Your reservation has been successfully placed.</p>
+            @if (Model.Booking.Status == "Pending")
+            {
+                <div class="confirmation-icon text-warning"><i class="fas fa-clock"></i></div>
+                <h1>Booking Request Submitted</h1>
+                <p class="confirmation-subtitle">Waiting for hotel approval. We'll notify you shortly.</p>
+            }
+            else if (Model.Booking.Status == "AwaitingPayment")
+            {
+                <div class="confirmation-icon text-success"><i class="fas fa-check-circle"></i></div>
+                <h1>Approved! Complete Payment</h1>
+                <p class="confirmation-subtitle">Your booking has been approved. Please pay within 24 hours to confirm.</p>
+            }
+            else if (Model.Booking.Status == "Confirmed" || Model.Booking.Status == "CheckedIn")
+            {
+                <div class="confirmation-icon"><i class="fas fa-check-circle"></i></div>
+                <h1>Booking Confirmed!</h1>
+                <p class="confirmation-subtitle">All set! See you on @Model.Booking.CheckIn.ToString("MMMM dd, yyyy").</p>
+            }
+            else if (Model.Booking.Status == "Rejected")
+            {
+                <div class="confirmation-icon text-danger"><i class="fas fa-times-circle"></i></div>
+                <h1>Booking Declined</h1>
+                <p class="confirmation-subtitle">Unfortunately your request was declined. @(string.IsNullOrEmpty(Model.Booking.CancellationReason) ? "" : "Reason: " + Model.Booking.CancellationReason)</p>
+            }
+            else if (Model.Booking.Status == "Expired")
+            {
+                <div class="confirmation-icon text-muted"><i class="fas fa-clock"></i></div>
+                <h1>Booking Expired</h1>
+                <p class="confirmation-subtitle">This booking has expired. Please make a new reservation.</p>
+            }
+            else if (Model.Booking.Status == "Cancelled")
+            {
+                <div class="confirmation-icon text-danger"><i class="fas fa-times-circle"></i></div>
+                <h1>Booking Cancelled</h1>
+                <p class="confirmation-subtitle">This booking has been cancelled.</p>
+            }
+            else
+            {
+                <div class="confirmation-icon"><i class="fas fa-check-circle"></i></div>
+                <h1>Booking @Model.Booking.Status</h1>
+                <p class="confirmation-subtitle">Your reservation status.</p>
+            }
 
             <div class="booking-summary">
                 <div class="summary-row">
@@ -45,7 +89,7 @@
             </div>
 
             <div class="confirmation-actions">
-                @if (Model.Booking.Status == "Pending")
+                @if (Model.Booking.Status == "AwaitingPayment")
                 {
                     <a href="/Booking/Payment?id=@Model.Booking.Id" class="btn btn-success">
                         <i class="fas fa-credit-card"></i> Pay Now

@@ -17,4 +17,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <Target Name="BuildClientApp" BeforeTargets="Publish" Condition="Exists('ClientApp\package.json')">
+    <Message Text="Building ClientApp (Vite)..." Importance="high" />
+    <Exec WorkingDirectory="ClientApp" Command="npm install" />
+    <Exec WorkingDirectory="ClientApp" Command="npm run build" />
+  </Target>
+
 </Project>

@@ -11,13 +11,15 @@ public class PaymentService : IPaymentService
     private readonly IPaymentRepository _paymentRepo;
     private readonly IBookingRepository _bookingRepo;
     private readonly IBookingService _bookingService;
+    private readonly IBookingHubNotifier _notifier;
     private readonly IMapper _mapper;
 
-    public PaymentService(IPaymentRepository paymentRepo, IBookingRepository bookingRepo, IBookingService bookingService, IMapper mapper)
+    public PaymentService(IPaymentRepository paymentRepo, IBookingRepository bookingRepo, IBookingService bookingService, IBookingHubNotifier notifier, IMapper mapper)
     {
         _paymentRepo = paymentRepo;
         _bookingRepo = bookingRepo;
         _bookingService = bookingService;
+        _notifier = notifier;
         _mapper = mapper;
     }
 
@@ -25,8 +27,10 @@ public class PaymentService : IPaymentService
     {
         var booking = await _bookingRepo.GetByIdAsync(dto.BookingId, ct);
         if (booking is null) return ServiceResult<PaymentDto>.Failure("Booking not found", "NOT_FOUND");
-        if (booking.Status == BookingStatus.Cancelled)
-            return ServiceResult<PaymentDto>.Failure("Cannot pay for a cancelled booking", "INVALID_STATE");
+        if (booking.Status is BookingStatus.Cancelled or BookingStatus.Rejected or BookingStatus.Expired)
+            return ServiceResult<PaymentDto>.Failure("Cannot pay for a cancelled, rejected, or expired booking", "INVALID_STATE");
+        if (booking.Status != BookingStatus.AwaitingPayment)
+            return ServiceResult<PaymentDto>.Failure("Only bookings awaiting payment can be paid", "INVALID_STATE");
 
         // Check if already paid
         var existing = await _paymentRepo.GetByBookingIdAsync(dto.BookingId, ct);
@@ -51,6 +55,9 @@ public class PaymentService : IPaymentService
         // Auto-confirm booking after payment
         await _bookingService.ConfirmBookingAsync(booking.Id, ct);
 
+        await _notifier.PaymentReceived(booking.Id);
+        await _notifier.BookingConfirmed(booking.Id, booking.UserId);
+
         return ServiceResult<PaymentDto>.Success(_mapper.Map<PaymentDto>(payment));
     }
 
@@ -59,5 +66,32 @@ public class PaymentService : IPaymentService
         var payment = await _paymentRepo.GetByBookingIdAsync(bookingId, ct);
         if (payment is null) return ServiceResult<PaymentDto>.Failure("Payment not found", "NOT_FOUND");
         return ServiceResult<PaymentDto>.Success(_mapper.Map<PaymentDto>(payment));
+    }
+
+    public async Task<ServiceResult> RefundAsync(int bookingId, decimal? amount = null, string? reason = null, CancellationToken ct = default)
+    {
+        var payment = await _paymentRepo.GetByBookingIdAsync(bookingId, ct);
+        if (payment is null)
+            return ServiceResult.Failure("No payment found for this booking", "NOT_FOUND");
+
+        if (payment.Status is not PaymentStatus.Completed and not PaymentStatus.PartialRefund)
+            return ServiceResult.Failure("Only completed payments can be refunded", "INVALID_STATE");
+
+        var refundAmount = amount ?? payment.Amount;
+        if (refundAmount <= 0 || refundAmount > payment.Amount)
+            return ServiceResult.Failure("Invalid refund amount", "VALIDATION");
+
+        payment.RefundAmount = refundAmount;
+        payment.RefundReason = reason;
+        payment.RefundedAt = DateTime.UtcNow;
+        payment.Status = refundAmount == payment.Amount ? PaymentStatus.Refunded : PaymentStatus.PartialRefund;
+
+        await _paymentRepo.UpdateAsync(payment, ct);
+
+        var b = await _bookingRepo.GetByIdAsync(bookingId, ct);
+        if (b != null)
+            await _notifier.RefundProcessed(bookingId, b.UserId, refundAmount);
+
+        return ServiceResult.Success();
     }
 }

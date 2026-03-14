@@ -1,0 +1,55 @@
+@page
+@model HotelBooking.Web.Pages.Admin.Hotels.IndexModel
+@{
+    ViewData["Title"] = "Admin — Hotels";
+}
+
+<div class="page-container">
+    <div class="page-header-row">
+        <div class="page-header">
+            <h1><i class="fas fa-hotel"></i> Hotels</h1>
+            <p>Manage properties and staff assignment</p>
+        </div>
+        <a href="/Admin/Hotels/Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Hotel
+        </a>
+    </div>
+
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>City</th>
+                    <th>Stars</th>
+                    <th>Rooms</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var h in Model.Hotels)
+                {
+                    <tr>
+                        <td>@h.Id</td>
+                        <td>@h.Name</td>
+                        <td>@h.City</td>
+                        <td>@h.StarRating</td>
+                        <td>@h.RoomCount</td>
+                        <td>
+                            <span class="badge badge-@(h.IsActive ? "available" : "unavailable")">
+                                @(h.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td class="actions-cell">
+                            <a class="btn btn-sm btn-outline" href="/Admin/Hotels/Edit?id=@h.Id"><i class="fas fa-edit"></i> Edit</a>
+                            <a class="btn btn-sm btn-info" href="/Admin/Hotels/Staff?id=@h.Id"><i class="fas fa-users"></i> Staff</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

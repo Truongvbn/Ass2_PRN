@@ -55,6 +55,11 @@
                         <span asp-validation-for="Input.NumberOfGuests" class="field-error"></span>
                     </div>
 
+                    <div class="form-group">
+                        <label asp-for="Input.GuestNotes"><i class="fas fa-sticky-note"></i> Special Requests (optional)</label>
+                        <textarea asp-for="Input.GuestNotes" class="form-control" rows="2" placeholder="Late check-in, high floor, etc."></textarea>
+                    </div>
+
                     <div class="price-estimate" id="price-estimate">
                         <div class="price-label">Estimated Total</div>
                         <div class="price-formula">

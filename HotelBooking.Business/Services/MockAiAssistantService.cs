@@ -19,6 +19,7 @@ public class MockAiAssistantService : IAiAssistantService
         RoomPreferenceDto preferences, CancellationToken ct = default)
     {
         var result = await _roomService.SearchRoomsAsync(
+            hotelId: null,
             roomTypeId: null,
             minPrice: null,
             maxPrice: preferences.MaxBudget,

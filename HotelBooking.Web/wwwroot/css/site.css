@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap');
 /* ═══════════════════════════════════════════════════════════════
    Grand Azure Hotel — Luxury Design System
    ═══════════════════════════════════════════════════════════════ */
@@ -40,7 +41,7 @@ html {
 }
 
 body {
-  font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+  font-family: 'DM Sans', 'Source Sans 3', 'Segoe UI', sans-serif;
   background: var(--cream);
   color: var(--text-dark);
   line-height: 1.7;
@@ -58,7 +59,7 @@ h1,
 h2,
 h3,
 h4 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Merriweather', Georgia, serif;
   font-weight: 600;
   line-height: 1.3;
 }
@@ -116,7 +117,7 @@ p {
   align-items: center;
   gap: 0.6rem;
   color: var(--white);
-  font-family: 'Playfair Display', serif;
+  font-family: 'Merriweather', serif;
   font-size: 1.3rem;
 }
 
@@ -223,7 +224,7 @@ p {
 
 .footer-brand h3 {
   color: var(--white);
-  font-family: 'Playfair Display', serif;
+  font-family: 'Merriweather', serif;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -558,6 +559,31 @@ select.form-control {
   color: #991B1B;
 }
 
+.badge-awaitingpayment {
+  background: #DBEAFE;
+  color: #1D4ED8;
+}
+
+.badge-checkedin {
+  background: #D1FAE5;
+  color: #047857;
+}
+
+.badge-rejected {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+
+.badge-expired {
+  background: #E5E7EB;
+  color: #6B7280;
+}
+
+.badge-noshow {
+  background: #FEF3C7;
+  color: #B45309;
+}
+
 .badge-category {
   background: #EDE9FE;
   color: #5B21B6;
@@ -612,6 +638,14 @@ select.form-control {
   color: var(--text-light);
 }
 
+.text-warning {
+  color: #D97706;
+}
+
+.payment-deadline {
+  margin-bottom: 1rem;
+}
+
 /* ── Hero ── */
 .hero {
   background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 60%, #1A3A6B 100%);
@@ -650,7 +684,7 @@ select.form-control {
 }
 
 .hero-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Merriweather', serif;
   font-size: clamp(2.8rem, 7vw, 5rem);
   color: var(--white);
   line-height: 1.1;
@@ -770,9 +804,8 @@ select.form-control {
 
 /* ── Rooms ── */
 .page-header {
-  padding: 3rem 2rem 1.5rem;
   max-width: 1280px;
-  margin: 0 auto;
+  margin: 0;
 }
 
 .page-header h1 {
@@ -786,9 +819,11 @@ select.form-control {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 3rem 2rem 1.5rem;
+  padding: 0.75rem 0;
   max-width: 1280px;
-  margin: 0 auto;
+  margin: 3rem auto;
+
+  border-bottom: 1px solid #0003;
 }
 
 .room-search-bar {
@@ -893,7 +928,7 @@ select.form-control {
 }
 
 .room-name {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Merriweather', serif;
   font-size: 1.2rem;
   color: var(--navy);
   margin-bottom: 0.75rem;
@@ -919,7 +954,7 @@ select.form-control {
   font-size: 1.6rem;
   font-weight: 700;
   color: var(--navy);
-  font-family: 'Playfair Display', serif;
+  font-family: 'Merriweather', serif;
 }
 
 .price-per {
@@ -1297,7 +1332,7 @@ select.form-control {
 }
 
 .price-total {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Merriweather', serif;
   font-size: 2rem;
   font-weight: 700;
   color: var(--gold-light);
@@ -1391,7 +1426,7 @@ select.form-control {
 }
 
 .booking-price {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Merriweather', serif;
   font-size: 1.3rem;
   color: var(--gold);
 }
@@ -1517,7 +1552,7 @@ select.form-control {
 }
 
 .ticket-subject {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Merriweather', serif;
   font-size: 1.1rem;
   color: var(--navy);
   margin-bottom: 0.5rem;

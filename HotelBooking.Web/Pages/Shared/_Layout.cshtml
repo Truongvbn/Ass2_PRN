@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <nav class="navbar">
@@ -25,6 +26,10 @@
                     @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
                     {
                         <a href="/Admin/Rooms" class="nav-link nav-admin"><i class="fas fa-cog"></i> Admin</a>
+                    }
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a href="/Admin/Hotels" class="nav-link nav-admin"><i class="fas fa-hotel"></i> Hotels</a>
                     }
                     <div class="nav-user">
                         <span class="nav-user-name">

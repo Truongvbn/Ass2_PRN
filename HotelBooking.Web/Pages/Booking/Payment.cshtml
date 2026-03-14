@@ -17,6 +17,12 @@
 
     @if (Model.Booking != null)
     {
+        @if (Model.Booking.PaymentDeadline.HasValue)
+        {
+            <div class="payment-deadline alert alert-info">
+                <i class="fas fa-clock"></i> Complete payment by <strong>@Model.Booking.PaymentDeadline.Value.ToString("MMMM dd, yyyy HH:mm")</strong>
+            </div>
+        }
         <div class="payment-layout">
             <div class="payment-summary-card">
                 <h2><i class="fas fa-receipt"></i> Booking Summary</h2>

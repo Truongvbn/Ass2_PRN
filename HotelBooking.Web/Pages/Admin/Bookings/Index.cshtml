@@ -20,6 +20,7 @@
             <thead>
                 <tr>
                     <th>#</th>
+                    <th>Hotel</th>
                     <th>Customer</th>
                     <th>Room</th>
                     <th>Check-In</th>
@@ -35,6 +36,7 @@
                 {
                     <tr id="booking-row-@b.Id">
                         <td>@b.Id</td>
+                        <td>@b.HotelName</td>
                         <td>@b.UserName</td>
                         <td>@b.RoomName</td>
                         <td>@b.CheckIn.ToString("MMM dd")</td>
@@ -46,19 +48,39 @@
                             <a href="/Admin/Bookings/Detail?id=@b.Id" class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View</a>
                             @if (b.Status == "Pending")
                             {
-                                <form method="post" asp-page-handler="Confirm" class="inline-form">
+                                <form method="post" asp-page-handler="Approve" class="inline-form">
                                     <input type="hidden" name="bookingId" value="@b.Id" />
-                                    <button class="btn btn-sm btn-success"><i class="fas fa-check"></i> Confirm</button>
+                                    <button class="btn btn-sm btn-success"><i class="fas fa-check"></i> Approve</button>
+                                </form>
+                                <form method="post" asp-page-handler="Reject" class="inline-form">
+                                    <input type="hidden" name="bookingId" value="@b.Id" />
+                                    <input type="text" name="RejectReason" placeholder="Reason (optional)" class="form-control form-control-sm d-inline-block" style="width:120px;" />
+                                    <button class="btn btn-sm btn-warning"><i class="fas fa-times"></i> Reject</button>
                                 </form>
                             }
+                            @if (b.Status == "AwaitingPayment")
+                            {
+                                <span class="text-muted small">Awaiting guest payment</span>
+                            }
                             @if (b.Status == "Confirmed")
+                            {
+                                <form method="post" asp-page-handler="CheckIn" class="inline-form">
+                                    <input type="hidden" name="bookingId" value="@b.Id" />
+                                    <button class="btn btn-sm btn-success"><i class="fas fa-door-open"></i> Check-in</button>
+                                </form>
+                                <form method="post" asp-page-handler="NoShow" class="inline-form">
+                                    <input type="hidden" name="bookingId" value="@b.Id" />
+                                    <button class="btn btn-sm btn-warning"><i class="fas fa-user-times"></i> No-show</button>
+                                </form>
+                            }
+                            @if (b.Status == "CheckedIn")
                             {
                                 <form method="post" asp-page-handler="Complete" class="inline-form">
                                     <input type="hidden" name="bookingId" value="@b.Id" />
                                     <button class="btn btn-sm btn-primary"><i class="fas fa-flag-checkered"></i> Complete</button>
                                 </form>
                             }
-                            @if (b.Status == "Pending" || b.Status == "Confirmed")
+                            @if (b.Status == "Pending" || b.Status == "AwaitingPayment" || b.Status == "Confirmed")
                             {
                                 <form method="post" asp-page-handler="Cancel" class="inline-form"
                                       onsubmit="return confirm('Are you sure you want to cancel this booking?')">

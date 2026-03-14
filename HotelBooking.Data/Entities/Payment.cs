@@ -2,9 +2,10 @@ namespace HotelBooking.Data.Entities;
 
 public enum PaymentMethod
 {
-    Cash,
-    Card,
-    BankTransfer
+    CreditCard,
+    DebitCard,
+    BankTransfer,
+    Cash
 }
 
 public enum PaymentStatus
@@ -12,7 +13,8 @@ public enum PaymentStatus
     Pending,
     Completed,
     Failed,
-    Refunded
+    Refunded,
+    PartialRefund
 }
 
 public class Payment
@@ -24,6 +26,11 @@ public class Payment
     public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
     public DateTime? PaidAt { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public string? TransactionId { get; set; }
+    public string? RefundReason { get; set; }
+    public DateTime? RefundedAt { get; set; }
+    public decimal RefundAmount { get; set; }
 
     // Navigation
     public Booking Booking { get; set; } = null!;

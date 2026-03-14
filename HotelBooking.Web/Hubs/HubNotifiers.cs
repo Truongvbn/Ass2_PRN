@@ -6,15 +6,43 @@ namespace HotelBooking.Web.Hubs;
 
 public class BookingHubNotifier(IHubContext<BookingHub> hub) : IBookingHubNotifier
 {
+    private const string AdminGroup = "AdminGroup";
+
+    public Task NewBookingRequest(BookingDto booking)
+        => hub.Clients.Group(AdminGroup).SendAsync("NewBookingRequest", booking);
+
+    public Task BookingApproved(int bookingId, string userId)
+        => hub.Clients.User(userId).SendAsync("BookingApproved", bookingId);
+
+    public Task BookingRejected(int bookingId, string userId, string reason)
+        => hub.Clients.User(userId).SendAsync("BookingRejected", bookingId, reason);
+
+    public Task PaymentReceived(int bookingId)
+        => hub.Clients.Group(AdminGroup).SendAsync("PaymentReceived", bookingId);
+
+    public Task BookingConfirmed(int bookingId, string userId)
+        => hub.Clients.User(userId).SendAsync("BookingConfirmed", bookingId);
+
+    public Task RefundProcessed(int bookingId, string userId, decimal amount)
+        => hub.Clients.User(userId).SendAsync("RefundProcessed", bookingId, amount);
+
+    public Task BookingExpired(int bookingId, string userId)
+        => hub.Clients.User(userId).SendAsync("BookingExpired", bookingId);
+
+    public Task CheckedIn(int bookingId, string userId)
+        => hub.Clients.User(userId).SendAsync("CheckedIn", bookingId);
+
+    public Task StayCompleted(int bookingId, string userId)
+        => hub.Clients.User(userId).SendAsync("StayCompleted", bookingId);
+
+    public Task NoShow(int bookingId)
+        => hub.Clients.Group(AdminGroup).SendAsync("NoShow", bookingId);
+
     public Task BookingCreated(BookingDto booking)
         => hub.Clients.User(booking.UserId).SendAsync("BookingCreated", booking);
 
-    // Provide generic status changes to all or just user? Only user needs to know their status changed.
     public Task BookingStatusChanged(int bookingId, string newStatus)
-        => hub.Clients.All.SendAsync("BookingStatusChanged", bookingId, newStatus); 
-        // Note: Ideally we pass userId here too, but for simplicity we just notify. 
-        // A better approach is to change the interface to include userId, but let's just 
-        // broadcast a very minimal ID-only message which doesn't leak much.
+        => hub.Clients.All.SendAsync("BookingStatusChanged", bookingId, newStatus);
 
     public Task BookingCancelled(int bookingId)
         => hub.Clients.All.SendAsync("BookingCancelled", bookingId);
@@ -41,7 +69,7 @@ public class ReviewHubNotifier(IHubContext<ReviewHub> hub) : IReviewHubNotifier
 public class TicketHubNotifier(IHubContext<TicketHub> hub) : ITicketHubNotifier
 {
     public Task TicketCreated(TicketDto ticket)
-        => hub.Clients.User(ticket.UserId).SendAsync("TicketCreated", ticket);
+        => hub.Clients.All.SendAsync("TicketCreated", ticket);
 
     public Task TicketAssigned(int ticketId, string staffName)
         => hub.Clients.All.SendAsync("TicketAssigned", ticketId, staffName);

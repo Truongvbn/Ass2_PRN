@@ -13,7 +13,10 @@ public class RoomRepository : Repository<Room>, IRoomRepository
         int? minOccupancy, DateTime? checkIn, DateTime? checkOut,
         CancellationToken ct = default)
     {
-        var query = DbSet.AsNoTracking().Include(r => r.RoomType).AsQueryable();
+        var query = DbSet.AsNoTracking()
+            .Include(r => r.Hotel)
+            .Include(r => r.RoomType)
+            .AsQueryable();
 
         if (roomTypeId.HasValue)
             query = query.Where(r => r.RoomTypeId == roomTypeId.Value);
@@ -25,9 +28,41 @@ public class RoomRepository : Repository<Room>, IRoomRepository
             query = query.Where(r => r.MaxOccupancy >= minOccupancy.Value);
         if (checkIn.HasValue && checkOut.HasValue)
         {
-            // Exclude rooms with overlapping confirmed/pending bookings
+            var activeStatuses = new[] { BookingStatus.Pending, BookingStatus.AwaitingPayment, BookingStatus.Confirmed, BookingStatus.CheckedIn, BookingStatus.Completed };
             query = query.Where(r => !r.Bookings.Any(b =>
-                b.Status != BookingStatus.Cancelled &&
+                activeStatuses.Contains(b.Status) &&
+                b.CheckIn < checkOut.Value &&
+                b.CheckOut > checkIn.Value));
+        }
+
+        return await query.Where(r => r.IsAvailable).OrderBy(r => r.PricePerNight).ToListAsync(ct);
+    }
+
+    public async Task<IReadOnlyList<Room>> SearchByHotelAsync(
+        int hotelId,
+        int? roomTypeId, decimal? minPrice, decimal? maxPrice,
+        int? minOccupancy, DateTime? checkIn, DateTime? checkOut,
+        CancellationToken ct = default)
+    {
+        var query = DbSet.AsNoTracking()
+            .Include(r => r.Hotel)
+            .Include(r => r.RoomType)
+            .Where(r => r.HotelId == hotelId)
+            .AsQueryable();
+
+        if (roomTypeId.HasValue)
+            query = query.Where(r => r.RoomTypeId == roomTypeId.Value);
+        if (minPrice.HasValue)
+            query = query.Where(r => r.PricePerNight >= minPrice.Value);
+        if (maxPrice.HasValue)
+            query = query.Where(r => r.PricePerNight <= maxPrice.Value);
+        if (minOccupancy.HasValue)
+            query = query.Where(r => r.MaxOccupancy >= minOccupancy.Value);
+        if (checkIn.HasValue && checkOut.HasValue)
+        {
+            var activeStatuses = new[] { BookingStatus.Pending, BookingStatus.AwaitingPayment, BookingStatus.Confirmed, BookingStatus.CheckedIn, BookingStatus.Completed };
+            query = query.Where(r => !r.Bookings.Any(b =>
+                activeStatuses.Contains(b.Status) &&
                 b.CheckIn < checkOut.Value &&
                 b.CheckOut > checkIn.Value));
         }
@@ -54,9 +89,10 @@ public class BookingRepository : Repository<Booking>, IBookingRepository
     public async Task<bool> HasOverlappingBookingAsync(int roomId, DateTime checkIn, DateTime checkOut,
         int? excludeBookingId = null, CancellationToken ct = default)
     {
+        var activeStatuses = new[] { BookingStatus.Pending, BookingStatus.AwaitingPayment, BookingStatus.Confirmed, BookingStatus.CheckedIn, BookingStatus.Completed };
         var query = DbSet.Where(b =>
             b.RoomId == roomId &&
-            b.Status != BookingStatus.Cancelled &&
+            activeStatuses.Contains(b.Status) &&
             b.CheckIn < checkOut &&
             b.CheckOut > checkIn);
 
@@ -69,16 +105,99 @@ public class BookingRepository : Repository<Booking>, IBookingRepository
     public async Task<IReadOnlyList<Booking>> GetByUserAsync(string userId, CancellationToken ct = default)
         => await DbSet.AsNoTracking()
             .Include(b => b.Room).ThenInclude(r => r.RoomType)
+            .Include(b => b.Room).ThenInclude(r => r.Hotel)
             .Include(b => b.Payment)
             .Where(b => b.UserId == userId)
             .OrderByDescending(b => b.CreatedAt)
             .ToListAsync(ct);
 
+    public async Task<IReadOnlyList<Booking>> GetByHotelAsync(int hotelId, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(b => b.Room).ThenInclude(r => r.RoomType)
+            .Include(b => b.Room).ThenInclude(r => r.Hotel)
+            .Include(b => b.User)
+            .Include(b => b.Payment)
+            .Where(b => b.Room.HotelId == hotelId)
+            .OrderByDescending(b => b.CreatedAt)
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<Booking>> GetAllWithDetailsAsync(CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(b => b.Room).ThenInclude(r => r.RoomType)
+            .Include(b => b.Room).ThenInclude(r => r.Hotel)
+            .Include(b => b.User)
+            .Include(b => b.Payment)
+            .OrderByDescending(b => b.CreatedAt)
+            .ToListAsync(ct);
+
     public async Task<Booking?> GetWithDetailsAsync(int id, CancellationToken ct = default)
         => await DbSet.Include(b => b.Room).ThenInclude(r => r.RoomType)
+            .Include(b => b.Room).ThenInclude(r => r.Hotel)
             .Include(b => b.User)
             .Include(b => b.Payment)
             .FirstOrDefaultAsync(b => b.Id == id, ct);
+
+    public async Task<IReadOnlyList<Booking>> GetExpiredPendingAsync(DateTime utcNow, CancellationToken ct = default)
+        => await DbSet
+            .Where(b => b.Status == BookingStatus.Pending && b.CreatedAt < utcNow.AddHours(-48))
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<Booking>> GetExpiredAwaitingPaymentAsync(DateTime utcNow, CancellationToken ct = default)
+        => await DbSet
+            .Where(b => b.Status == BookingStatus.AwaitingPayment && b.PaymentDeadline != null && b.PaymentDeadline < utcNow)
+            .ToListAsync(ct);
+}
+
+public class HotelRepository : Repository<Hotel>, IHotelRepository
+{
+    public HotelRepository(HotelDbContext context) : base(context) { }
+
+    public override async Task<IReadOnlyList<Hotel>> GetAllAsync(CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(h => h.Rooms)
+            .OrderBy(h => h.Name)
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<Hotel>> GetActiveHotelsAsync(CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Where(h => h.IsActive)
+            .OrderBy(h => h.Name)
+            .ToListAsync(ct);
+
+    public async Task<Hotel?> GetWithRoomsAsync(int hotelId, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(h => h.Rooms)
+            .FirstOrDefaultAsync(h => h.Id == hotelId, ct);
+
+    public async Task<IReadOnlyList<Hotel>> GetByStaffUserAsync(string userId, CancellationToken ct = default)
+        => await Context.Set<HotelStaff>()
+            .AsNoTracking()
+            .Where(hs => hs.UserId == userId)
+            .Include(hs => hs.Hotel)
+            .Select(hs => hs.Hotel)
+            .OrderBy(h => h.Name)
+            .ToListAsync(ct);
+}
+
+public class HotelStaffRepository : Repository<HotelStaff>, IHotelStaffRepository
+{
+    public HotelStaffRepository(HotelDbContext context) : base(context) { }
+
+    public async Task<IReadOnlyList<HotelStaff>> GetByHotelAsync(int hotelId, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(hs => hs.User)
+            .Where(hs => hs.HotelId == hotelId)
+            .OrderByDescending(hs => hs.AssignedAt)
+            .ToListAsync(ct);
+
+    public async Task<HotelStaff?> GetAssignmentAsync(int hotelId, string userId, CancellationToken ct = default)
+        => await DbSet.FirstOrDefaultAsync(hs => hs.HotelId == hotelId && hs.UserId == userId, ct);
+
+    public async Task<IReadOnlyList<int>> GetHotelIdsByUserAsync(string userId, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Where(hs => hs.UserId == userId)
+            .Select(hs => hs.HotelId)
+            .ToListAsync(ct);
 }
 
 public class ReviewRepository : Repository<Review>, IReviewRepository

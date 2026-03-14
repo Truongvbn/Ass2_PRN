@@ -8,6 +8,8 @@ public class HotelDbContext : IdentityDbContext<ApplicationUser>
 {
     public HotelDbContext(DbContextOptions<HotelDbContext> options) : base(options) { }
 
+    public DbSet<Hotel> Hotels => Set<Hotel>();
+    public DbSet<HotelStaff> HotelStaff => Set<HotelStaff>();
     public DbSet<Room> Rooms => Set<Room>();
     public DbSet<RoomType> RoomTypes => Set<RoomType>();
     public DbSet<Booking> Bookings => Set<Booking>();

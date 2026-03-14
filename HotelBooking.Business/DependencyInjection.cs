@@ -17,6 +17,7 @@ public static class DependencyInjection
 
         services.AddScoped<IRoomService, RoomService>();
         services.AddScoped<IBookingService, BookingService>();
+        services.AddScoped<IHotelService, HotelService>();
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<ITicketService, TicketService>();
         services.AddScoped<IPaymentService, PaymentService>();

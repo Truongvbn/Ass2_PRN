@@ -1,0 +1,79 @@
+@page
+@model HotelBooking.Web.Pages.Admin.Hotels.StaffModel
+@{
+    ViewData["Title"] = "Admin — Hotel Staff";
+}
+
+<div class="page-container">
+    <div class="page-header">
+        <a href="/Admin/Hotels" class="back-link"><i class="fas fa-arrow-left"></i> Hotels</a>
+        <h1><i class="fas fa-users"></i> Staff — @Model.Hotel?.Name</h1>
+        <p>Assign and remove staff for this hotel</p>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-@(Model.IsError ? "danger" : "success")">@Model.Message</div>
+    }
+
+    <div class="form-card">
+        <form method="post" asp-page-handler="Assign">
+            <input type="hidden" asp-for="Input.HotelId" />
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.UserId">Staff user</label>
+                    <select asp-for="Input.UserId" class="form-control">
+                        <option value="">-- Select Staff --</option>
+                        @foreach (var u in Model.StaffUsers)
+                        {
+                            <option value="@u.Id">@u.FullName (@u.Email)</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Role">Role</label>
+                    <select asp-for="Input.Role" class="form-control">
+                        <option>Manager</option>
+                        <option selected>Receptionist</option>
+                        <option>Housekeeping</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-user-plus"></i> Assign</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="admin-table-wrapper" style="margin-top:16px;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Assigned</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model.Staff)
+                {
+                    <tr>
+                        <td>@s.UserName</td>
+                        <td>@s.Role</td>
+                        <td>@s.AssignedAt.ToString("MMM dd, yyyy")</td>
+                        <td class="actions-cell">
+                            <form method="post" asp-page-handler="Remove" class="inline-form"
+                                  onsubmit="return confirm('Remove this staff assignment?')">
+                                <input type="hidden" name="hotelId" value="@s.HotelId" />
+                                <input type="hidden" name="userId" value="@s.UserId" />
+                                <button class="btn btn-sm btn-danger"><i class="fas fa-user-minus"></i> Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

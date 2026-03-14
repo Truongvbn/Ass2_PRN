@@ -29,8 +29,14 @@ public class PaymentModel(
         Booking = result.Data;
         BookingId = id;
 
-        if (Booking!.Status != "Pending")
+        if (Booking!.Status != "AwaitingPayment")
             return RedirectToPage("/Booking/Confirmation", new { id });
+
+        if (Booking.PaymentDeadline.HasValue && Booking.PaymentDeadline.Value < DateTime.UtcNow)
+        {
+            TempData["ErrorMessage"] = "Payment window has expired.";
+            return RedirectToPage("/Booking/Confirmation", new { id });
+        }
 
         // Check if already paid
         var paymentResult = await paymentService.GetPaymentByBookingAsync(id);

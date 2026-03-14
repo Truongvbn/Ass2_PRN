@@ -19,7 +19,30 @@ else
     var isAdminOrStaff = User.IsInRole("Admin") || User.IsInRole("Staff");
     <div class="room-detail">
         <div class="room-detail-hero">
-            <img src="@room.ImageUrl" alt="@room.Name" onerror="this.src='/images/hotel-default.jpg'" />
+            <div class="room-detail-hero-carousel">
+                <div class="room-detail-hero-track">
+                    @{
+                        var gallery = room.Gallery ?? Array.Empty<string>();
+                        if (gallery.Length == 0)
+                        {
+                            <img src="@room.ImageUrl"
+                                 alt="@room.Name"
+                                 loading="lazy"
+                                 onerror="this.src='/images/hotel-default.jpg'" />
+                        }
+                        else
+                        {
+                            foreach (var img in gallery)
+                            {
+                                <img src="@img"
+                                     alt="@room.Name"
+                                     loading="lazy"
+                                     onerror="this.src='/images/hotel-default.jpg'" />
+                            }
+                        }
+                    }
+                </div>
+            </div>
             <div class="room-detail-hero-overlay">
                 <div class="room-detail-badge @(room.IsAvailable ? "badge-available" : "badge-unavailable")">
                     @(room.IsAvailable ? "Available" : "Unavailable")
@@ -27,6 +50,14 @@ else
                 <h1>@room.Name</h1>
                 <p class="room-type-label">@room.RoomTypeName</p>
             </div>
+        </div>
+
+        <div class="react-root" style="height: 320px; margin: 18px 0;">
+            <div id="hotel-location-root"
+                 style="height: 100%;"
+                 data-lat="@(room.HotelLatitude ?? 0)"
+                 data-lng="@(room.HotelLongitude ?? 0)"
+                 data-name="@room.HotelName"></div>
         </div>
 
         <div class="room-detail-body">
@@ -256,8 +287,13 @@ else
     </div>
 </div>
 
+@section Styles {
+    <link rel="stylesheet" href="~/react/hotel-map.css" asp-append-version="true" />
+}
+
 @section Scripts {
     <script src="~/js/signalr-review.js"></script>
+    <script type="module" src="~/react/hotel-map.js" asp-append-version="true"></script>
     <script>
     function openEditReviewModal(btn) {
         const reviewId = btn.getAttribute('data-review-id');

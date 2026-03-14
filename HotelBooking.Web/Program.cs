@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ── Business & Data Layers ──
 builder.Services.AddBusinessLayer(builder.Configuration);
+builder.Services.AddScoped<IHotelService, HotelService>();
 
 // ── SignalR Notifiers ──
 builder.Services.AddScoped<IBookingHubNotifier, BookingHubNotifier>();
@@ -23,9 +24,13 @@ builder.Services.AddScoped<ITicketHubNotifier, TicketHubNotifier>();
 // ── SignalR ──
 builder.Services.AddSignalR();
 
+// ── Background Services ──
+builder.Services.AddHostedService<HotelBooking.Web.Services.BookingExpirationService>();
+
 // ── Razor Pages & Controllers ──
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
+builder.Services.AddHttpClient("vn-provinces");
 
 var app = builder.Build();
 

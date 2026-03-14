@@ -1,6 +1,7 @@
 using HotelBooking.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HotelBooking.Data.Configurations;
 
@@ -13,16 +14,65 @@ public class RoomConfiguration : IEntityTypeConfiguration<Room>
         builder.Property(r => r.PricePerNight).HasPrecision(18, 2);
         builder.Property(r => r.Description).HasMaxLength(2000);
         builder.Property(r => r.ImageUrl).HasMaxLength(500);
+        builder.Property(r => r.Gallery).HasColumnType("nvarchar(max)").HasDefaultValue("[]");
         builder.Property(r => r.Amenities).HasMaxLength(2000);
         builder.Property(r => r.RowVersion).IsRowVersion();
         builder.HasQueryFilter(r => !r.IsDeleted);
+
+        builder.HasOne(r => r.Hotel)
+            .WithMany(h => h.Rooms)
+            .HasForeignKey(r => r.HotelId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(r => r.RoomType)
             .WithMany(rt => rt.Rooms)
             .HasForeignKey(r => r.RoomTypeId);
 
+        builder.HasIndex(r => r.HotelId);
         builder.HasIndex(r => r.RoomTypeId);
         builder.HasIndex(r => r.PricePerNight);
+    }
+}
+
+public class HotelConfiguration : IEntityTypeConfiguration<Hotel>
+{
+    public void Configure(EntityTypeBuilder<Hotel> builder)
+    {
+        builder.HasKey(h => h.Id);
+        builder.Property(h => h.Name).HasMaxLength(200).IsRequired();
+        builder.Property(h => h.Description).HasMaxLength(2000);
+        builder.Property(h => h.Address).HasMaxLength(500);
+        builder.Property(h => h.City).HasMaxLength(100);
+        builder.Property(h => h.Latitude).HasPrecision(9, 6);
+        builder.Property(h => h.Longitude).HasPrecision(9, 6);
+        builder.Property(h => h.PhoneNumber).HasMaxLength(30);
+        builder.Property(h => h.Email).HasMaxLength(200);
+        builder.Property(h => h.ImageUrl).HasMaxLength(500);
+        builder.Property(h => h.Gallery).HasColumnType("nvarchar(max)").HasDefaultValue("[]");
+        builder.Property(h => h.CreatedAt);
+        builder.HasIndex(h => h.City);
+    }
+}
+
+public class HotelStaffConfiguration : IEntityTypeConfiguration<HotelStaff>
+{
+    public void Configure(EntityTypeBuilder<HotelStaff> builder)
+    {
+        builder.HasKey(hs => hs.Id);
+        builder.Property(hs => hs.Role).HasConversion<string>().HasMaxLength(30);
+
+        builder.HasOne(hs => hs.Hotel)
+            .WithMany(h => h.StaffAssignments)
+            .HasForeignKey(hs => hs.HotelId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(hs => hs.User)
+            .WithMany(u => u.HotelAssignments)
+            .HasForeignKey(hs => hs.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(hs => new { hs.HotelId, hs.UserId }).IsUnique();
+        builder.HasIndex(hs => hs.UserId);
     }
 }
 
@@ -44,6 +94,10 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
         builder.Property(b => b.TotalPrice).HasPrecision(18, 2);
         builder.Property(b => b.Status).HasConversion<string>().HasMaxLength(20);
         builder.Property(b => b.RowVersion).IsRowVersion();
+
+        builder.Property(b => b.GuestNotes).HasMaxLength(2000);
+        builder.Property(b => b.AdminNotes).HasMaxLength(2000);
+        builder.Property(b => b.CancellationReason).HasMaxLength(1000);
 
         builder.HasOne(b => b.Room)
             .WithMany(r => r.Bookings)
@@ -67,12 +121,39 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
     {
         builder.HasKey(p => p.Id);
         builder.Property(p => p.Amount).HasPrecision(18, 2);
-        builder.Property(p => p.Method).HasConversion<string>().HasMaxLength(20);
+        var paymentMethodConverter = new ValueConverter<PaymentMethod, string>(
+            v => v.ToString(),
+            v => PaymentMethodLegacyConversion.FromDb(v));
+
+        builder.Property(p => p.Method)
+            .HasConversion(paymentMethodConverter)
+            .HasMaxLength(20);
         builder.Property(p => p.Status).HasConversion<string>().HasMaxLength(20);
+        builder.Property(p => p.TransactionId).HasMaxLength(200);
+        builder.Property(p => p.RefundReason).HasMaxLength(1000);
+        builder.Property(p => p.RefundAmount).HasPrecision(18, 2);
 
         builder.HasOne(p => p.Booking)
             .WithOne(b => b.Payment)
             .HasForeignKey<Payment>(p => p.BookingId);
+    }
+}
+
+internal static class PaymentMethodLegacyConversion
+{
+    public static PaymentMethod FromDb(string value)
+    {
+        if (string.Equals(value, "Card", StringComparison.OrdinalIgnoreCase)) return PaymentMethod.CreditCard;
+        if (string.Equals(value, "Credit Card", StringComparison.OrdinalIgnoreCase)) return PaymentMethod.CreditCard;
+        if (string.Equals(value, "Credit", StringComparison.OrdinalIgnoreCase)) return PaymentMethod.CreditCard;
+        if (string.Equals(value, "Debit Card", StringComparison.OrdinalIgnoreCase)) return PaymentMethod.DebitCard;
+        if (string.Equals(value, "Debit", StringComparison.OrdinalIgnoreCase)) return PaymentMethod.DebitCard;
+        if (string.Equals(value, "Bank", StringComparison.OrdinalIgnoreCase)) return PaymentMethod.BankTransfer;
+        if (string.Equals(value, "Bank Transfer", StringComparison.OrdinalIgnoreCase)) return PaymentMethod.BankTransfer;
+        if (string.Equals(value, "Transfer", StringComparison.OrdinalIgnoreCase)) return PaymentMethod.BankTransfer;
+        if (string.Equals(value, "CashPayment", StringComparison.OrdinalIgnoreCase)) return PaymentMethod.Cash;
+
+        return Enum.Parse<PaymentMethod>(value, ignoreCase: true);
     }
 }
 

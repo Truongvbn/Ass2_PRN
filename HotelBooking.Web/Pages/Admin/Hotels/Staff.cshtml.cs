@@ -1,0 +1,75 @@
+using HotelBooking.Business.DTOs;
+using HotelBooking.Business.Services.Interfaces;
+using HotelBooking.Data.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace HotelBooking.Web.Pages.Admin.Hotels;
+
+[Authorize(Roles = "Admin")]
+public class StaffModel(IHotelService hotelService, UserManager<ApplicationUser> userManager) : PageModel
+{
+    public HotelDto? Hotel { get; set; }
+    public IReadOnlyList<HotelStaffDto> Staff { get; set; } = [];
+    public IReadOnlyList<ApplicationUser> StaffUsers { get; set; } = [];
+
+    public string? Message { get; set; }
+    public bool IsError { get; set; }
+
+    [BindProperty] public AssignInput Input { get; set; } = new();
+
+    public class AssignInput
+    {
+        public int HotelId { get; set; }
+        public string UserId { get; set; } = "";
+        public string Role { get; set; } = "Receptionist";
+    }
+
+    public async Task OnGetAsync(int id)
+    {
+        Input.HotelId = id;
+        await LoadAsync(id);
+    }
+
+    public async Task<IActionResult> OnPostAssignAsync()
+    {
+        await LoadAsync(Input.HotelId);
+
+        var result = await hotelService.AssignStaffAsync(new AssignStaffDto
+        {
+            HotelId = Input.HotelId,
+            UserId = Input.UserId,
+            Role = Input.Role
+        });
+
+        Message = result.IsSuccess ? "Staff assigned." : result.ErrorMessage;
+        IsError = !result.IsSuccess;
+        await LoadAsync(Input.HotelId);
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostRemoveAsync(int hotelId, string userId)
+    {
+        await LoadAsync(hotelId);
+
+        var result = await hotelService.RemoveStaffAsync(hotelId, userId);
+        Message = result.IsSuccess ? "Staff removed." : result.ErrorMessage;
+        IsError = !result.IsSuccess;
+        await LoadAsync(hotelId);
+        return Page();
+    }
+
+    private async Task LoadAsync(int hotelId)
+    {
+        var hotelResult = await hotelService.GetHotelByIdAsync(hotelId);
+        if (hotelResult.IsSuccess) Hotel = hotelResult.Data;
+
+        var staffResult = await hotelService.GetHotelStaffAsync(hotelId);
+        if (staffResult.IsSuccess && staffResult.Data is not null) Staff = staffResult.Data;
+
+        StaffUsers = (await userManager.GetUsersInRoleAsync("Staff")).ToList();
+    }
+}
+

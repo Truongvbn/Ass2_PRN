@@ -22,15 +22,30 @@ public class RoomService : IRoomService
     }
 
     public async Task<ServiceResult<IReadOnlyList<RoomListDto>>> SearchRoomsAsync(
-        int? roomTypeId, decimal? minPrice, decimal? maxPrice, int? minOccupancy,
+        int? hotelId, int? roomTypeId, decimal? minPrice, decimal? maxPrice, int? minOccupancy,
         DateTime? checkIn, DateTime? checkOut, CancellationToken ct = default)
     {
-        var rooms = await _roomRepo.SearchAsync(roomTypeId, minPrice, maxPrice, minOccupancy, checkIn, checkOut, ct);
+        var rooms = hotelId.HasValue
+            ? await _roomRepo.SearchByHotelAsync(hotelId.Value, roomTypeId, minPrice, maxPrice, minOccupancy, checkIn, checkOut, ct)
+            : await _roomRepo.SearchAsync(roomTypeId, minPrice, maxPrice, minOccupancy, checkIn, checkOut, ct);
+
         var dtos = new List<RoomListDto>();
         foreach (var room in rooms)
         {
             var avgRating = await _reviewRepo.GetAverageRatingAsync(room.Id, ct);
-            dtos.Add(new RoomListDto { Id = room.Id, Name = room.Name, RoomTypeName = room.RoomType.Name, PricePerNight = room.PricePerNight, MaxOccupancy = room.MaxOccupancy, ImageUrl = room.ImageUrl, IsAvailable = room.IsAvailable, AverageRating = avgRating });
+            dtos.Add(new RoomListDto
+            {
+                Id = room.Id,
+                HotelId = room.HotelId,
+                HotelName = room.Hotel?.Name ?? "",
+                Name = room.Name,
+                RoomTypeName = room.RoomType.Name,
+                PricePerNight = room.PricePerNight,
+                MaxOccupancy = room.MaxOccupancy,
+                ImageUrl = room.ImageUrl,
+                IsAvailable = room.IsAvailable,
+                AverageRating = avgRating
+            });
         }
         return ServiceResult<IReadOnlyList<RoomListDto>>.Success(dtos);
     }
@@ -53,6 +68,8 @@ public class RoomService : IRoomService
             return ServiceResult<RoomDto>.Failure("Price must be greater than 0", "VALIDATION");
         if (dto.MaxOccupancy <= 0)
             return ServiceResult<RoomDto>.Failure("Max occupancy must be greater than 0", "VALIDATION");
+        if (dto.HotelId <= 0)
+            return ServiceResult<RoomDto>.Failure("Hotel is required", "VALIDATION");
 
         var room = _mapper.Map<Room>(dto);
         room.CreatedAt = DateTime.UtcNow;
@@ -68,6 +85,7 @@ public class RoomService : IRoomService
         var room = await _roomRepo.GetByIdAsync(dto.Id, ct);
         if (room is null) return ServiceResult<RoomDto>.Failure("Room not found", "NOT_FOUND");
 
+        room.HotelId = dto.HotelId;
         room.Name = dto.Name;
         room.RoomTypeId = dto.RoomTypeId;
         room.PricePerNight = dto.PricePerNight;

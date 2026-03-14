@@ -31,136 +31,430 @@ public static class SeedData
         var customer2 = await EnsureUserAsync(userManager, "customer2@hotel.com", "Hotel@123", "Alice Smith", "Customer");
         var customer3 = await EnsureUserAsync(userManager, "customer3@hotel.com", "Hotel@123", "Bob Johnson", "Customer");
 
-        if (await context.RoomTypes.AnyAsync()) return; // Already seeded
-
-        // Seed room types
-        var roomTypes = new List<RoomType>
+        // Seed major Vietnam hotels (align with provinces API names)
+        var majorHotels = new List<Hotel>
         {
-            new() { Name = "Standard", Description = "Comfortable room with essential amenities" },
-            new() { Name = "Superior", Description = "Upgraded room with city or garden view" },
-            new() { Name = "Deluxe", Description = "Spacious room with premium furnishings" },
-            new() { Name = "Suite", Description = "Separate living area with luxury amenities" },
-            new() { Name = "Presidential", Description = "The finest accommodation with panoramic views" }
+            new()
+            {
+                Name = "Hanoi Elegance Hotel",
+                Description = "Boutique stay in the Old Quarter with curated rooms and local hospitality.",
+                Address = "Hoàn Kiếm, Hà Nội",
+                City = "Thành phố Hà Nội",
+                Latitude = 21.0285,
+                Longitude = 105.8542,
+                PhoneNumber = "+84 24 0000 0000",
+                Email = "contact@hanoielegance.example",
+                ImageUrl = "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80",
+                Gallery = """
+["https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1501117716987-c8e1ecb2108a?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1505691723518-36a5ac3be353?auto=format&fit=crop&w=1200&q=80"]
+""",
+                StarRating = 4,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            },
+            new()
+            {
+                Name = "Saigon Pearl Hotel",
+                Description = "Modern city hotel with skyline views and fast access to central districts.",
+                Address = "Quận 1, TP. Hồ Chí Minh",
+                City = "Thành phố Hồ Chí Minh",
+                Latitude = 10.7769,
+                Longitude = 106.7009,
+                PhoneNumber = "+84 28 0000 0000",
+                Email = "contact@saigonpearl.example",
+                ImageUrl = "https://images.unsplash.com/photo-1521783593447-5702f2f4b4d1?auto=format&fit=crop&w=1200&q=80",
+                Gallery = """
+["https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1501117716987-c8e1ecb2108a?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1500043201641-4b0acfa9a41b?auto=format&fit=crop&w=1200&q=80"]
+""",
+                StarRating = 4,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            },
+            new()
+            {
+                Name = "Da Nang Beach Resort",
+                Description = "Beachfront resort with airy rooms and sunset-facing balconies.",
+                Address = "Ngũ Hành Sơn, Đà Nẵng",
+                City = "Thành phố Đà Nẵng",
+                Latitude = 16.0544,
+                Longitude = 108.2022,
+                PhoneNumber = "+84 236 0000 0000",
+                Email = "contact@danangbeach.example",
+                ImageUrl = "https://images.unsplash.com/photo-1501117716987-c8e1ecb2108a?auto=format&fit=crop&w=1200&q=80",
+                Gallery = """
+["https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1501117716987-c8e1ecb2108a?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80"]
+""",
+                StarRating = 5,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            },
+            new()
+            {
+                Name = "Hai Phong Harbor Hotel",
+                Description = "Convenient harbor-side stay for business and weekend getaways.",
+                Address = "Hồng Bàng, Hải Phòng",
+                City = "Thành phố Hải Phòng",
+                Latitude = 20.8449,
+                Longitude = 106.6881,
+                PhoneNumber = "+84 225 0000 0000",
+                Email = "contact@haiphongharbor.example",
+                ImageUrl = "https://images.unsplash.com/photo-1479839672679-a46483c0e7c8?auto=format&fit=crop&w=1200&q=80",
+                Gallery = """
+["https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1469796466635-455ede028aca?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=80"]
+""",
+                StarRating = 4,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            },
+            new()
+            {
+                Name = "Can Tho Riverside Hotel",
+                Description = "Riverside views near the floating market with relaxing common areas.",
+                Address = "Ninh Kiều, Cần Thơ",
+                City = "Thành phố Cần Thơ",
+                Latitude = 10.0452,
+                Longitude = 105.7469,
+                PhoneNumber = "+84 292 0000 0000",
+                Email = "contact@canthoriverside.example",
+                ImageUrl = "https://images.unsplash.com/photo-1469796466635-455ede028aca?auto=format&fit=crop&w=1200&q=80",
+                Gallery = """
+["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80"]
+""",
+                StarRating = 4,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            },
+            new()
+            {
+                Name = "Hue Imperial Hotel",
+                Description = "Heritage-inspired comfort near the Perfume River and Imperial City.",
+                Address = "Trung tâm, Huế",
+                City = "Thành phố Huế",
+                Latitude = 16.4637,
+                Longitude = 107.5909,
+                PhoneNumber = "+84 234 0000 0000",
+                Email = "contact@hueimperial.example",
+                ImageUrl = "https://images.unsplash.com/photo-1519823551271-876d8e87aa36?auto=format&fit=crop&w=1200&q=80",
+                Gallery = """
+["https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1519823551271-876d8e87aa36?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1469796466635-455ede028aca?auto=format&fit=crop&w=1200&q=80"]
+""",
+                StarRating = 4,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            }
         };
-        context.RoomTypes.AddRange(roomTypes);
+
+        foreach (var h in majorHotels)
+        {
+            var existing = await context.Hotels.FirstOrDefaultAsync(x => x.Name == h.Name);
+            if (existing is null)
+            {
+                context.Hotels.Add(h);
+            }
+            else
+            {
+                existing.Description = h.Description;
+                existing.Address = h.Address;
+                existing.City = h.City;
+                existing.Latitude = h.Latitude;
+                existing.Longitude = h.Longitude;
+                existing.PhoneNumber = h.PhoneNumber;
+                existing.Email = h.Email;
+                existing.ImageUrl = h.ImageUrl;
+                existing.StarRating = h.StarRating;
+                existing.IsActive = h.IsActive;
+            }
+        }
         await context.SaveChangesAsync();
+
+        var defaultHotel = await context.Hotels.FirstAsync(h => h.Name == "Hanoi Elegance Hotel");
+        var majorHotelNames = majorHotels.Select(h => h.Name).ToList();
+
+        // Ensure staff is assigned to the default hotel
+        var existingAssignment = await context.HotelStaff
+            .AnyAsync(hs => hs.HotelId == defaultHotel.Id && hs.UserId == staff.Id);
+        if (!existingAssignment)
+        {
+            context.HotelStaff.Add(new HotelStaff
+            {
+                HotelId = defaultHotel.Id,
+                UserId = staff.Id,
+                Role = HotelStaffRole.Receptionist,
+                AssignedAt = DateTime.UtcNow
+            });
+            await context.SaveChangesAsync();
+        }
+
+        // Seed room types (idempotent)
+        if (!await context.RoomTypes.AnyAsync())
+        {
+            var roomTypes = new List<RoomType>
+            {
+                new() { Name = "Standard", Description = "Comfortable room with essential amenities" },
+                new() { Name = "Superior", Description = "Upgraded room with city or garden view" },
+                new() { Name = "Deluxe", Description = "Spacious room with premium furnishings" },
+                new() { Name = "Suite", Description = "Separate living area with luxury amenities" },
+                new() { Name = "Presidential", Description = "The finest accommodation with panoramic views" }
+            };
+            context.RoomTypes.AddRange(roomTypes);
+            await context.SaveChangesAsync();
+        }
+
+        var roomTypesByName = await context.RoomTypes.ToDictionaryAsync(rt => rt.Name);
 
         // Seed rooms
         var rooms = new List<Room>
         {
-            new() { Name = "Standard Room 101", RoomTypeId = roomTypes[0].Id, PricePerNight = 80, MaxOccupancy = 2, Description = "Cozy room on the first floor with garden view.", ImageUrl = "/images/rooms/standard1.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\"]" },
-            new() { Name = "Standard Room 102", RoomTypeId = roomTypes[0].Id, PricePerNight = 80, MaxOccupancy = 2, Description = "Comfortable standard room with modern decor.", ImageUrl = "/images/rooms/standard2.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\"]" },
-            new() { Name = "Standard Room 201", RoomTypeId = roomTypes[0].Id, PricePerNight = 85, MaxOccupancy = 2, Description = "Second floor standard with quiet atmosphere.", ImageUrl = "/images/rooms/standard3.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Fridge\"]" },
-            new() { Name = "Standard Room 202", RoomTypeId = roomTypes[0].Id, PricePerNight = 85, MaxOccupancy = 3, Description = "Family-friendly standard room.", ImageUrl = "/images/rooms/standard4.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Fridge\"]" },
-            new() { Name = "Superior Room 301", RoomTypeId = roomTypes[1].Id, PricePerNight = 130, MaxOccupancy = 2, Description = "Elegant room with stunning city skyline view.", ImageUrl = "/images/rooms/superior1.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Bathrobe\"]" },
-            new() { Name = "Superior Room 302", RoomTypeId = roomTypes[1].Id, PricePerNight = 130, MaxOccupancy = 2, Description = "Refined superior room overlooking the garden.", ImageUrl = "/images/rooms/superior2.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Bathrobe\"]" },
-            new() { Name = "Superior Room 303", RoomTypeId = roomTypes[1].Id, PricePerNight = 140, MaxOccupancy = 3, Description = "Spacious superior room ideal for small families.", ImageUrl = "/images/rooms/superior3.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Coffee Machine\"]" },
-            new() { Name = "Superior Room 304", RoomTypeId = roomTypes[1].Id, PricePerNight = 140, MaxOccupancy = 3, Description = "Modern superior room with balcony access.", ImageUrl = "/images/rooms/superior4.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Balcony\"]" },
-            new() { Name = "Deluxe Room 401", RoomTypeId = roomTypes[2].Id, PricePerNight = 220, MaxOccupancy = 2, Description = "Luxurious room with king-size bed and marble bathroom.", ImageUrl = "/images/rooms/deluxe1.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Bathrobe\",\"Jacuzzi\"]" },
-            new() { Name = "Deluxe Room 402", RoomTypeId = roomTypes[2].Id, PricePerNight = 220, MaxOccupancy = 2, Description = "Premium deluxe with ocean-inspired decor.", ImageUrl = "/images/rooms/deluxe2.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Bathrobe\",\"Workspace\"]" },
-            new() { Name = "Deluxe Room 403", RoomTypeId = roomTypes[2].Id, PricePerNight = 250, MaxOccupancy = 3, Description = "Family deluxe with connecting rooms available.", ImageUrl = "/images/rooms/deluxe3.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Bathrobe\",\"Jacuzzi\",\"Balcony\"]" },
-            new() { Name = "Deluxe Room 404", RoomTypeId = roomTypes[2].Id, PricePerNight = 250, MaxOccupancy = 4, Description = "Grand deluxe perfect for group stays.", ImageUrl = "/images/rooms/deluxe4.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Bathrobe\",\"Jacuzzi\",\"Living Area\"]" },
-            new() { Name = "Suite 501", RoomTypeId = roomTypes[3].Id, PricePerNight = 380, MaxOccupancy = 3, Description = "Elegant suite with separate living and dining areas.", ImageUrl = "/images/rooms/suite1.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Bathrobe\",\"Jacuzzi\",\"Living Room\",\"Kitchen\"]" },
-            new() { Name = "Suite 502", RoomTypeId = roomTypes[3].Id, PricePerNight = 380, MaxOccupancy = 3, Description = "Modern suite with panoramic window wall.", ImageUrl = "/images/rooms/suite2.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Bathrobe\",\"Panoramic View\",\"Living Room\"]" },
-            new() { Name = "Suite 503", RoomTypeId = roomTypes[3].Id, PricePerNight = 420, MaxOccupancy = 4, Description = "Family suite with two bedrooms and lounge.", ImageUrl = "/images/rooms/suite3.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Bathrobe\",\"Jacuzzi\",\"2 Bedrooms\",\"Lounge\"]" },
-            new() { Name = "Suite 504", RoomTypeId = roomTypes[3].Id, PricePerNight = 420, MaxOccupancy = 4, Description = "Corner suite with wrap-around terrace.", ImageUrl = "/images/rooms/suite4.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Bathrobe\",\"Terrace\",\"Living Room\",\"Dining\"]" },
-            new() { Name = "Presidential Suite 601", RoomTypeId = roomTypes[4].Id, PricePerNight = 750, MaxOccupancy = 4, Description = "The ultimate in luxury. Private elevator, butler service.", ImageUrl = "/images/rooms/presidential1.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Full Bar\",\"Bathrobe\",\"Jacuzzi\",\"Private Pool\",\"Butler\",\"3 Bedrooms\"]" },
-            new() { Name = "Presidential Suite 602", RoomTypeId = roomTypes[4].Id, PricePerNight = 750, MaxOccupancy = 4, Description = "Penthouse suite with rooftop terrace and 360° views.", ImageUrl = "/images/rooms/presidential2.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Full Bar\",\"Bathrobe\",\"Spa\",\"Rooftop Terrace\",\"Butler\",\"Grand Piano\"]" },
-            new() { Name = "Presidential Suite 603", RoomTypeId = roomTypes[4].Id, PricePerNight = 900, MaxOccupancy = 6, Description = "Royal presidential suite for distinguished guests.", ImageUrl = "/images/rooms/presidential3.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Full Bar\",\"Bathrobe\",\"Private Cinema\",\"Private Pool\",\"Butler\",\"4 Bedrooms\"]" },
-            new() { Name = "Presidential Suite 604", RoomTypeId = roomTypes[4].Id, PricePerNight = 1200, MaxOccupancy = 8, Description = "The Crown Suite — our most exclusive accommodation.", ImageUrl = "/images/rooms/presidential4.jpg", Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Full Bar\",\"Bathrobe\",\"Helipad Access\",\"Private Pool\",\"Butler\",\"5 Bedrooms\",\"Private Gym\"]" },
+            new()
+            {
+                HotelId = defaultHotel.Id,
+                Name = "Standard Room 101",
+                RoomTypeId = roomTypesByName["Standard"].Id,
+                PricePerNight = 900_000,
+                MaxOccupancy = 2,
+                Description = "Cozy room with Old Quarter vibes and a calm corner view.",
+                ImageUrl = "https://images.unsplash.com/photo-1505691723518-36a5ac3be353?auto=format&fit=crop&w=1200&q=80",
+                Gallery = """
+["https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1499916078039-922301b0eb9b?auto=format&fit=crop&w=1200&q=80"]
+""",
+                Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\"]"
+            },
+            new()
+            {
+                HotelId = defaultHotel.Id,
+                Name = "Standard Room 102",
+                RoomTypeId = roomTypesByName["Standard"].Id,
+                PricePerNight = 950_000,
+                MaxOccupancy = 2,
+                Description = "Clean and comfortable with modern decor.",
+                ImageUrl = "https://images.unsplash.com/photo-1501117716987-c8e1ecb2108a?auto=format&fit=crop&w=1200&q=80",
+                Gallery = """
+["https://images.unsplash.com/photo-1512914890250-353c97c9e7e2?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1200&q=80"]
+""",
+                Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\"]"
+            },
+            new()
+            {
+                HotelId = defaultHotel.Id,
+                Name = "Superior Room 201",
+                RoomTypeId = roomTypesByName["Superior"].Id,
+                PricePerNight = 1_300_000,
+                MaxOccupancy = 2,
+                Description = "Upgraded comfort with a brighter layout.",
+                ImageUrl = "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1200&q=80",
+                Gallery = """
+["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1469796466635-455ede028aca?auto=format&fit=crop&w=1200&q=80"]
+""",
+                Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\"]"
+            },
+            new()
+            {
+                HotelId = defaultHotel.Id,
+                Name = "Deluxe Room 301",
+                RoomTypeId = roomTypesByName["Deluxe"].Id,
+                PricePerNight = 1_900_000,
+                MaxOccupancy = 3,
+                Description = "Spacious deluxe room ideal for couples or small families.",
+                ImageUrl = "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80",
+                Gallery = """
+["https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80"]
+""",
+                Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Workspace\"]"
+            },
+            new()
+            {
+                HotelId = defaultHotel.Id,
+                Name = "Suite 401",
+                RoomTypeId = roomTypesByName["Suite"].Id,
+                PricePerNight = 2_800_000,
+                MaxOccupancy = 4,
+                Description = "Suite with separate seating area and upgraded bath amenities.",
+                ImageUrl = "https://images.unsplash.com/photo-1520256862855-398228c41684?auto=format&fit=crop&w=1200&q=80",
+                Gallery = """
+["https://images.unsplash.com/photo-1512914890250-353c97c9e7e2?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1519823551271-876d8e87aa36?auto=format&fit=crop&w=1200&q=80"]
+""",
+                Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Living Room\"]"
+            },
         };
-        context.Rooms.AddRange(rooms);
-        await context.SaveChangesAsync();
-
-        var bookings = new List<Booking>
+        if (!await context.Rooms.AnyAsync(r => r.HotelId == defaultHotel.Id))
         {
-            // Customer 1
-            new() { RoomId = rooms[0].Id, UserId = customer.Id, CheckIn = DateTime.Today.AddDays(-10), CheckOut = DateTime.Today.AddDays(-7), NumberOfGuests = 2, TotalPrice = 240, Status = BookingStatus.Completed },
-            new() { RoomId = rooms[4].Id, UserId = customer.Id, CheckIn = DateTime.Today.AddDays(-5), CheckOut = DateTime.Today.AddDays(-2), NumberOfGuests = 2, TotalPrice = 390, Status = BookingStatus.Completed },
-            new() { RoomId = rooms[8].Id, UserId = customer.Id, CheckIn = DateTime.Today.AddDays(5), CheckOut = DateTime.Today.AddDays(8), NumberOfGuests = 2, TotalPrice = 660, Status = BookingStatus.Confirmed },
-            new() { RoomId = rooms[12].Id, UserId = customer.Id, CheckIn = DateTime.Today.AddDays(15), CheckOut = DateTime.Today.AddDays(18), NumberOfGuests = 3, TotalPrice = 1140, Status = BookingStatus.Pending },
-            // Customer 2
-            new() { RoomId = rooms[16].Id, UserId = customer2.Id, CheckIn = DateTime.Today.AddDays(-20), CheckOut = DateTime.Today.AddDays(-18), NumberOfGuests = 2, TotalPrice = 1500, Status = BookingStatus.Completed },
-            new() { RoomId = rooms[1].Id, UserId = customer2.Id, CheckIn = DateTime.Today.AddDays(-15), CheckOut = DateTime.Today.AddDays(-12), NumberOfGuests = 1, TotalPrice = 240, Status = BookingStatus.Cancelled },
-            new() { RoomId = rooms[5].Id, UserId = customer2.Id, CheckIn = DateTime.Today.AddDays(10), CheckOut = DateTime.Today.AddDays(12), NumberOfGuests = 2, TotalPrice = 260, Status = BookingStatus.Confirmed },
-            // Customer 3
-            new() { RoomId = rooms[2].Id, UserId = customer3.Id, CheckIn = DateTime.Today.AddDays(-8), CheckOut = DateTime.Today.AddDays(-4), NumberOfGuests = 2, TotalPrice = 340, Status = BookingStatus.Completed },
-            new() { RoomId = rooms[9].Id, UserId = customer3.Id, CheckIn = DateTime.Today.AddDays(-2), CheckOut = DateTime.Today.AddDays(1), NumberOfGuests = 2, TotalPrice = 660, Status = BookingStatus.Confirmed },
-            new() { RoomId = rooms[13].Id, UserId = customer3.Id, CheckIn = DateTime.Today.AddDays(20), CheckOut = DateTime.Today.AddDays(25), NumberOfGuests = 4, TotalPrice = 1900, Status = BookingStatus.Pending }
-        };
-        context.Bookings.AddRange(bookings);
-        await context.SaveChangesAsync();
+            context.Rooms.AddRange(rooms);
+            await context.SaveChangesAsync();
+        }
 
-        // Seed payments for completed/confirmed bookings
-        context.Payments.AddRange(
-            // Customer 1 Payments
-            new Payment { BookingId = bookings[0].Id, Amount = 240, Method = PaymentMethod.Card, Status = PaymentStatus.Completed, PaidAt = DateTime.Today.AddDays(-10) },
-            new Payment { BookingId = bookings[1].Id, Amount = 390, Method = PaymentMethod.BankTransfer, Status = PaymentStatus.Completed, PaidAt = DateTime.Today.AddDays(-5) },
-            new Payment { BookingId = bookings[2].Id, Amount = 660, Method = PaymentMethod.Card, Status = PaymentStatus.Completed, PaidAt = DateTime.Today.AddDays(-1) },
-            // Customer 2 Payments
-            new Payment { BookingId = bookings[4].Id, Amount = 1500, Method = PaymentMethod.Card, Status = PaymentStatus.Completed, PaidAt = DateTime.Today.AddDays(-20) },
-            new Payment { BookingId = bookings[6].Id, Amount = 260, Method = PaymentMethod.Cash, Status = PaymentStatus.Completed, PaidAt = DateTime.Today.AddDays(-2) },
-            // Customer 3 Payments
-            new Payment { BookingId = bookings[7].Id, Amount = 340, Method = PaymentMethod.BankTransfer, Status = PaymentStatus.Completed, PaidAt = DateTime.Today.AddDays(-8) },
-            new Payment { BookingId = bookings[8].Id, Amount = 660, Method = PaymentMethod.Card, Status = PaymentStatus.Completed, PaidAt = DateTime.Today.AddDays(-3) }
-        );
-        await context.SaveChangesAsync();
-
-        // Seed reviews (only for completed bookings)
-        var reviews = new List<Review>
+        // Seed a small set of rooms for other major hotels (3-4 per hotel)
+        foreach (var hotel in await context.Hotels.Where(h => majorHotelNames.Contains(h.Name)).ToListAsync())
         {
-            new() { RoomId = rooms[0].Id, UserId = customer.Id, Rating = 4, Content = "Great stay! The room was clean and comfortable. WiFi was excellent. Would recommend for budget travelers." },
-            new() { RoomId = rooms[4].Id, UserId = customer.Id, Rating = 5, Content = "Absolutely wonderful experience! The city view was breathtaking and the mini bar was well-stocked. Staff was very attentive." },
-            new() { RoomId = rooms[16].Id, UserId = customer2.Id, Rating = 5, Content = "Incredible luxury. The private butler was amazing and the views are unmatched. Worth every penny." },
-            new() { RoomId = rooms[2].Id, UserId = customer3.Id, Rating = 3, Content = "Decent stay but the AC was loud and the mini fridge wasn't very cold." },
-            new() { RoomId = rooms[0].Id, UserId = customer3.Id, Rating = 4, Content = "Very nice standard room. The garden view is lovely in the morning." },
-            new() { RoomId = rooms[4].Id, UserId = customer2.Id, Rating = 5, Content = "Perfect for a weekend getaway. Will return for sure." },
-            new() { RoomId = rooms[8].Id, UserId = admin.Id, Rating = 5, Content = "We recently tested this room, flawless." },
-            // Adding more to reach around 15 as per the plan
-            new() { RoomId = rooms[1].Id, UserId = customer.Id, Rating = 4, Content = "Clean and nice, no issues." },
-            new() { RoomId = rooms[3].Id, UserId = customer2.Id, Rating = 5, Content = "So quiet! Best sleep I've had in weeks." },
-            new() { RoomId = rooms[5].Id, UserId = customer3.Id, Rating = 4, Content = "The balcony access is a huge plus." },
-            new() { RoomId = rooms[6].Id, UserId = customer.Id, Rating = 5, Content = "Very spacious." },
-            new() { RoomId = rooms[7].Id, UserId = customer2.Id, Rating = 3, Content = "Good bed, awful instant coffee." },
-            new() { RoomId = rooms[10].Id, UserId = customer3.Id, Rating = 5, Content = "Jacuzzi was fantastic." },
-            new() { RoomId = rooms[12].Id, UserId = customer.Id, Rating = 4, Content = "Dining area is a bit small but very nice overall." },
-            new() { RoomId = rooms[18].Id, UserId = customer2.Id, Rating = 5, Content = "Private pool and cinema were exceptional!" }
-        };
-        context.Reviews.AddRange(reviews);
-        await context.SaveChangesAsync();
+            if (hotel.Id == defaultHotel.Id) continue;
+            if (await context.Rooms.AnyAsync(r => r.HotelId == hotel.Id)) continue;
 
-        // Seed comments
-        context.ReviewComments.AddRange(
-            new ReviewComment { ReviewId = reviews[0].Id, UserId = admin.Id, Content = "Thank you for your kind words! We're glad you enjoyed your stay." },
-            new ReviewComment { ReviewId = reviews[0].Id, UserId = customer.Id, Content = "Will definitely come back next month!" },
-            new ReviewComment { ReviewId = reviews[1].Id, UserId = staff.Id, Content = "We appreciate your feedback! Looking forward to welcoming you again." },
-            new ReviewComment { ReviewId = reviews[2].Id, UserId = staff.Id, Content = "We are thrilled you had a luxury experience." },
-            new ReviewComment { ReviewId = reviews[3].Id, UserId = staff.Id, Content = "We apologize for the AC noise. Maintenance has been notified." },
-            new ReviewComment { ReviewId = reviews[3].Id, UserId = customer3.Id, Content = "Thanks for the quick response." },
-            new ReviewComment { ReviewId = reviews[4].Id, UserId = staff.Id, Content = "The garden is beautiful this time of year! Glad you liked it." },
-            new ReviewComment { ReviewId = reviews[11].Id, UserId = staff.Id, Content = "We will look into upgrading our coffee options. Thank you." },
-            new ReviewComment { ReviewId = reviews[14].Id, UserId = admin.Id, Content = "The cinema room is definitely a guest favorite!" },
-            // Pad out a few more customer replies for realism
-            new ReviewComment { ReviewId = reviews[1].Id, UserId = customer2.Id, Content = "Did they offer room service?" },
-            new ReviewComment { ReviewId = reviews[1].Id, UserId = customer.Id, Content = "Yes, 24/7!" },
-            new ReviewComment { ReviewId = reviews[8].Id, UserId = customer.Id, Content = "Do they have thick curtains?" },
-            new ReviewComment { ReviewId = reviews[8].Id, UserId = customer2.Id, Content = "Yes, blackout curtains installed." },
-            new ReviewComment { ReviewId = reviews[12].Id, UserId = staff.Id, Content = "Glad the Jacuzzi made your trip special." },
-            new ReviewComment { ReviewId = reviews[13].Id, UserId = customer3.Id, Content = "Was it noisy?" },
-            new ReviewComment { ReviewId = reviews[13].Id, UserId = customer.Id, Content = "Not at all, very well insulated." },
-            new ReviewComment { ReviewId = reviews[10].Id, UserId = staff.Id, Content = "Thank you for the review." }
-        );
-        await context.SaveChangesAsync();
+            var otherRooms = new List<Room>
+            {
+                new()
+                {
+                    HotelId = hotel.Id,
+                    Name = $"{hotel.City} Standard 101",
+                    RoomTypeId = roomTypesByName["Standard"].Id,
+                    PricePerNight = 850_000,
+                    MaxOccupancy = 2,
+                    Description = "Essential comfort with reliable amenities.",
+                    ImageUrl = "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1200&q=80",
+                    Gallery = """
+["https://images.unsplash.com/photo-1505691723518-36a5ac3be353?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1200&q=80"]
+""",
+                    Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\"]"
+                },
+                new()
+                {
+                    HotelId = hotel.Id,
+                    Name = $"{hotel.City} Superior 201",
+                    RoomTypeId = roomTypesByName["Superior"].Id,
+                    PricePerNight = 1_250_000,
+                    MaxOccupancy = 2,
+                    Description = "More space and a brighter room layout.",
+                    ImageUrl = "https://images.unsplash.com/photo-1505691723518-36a5ac3be353?auto=format&fit=crop&w=1200&q=80",
+                    Gallery = """
+["https://images.unsplash.com/photo-1512914890250-353c97c9e7e2?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1499916078039-922301b0eb9b?auto=format&fit=crop&w=1200&q=80"]
+""",
+                    Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\"]"
+                },
+                new()
+                {
+                    HotelId = hotel.Id,
+                    Name = $"{hotel.City} Deluxe 301",
+                    RoomTypeId = roomTypesByName["Deluxe"].Id,
+                    PricePerNight = 1_850_000,
+                    MaxOccupancy = 3,
+                    Description = "Premium furnishings with a city-facing window.",
+                    ImageUrl = "https://images.unsplash.com/photo-1519823551271-876d8e87aa36?auto=format&fit=crop&w=1200&q=80",
+                    Gallery = """
+["https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1505691723518-36a5ac3be353?auto=format&fit=crop&w=1200&q=80"]
+""",
+                    Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Workspace\"]"
+                },
+                new()
+                {
+                    HotelId = hotel.Id,
+                    Name = $"{hotel.City} Suite 401",
+                    RoomTypeId = roomTypesByName["Suite"].Id,
+                    PricePerNight = 2_650_000,
+                    MaxOccupancy = 4,
+                    Description = "Suite-style comfort with a separate seating area.",
+                    ImageUrl = "https://images.unsplash.com/photo-1520256862855-398228c41684?auto=format&fit=crop&w=1200&q=80",
+                    Gallery = """
+["https://images.unsplash.com/photo-1512914890250-353c97c9e7e2?auto=format&fit=crop&w=1200&q=80",
+"https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80"]
+""",
+                    Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Living Room\"]"
+                }
+            };
+            context.Rooms.AddRange(otherRooms);
+            await context.SaveChangesAsync();
+        }
 
-        // Seed tickets
-        context.SupportTickets.AddRange(
-            new SupportTicket { UserId = customer.Id, Category = TicketCategory.Room, Priority = TicketPriority.Medium, Subject = "Air conditioning noise", Description = "The AC in room 101 was making a buzzing noise during the night.", Status = TicketStatus.Resolved, AssignedToId = staff.Id },
-            new SupportTicket { UserId = customer.Id, Category = TicketCategory.Payment, Priority = TicketPriority.High, Subject = "Double charge on credit card", Description = "I was charged twice for my booking #3. Please investigate.", Status = TicketStatus.InProgress, AssignedToId = staff.Id },
-            new SupportTicket { UserId = customer.Id, Category = TicketCategory.Service, Priority = TicketPriority.Low, Subject = "Late checkout request", Description = "Can I get a late checkout at 2 PM for my upcoming stay?", Status = TicketStatus.Open },
-            new SupportTicket { UserId = customer2.Id, Category = TicketCategory.Other, Priority = TicketPriority.Medium, Subject = "Cannot update profile picture", Description = "The system gives an error when I try to upload a JPEG.", Status = TicketStatus.Open },
-            new SupportTicket { UserId = customer3.Id, Category = TicketCategory.Other, Priority = TicketPriority.Low, Subject = "Lost item", Description = "I think I left my sunglasses in room 201.", Status = TicketStatus.Closed, AssignedToId = admin.Id, ClosedAt = DateTime.Today.AddDays(-2) }
-        );
-        await context.SaveChangesAsync();
+        // Seed a small set of bookings/payments/reviews only once
+        if (!await context.Bookings.AnyAsync())
+        {
+            var seedRooms = await context.Rooms
+                .Where(r => r.HotelId == defaultHotel.Id)
+                .OrderBy(r => r.Id)
+                .ToListAsync();
+
+            if (seedRooms.Count >= 3)
+            {
+                var bookings = new List<Booking>
+                {
+                    new()
+                    {
+                        RoomId = seedRooms[0].Id,
+                        UserId = customer.Id,
+                        CheckIn = DateTime.Today.AddDays(-7),
+                        CheckOut = DateTime.Today.AddDays(-5),
+                        NumberOfGuests = 2,
+                        TotalPrice = seedRooms[0].PricePerNight * 2,
+                        Status = BookingStatus.Completed,
+                        CheckedInAt = DateTime.Today.AddDays(-7),
+                        CheckedOutAt = DateTime.Today.AddDays(-5)
+                    },
+                    new()
+                    {
+                        RoomId = seedRooms[1].Id,
+                        UserId = customer2.Id,
+                        CheckIn = DateTime.Today.AddDays(5),
+                        CheckOut = DateTime.Today.AddDays(7),
+                        NumberOfGuests = 2,
+                        TotalPrice = seedRooms[1].PricePerNight * 2,
+                        Status = BookingStatus.Confirmed,
+                        ConfirmedAt = DateTime.Today,
+                        PaymentDeadline = DateTime.Today.AddDays(1)
+                    },
+                    new()
+                    {
+                        RoomId = seedRooms[2].Id,
+                        UserId = customer3.Id,
+                        CheckIn = DateTime.Today.AddDays(12),
+                        CheckOut = DateTime.Today.AddDays(14),
+                        NumberOfGuests = 3,
+                        TotalPrice = seedRooms[2].PricePerNight * 2,
+                        Status = BookingStatus.Pending
+                    }
+                };
+                context.Bookings.AddRange(bookings);
+                await context.SaveChangesAsync();
+
+                context.Payments.AddRange(
+                    new Payment { BookingId = bookings[0].Id, Amount = bookings[0].TotalPrice, Method = PaymentMethod.CreditCard, Status = PaymentStatus.Completed, PaidAt = DateTime.Today.AddDays(-6) },
+                    new Payment { BookingId = bookings[1].Id, Amount = bookings[1].TotalPrice, Method = PaymentMethod.BankTransfer, Status = PaymentStatus.Completed, PaidAt = DateTime.Today.AddDays(-1) }
+                );
+                await context.SaveChangesAsync();
+
+                var reviews = new List<Review>
+                {
+                    new() { RoomId = seedRooms[0].Id, UserId = customer.Id, Rating = 5, Content = "Great location and very clean room. Staff was friendly and helpful." },
+                    new() { RoomId = seedRooms[0].Id, UserId = customer3.Id, Rating = 4, Content = "Nice stay overall. Good WiFi and comfortable bed." }
+                };
+                context.Reviews.AddRange(reviews);
+                await context.SaveChangesAsync();
+
+                context.ReviewComments.AddRange(
+                    new ReviewComment { ReviewId = reviews[0].Id, UserId = staff.Id, Content = "Thank you! We hope to welcome you again soon." }
+                );
+                await context.SaveChangesAsync();
+            }
+        }
+
+        // Seed tickets (idempotent)
+        if (!await context.SupportTickets.AnyAsync())
+        {
+            context.SupportTickets.AddRange(
+                new SupportTicket { UserId = customer.Id, Category = TicketCategory.Room, Priority = TicketPriority.Medium, Subject = "Air conditioning noise", Description = "The AC in room 101 was making a buzzing noise during the night.", Status = TicketStatus.Resolved, AssignedToId = staff.Id },
+                new SupportTicket { UserId = customer.Id, Category = TicketCategory.Payment, Priority = TicketPriority.High, Subject = "Double charge on credit card", Description = "I was charged twice for my booking #3. Please investigate.", Status = TicketStatus.InProgress, AssignedToId = staff.Id },
+                new SupportTicket { UserId = customer.Id, Category = TicketCategory.Service, Priority = TicketPriority.Low, Subject = "Late checkout request", Description = "Can I get a late checkout at 2 PM for my upcoming stay?", Status = TicketStatus.Open },
+                new SupportTicket { UserId = customer2.Id, Category = TicketCategory.Other, Priority = TicketPriority.Medium, Subject = "Cannot update profile picture", Description = "The system gives an error when I try to upload a JPEG.", Status = TicketStatus.Open },
+                new SupportTicket { UserId = customer3.Id, Category = TicketCategory.Other, Priority = TicketPriority.Low, Subject = "Lost item", Description = "I think I left my sunglasses in room 201.", Status = TicketStatus.Closed, AssignedToId = admin.Id, ClosedAt = DateTime.Today.AddDays(-2) }
+            );
+            await context.SaveChangesAsync();
+        }
     }
 
     private static async Task<ApplicationUser> EnsureUserAsync(

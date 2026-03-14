@@ -2,7 +2,13 @@
 
 A **.NET 10** web application for premium hotel bookings, real-time support, and administrative control.
 
-Built with **N-Tier Architecture** (Data -> Business -> Web), **ASP.NET Core Razor Pages**, **Entity Framework Core**, **SignalR**, and **AutoMapper**.
+Built with **N-Tier Architecture** (Data -> Business -> Web), **ASP.NET Core Razor Pages**, **a React+Vite mini-app for map-based discovery**, **Entity Framework Core**, **SignalR**, and **AutoMapper**.
+
+Key highlights:
+
+- **Interactive Vietnam map on `/Rooms`** — React + MapLibre + Tailwind UI for searching hotels and rooms on a map.
+- **Rich galleries with real Unsplash images** for both hotels and rooms (multi-image `Gallery` field).
+- **Multi-hotel property system** with scoped staff access and full admin tools.
 
 ---
 
@@ -49,24 +55,26 @@ Register -> Login -> Role-based access -> Logout
 
 ---
 
-### 2. Room Browsing & Search
+### 2. Room Browsing, Map Search & Discovery
 
 **Flow:**
 ```
-Home Page -> Rooms List (search/filter) -> Room Detail (reviews + AI concierge)
+Home Page -> Rooms (map + filters) -> Select hotel pin/card -> See rooms -> Room Detail (reviews + AI concierge)
 ```
 
 **Features:**
-- **Search & Filter:** Filter by room type, price range (min/max), occupancy, check-in/check-out dates
-- **Real-time availability badges:** Green "Available" / Red "Booked" tags
-- **Room Detail Page:** Full description, amenities list, image, pricing
-- **Average Rating Display:** Star ratings calculated from completed-stay reviews
-- **5 Room Types:** Standard, Deluxe, Suite, Penthouse, Villa (seeded)
-- **20 Sample Rooms** pre-seeded with varied pricing and amenities
+- **React map explorer on `/Rooms`:**
+  - Left sidebar: province/city, dates, guests filters; scrollable hotel list; per-hotel room list.
+  - Right: MapLibre map of Vietnam with hotel pins and rich popups.
+- **Search & Filter:** Filter by city, check-in/check-out, guests via the React sidebar (plus server-side room search).
+- **Real-time availability badges:** Green "Available" / red "Unavailable" tags on room cards.
+- **Room Detail Page:** Full description, amenities list, image gallery, pricing, reviews, AI concierge, and location map.
+- **5 Room Types:** Standard, Superior, Deluxe, Suite, Presidential (seeded).
+- **~30 Sample Rooms** pre-seeded across major Vietnamese cities with realistic pricing/amenities.
 
 **Service Methods:**
-- `SearchRoomsAsync(roomTypeId?, minPrice?, maxPrice?, minOccupancy?, checkIn?, checkOut?)`
-- `GetRoomByIdAsync(id)` - includes average rating + review count
+- `SearchRoomsAsync(hotelId?, roomTypeId?, minPrice?, maxPrice?, minOccupancy?, checkIn?, checkOut?)`
+- `GetRoomByIdAsync(id)` - includes average rating + review count + hotel coordinates
 - `GetRoomTypesAsync()` - for dropdown filters
 
 ---
@@ -210,16 +218,23 @@ Get personalized room recommendations + AI-generated answers
 
 ### 9. Admin Panel
 
-**Admin has access to 3 management dashboards:**
+**Admin has access to 4 management areas:**
+
+#### Admin > Hotels (`/Admin/Hotels`)
+- **List all hotels** with name, city, star rating, room count, status
+- **Create hotel** - name, address, city, coordinates, phone, email, image, gallery
+- **Edit hotel** - update any field, toggle IsActive
+- **Staff** - assign staff to hotel (`/Admin/Hotels/Staff?id=X`)
 
 #### Admin > Rooms (`/Admin/Rooms`)
 - **List all rooms** with type, price, occupancy, availability status
-- **Create new room** - select type, set price, add amenities, upload image URL
+- **Create new room** - select hotel, type, set price, add amenities, image URL/gallery
 - **Edit room** - update any field including toggling availability
 - **Delete room** - soft delete (sets `IsDeleted = true`)
 
 #### Admin > Bookings (`/Admin/Bookings`)
 - **View all bookings** with customer name, room, dates, price, status
+- **Detail** - full booking info and payment (`/Admin/Bookings/Detail?id=X`)
 - **Confirm** pending bookings -> changes status to `Confirmed`
 - **Complete** confirmed bookings -> changes status to `Completed`
 - Real-time updates when new bookings arrive
@@ -236,12 +251,12 @@ Get personalized room recommendations + AI-generated answers
 
 | Layer | Technology |
 |-------|-----------|
-| **Framework** | .NET 10 / ASP.NET Core Razor Pages |
+| **Framework** | .NET 10 / ASP.NET Core Razor Pages + React (Vite, TypeScript, Tailwind) |
 | **Database** | SQL Server LocalDB + Entity Framework Core (Code-First) |
 | **Authentication** | ASP.NET Identity (Roles: Customer, Staff, Admin) |
 | **Real-time** | SignalR (3 Hubs: BookingHub, ReviewHub, TicketHub) |
 | **Mapping** | AutoMapper |
-| **Frontend** | HTML5, Vanilla CSS (Custom Luxury Design System), JavaScript |
+| **Frontend** | Razor Pages, HTML5, custom luxury CSS design system, JavaScript, React+TypeScript Map UI |
 
 ---
 
@@ -250,30 +265,38 @@ Get personalized room recommendations + AI-generated answers
 ```
 HotelBooking/
 ├── HotelBooking.Data/                   # DATA LAYER
-│   ├── Entities/                        # Room, Booking, Review, SupportTicket, etc.
+│   ├── Entities/                        # Hotel, HotelStaff, Room, Booking, Payment, Review, etc.
 │   ├── Configurations/                  # Fluent API entity configurations
-│   ├── Repositories/                    # GenericRepository + BookingRepo + ReviewRepo
+│   ├── Repositories/                    # GenericRepository + domain repos
 │   ├── HotelDbContext.cs                # EF Core DbContext with Identity
-│   ├── SeedData.cs                      # Seeds roles, users, 20 rooms, bookings, reviews, tickets
-│   └── Migrations/                      # Auto-generated EF Core migrations
+│   ├── SeedData.cs                      # Roles, users, hotels (6 cities), rooms, bookings, reviews, tickets
+│   └── Migrations/                      # EF Core migrations
 │
 ├── HotelBooking.Business/              # BUSINESS LAYER
 │   ├── DTOs/AllDtos.cs                  # All record DTOs
 │   ├── Mappings/MappingProfile.cs       # AutoMapper profiles
-│   └── Services/                        # RoomService, BookingService, ReviewService, etc.
+│   └── Services/                        # HotelService, RoomService, BookingService, PaymentService, etc.
 │
 ├── HotelBooking.Web/                   # WEB LAYER
 │   ├── Program.cs                       # DI, Identity, SignalR config
+│   ├── Controllers/                     # HotelsApiController (JSON API for React map)
 │   ├── Hubs/Hubs.cs                     # SignalR hub classes
+│   ├── ClientApp/                       # React + Vite + TypeScript (map explorer)
+│   │   ├── src/
+│   │   │   ├── components/              # RoomsExplorer, HotelLocationMap
+│   │   │   ├── api.ts, types.ts
+│   │   │   └── main.tsx
+│   │   └── package.json                 # npm run build → wwwroot/react/
 │   ├── Pages/
 │   │   ├── Account/                     # Login, Register, Logout, AccessDenied
-│   │   ├── Rooms/                       # Index (list), Detail (view + reviews)
-│   │   ├── Booking/                     # Create, Confirmation, MyBookings
-│   │   ├── Tickets/                     # Index (list), Create
-│   │   └── Admin/                       # Rooms CRUD, Bookings mgmt, Tickets mgmt
+│   │   ├── Rooms/                       # Index (React map), Detail (reviews + AI + map)
+│   │   ├── Booking/                     # Create, Payment, Confirmation, MyBookings
+│   │   ├── Tickets/                     # Index, Create
+│   │   └── Admin/                       # Hotels, Rooms CRUD, Bookings, Tickets
 │   └── wwwroot/
 │       ├── css/site.css                 # Luxury design system
-│       └── js/signalr-*.js             # Real-time client scripts
+│       ├── js/signalr-*.js              # Real-time client scripts
+│       └── react/                       # Vite build output (hotel-map.js, hotel-map.css)
 ```
 
 ---
@@ -282,30 +305,44 @@ HotelBooking/
 
 ### Prerequisites
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- SQL Server LocalDB (included with Visual Studio)
+- [Node.js 18+](https://nodejs.org/) (for building the React map UI)
+- SQL Server LocalDB (included with Visual Studio / SQL Server Express)
 
 ### First-Time Setup
 
+1. **Restore .NET packages**
+   ```powershell
+   cd d:\Code\HotelBooking
+   dotnet restore
+   ```
+
+2. **Build the React map app** (required for `/Rooms` map and room detail map)
+   ```powershell
+   cd HotelBooking.Web\ClientApp
+   npm install
+   npm run build
+   cd ..\..
+   ```
+   Output is written to `HotelBooking.Web/wwwroot/react/` (hotel-map.js, hotel-map.css).
+
+3. **Run the web app**
+   ```powershell
+   dotnet run --project HotelBooking.Web
+   ```
+   On first run, EF Core applies migrations and seeds the database (roles, users, hotels, rooms, bookings, reviews, tickets). Open **https://localhost:5xxx** (or the URL shown in the console).
+
+### Optional: EF Core tools (only if you add new migrations)
 ```powershell
-cd d:\Code\HotelBooking
-
-# Install EF Core tools
 dotnet tool install --global dotnet-ef
-
-# Add Design package
-dotnet add HotelBooking.Web package Microsoft.EntityFrameworkCore.Design
-
-# Create migration
-dotnet ef migrations add InitialCreate --project HotelBooking.Data --startup-project HotelBooking.Web
-
-# Run (auto-applies migrations + seeds data)
-dotnet run --project HotelBooking.Web
+# Add design package if missing: dotnet add HotelBooking.Web package Microsoft.EntityFrameworkCore.Design
+dotnet ef migrations add YourMigrationName --project HotelBooking.Data --startup-project HotelBooking.Web
 ```
 
 ### Subsequent Runs
 ```powershell
 dotnet run --project HotelBooking.Web
 ```
+Re-run `npm run build` in `ClientApp` only when you change React/TypeScript code.
 
 ---
 
@@ -342,14 +379,20 @@ Works for **Bookings**, **Reviews**, and **Support Tickets**.
 | `/Account/Login` | No | Any | Login form |
 | `/Account/Register` | No | Any | Registration form |
 | `/Booking/Create?roomId=X` | Yes | Customer | Create booking with live price |
+| `/Booking/Payment?bookingId=X` | Yes | Customer | Payment form for booking |
 | `/Booking/Confirmation?id=X` | Yes | Customer | Booking confirmation details |
 | `/Booking/MyBookings` | Yes | Customer | View & cancel bookings |
 | `/Tickets` | Yes | Customer/Staff | View tickets |
 | `/Tickets/Create` | Yes | Customer | Submit support ticket |
+| `/Admin/Hotels` | Yes | Admin/Staff | List hotels |
+| `/Admin/Hotels/Create` | Yes | Admin/Staff | Create hotel |
+| `/Admin/Hotels/Edit?id=X` | Yes | Admin/Staff | Edit hotel |
+| `/Admin/Hotels/Staff?id=X` | Yes | Admin/Staff | Assign staff to hotel |
 | `/Admin/Rooms` | Yes | Admin/Staff | Manage rooms |
 | `/Admin/Rooms/Create` | Yes | Admin/Staff | Add new room |
-| `/Admin/Rooms/Edit?id=X` | yes | Admin/Staff | Edit room details |
+| `/Admin/Rooms/Edit?id=X` | Yes | Admin/Staff | Edit room details |
 | `/Admin/Bookings` | Yes | Admin/Staff | Confirm/complete bookings |
+| `/Admin/Bookings/Detail?id=X` | Yes | Admin/Staff | Booking & payment detail |
 | `/Admin/Tickets` | Yes | Admin/Staff | Assign & resolve tickets |
 
 ---
@@ -366,6 +409,13 @@ Connection string in `appsettings.json`:
 ```
 
 - **Auto-created** on first run via EF Core Migrations
-- **Auto-seeded** with roles, 5 users, 5 room types, 20 rooms, 10 bookings, 15 reviews, 17 comments, 5 tickets
+- **Auto-seeded** with roles, users, hotels (6 Vietnamese cities), room types, rooms, bookings, payments, reviews, comments, tickets
 - Uses `rowversion` for optimistic concurrency on Rooms and Bookings
 - Soft delete pattern on Rooms, Reviews, and Comments
+
+---
+
+## More documentation
+- **HUONG_DAN_CHAY.md** — Hướng dẫn chạy dự án (tiếng Việt)
+- **DOCS_OVERVIEW.md** — Kiến trúc và tích hợp React/API
+- **FEATURES.md** — Luồng nghiệp vụ và business rules chi tiết

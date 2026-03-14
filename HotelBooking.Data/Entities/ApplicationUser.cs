@@ -8,6 +8,7 @@ public class ApplicationUser : IdentityUser
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation
+    public ICollection<HotelStaff> HotelAssignments { get; set; } = new List<HotelStaff>();
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
     public ICollection<ReviewComment> ReviewComments { get; set; } = new List<ReviewComment>();

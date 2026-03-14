@@ -60,7 +60,7 @@
                         </div>
                     </div>
                     <div class="booking-card-footer">
-                        @if (booking.Status == "Pending")
+                        @if (booking.Status == "AwaitingPayment")
                         {
                             <a href="/Booking/Payment?id=@booking.Id" class="btn btn-sm btn-success">
                                 <i class="fas fa-credit-card"></i> Pay Now
@@ -73,15 +73,29 @@
                                 </button>
                             </form>
                         }
-                        @if (booking.Status == "Confirmed")
+                        @if (booking.Status == "Pending")
                         {
-                            <form method="post" asp-page-handler="Cancel"
+                            <form method="post" asp-page-handler="Cancel" class="d-inline"
                                   onsubmit="return confirm('Are you sure you want to cancel this booking?')">
                                 <input type="hidden" name="bookingId" value="@booking.Id" />
                                 <button type="submit" class="btn btn-sm btn-danger">
                                     <i class="fas fa-times"></i> Cancel
                                 </button>
                             </form>
+                        }
+                        @if (booking.Status == "Confirmed")
+                        {
+                            <form method="post" asp-page-handler="Cancel" class="d-inline"
+                                  onsubmit="return confirm('Cancel? A full refund will be processed.')">
+                                <input type="hidden" name="bookingId" value="@booking.Id" />
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </form>
+                        }
+                        @if (booking.RefundedAt.HasValue && booking.RefundAmount > 0)
+                        {
+                            <span class="text-success small"><i class="fas fa-undo"></i> Refund $@((booking.RefundAmount ?? 0).ToString("N2")) on @booking.RefundedAt!.Value.ToString("MMM dd")</span>
                         }
                         @if (booking.Status == "Completed")
                         {

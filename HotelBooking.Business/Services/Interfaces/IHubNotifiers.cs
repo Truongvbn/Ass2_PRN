@@ -4,6 +4,16 @@ namespace HotelBooking.Business.Services.Interfaces;
 
 public interface IBookingHubNotifier
 {
+    Task NewBookingRequest(BookingDto booking);
+    Task BookingApproved(int bookingId, string userId);
+    Task BookingRejected(int bookingId, string userId, string reason);
+    Task PaymentReceived(int bookingId);
+    Task BookingConfirmed(int bookingId, string userId);
+    Task RefundProcessed(int bookingId, string userId, decimal amount);
+    Task BookingExpired(int bookingId, string userId);
+    Task CheckedIn(int bookingId, string userId);
+    Task StayCompleted(int bookingId, string userId);
+    Task NoShow(int bookingId);
     Task BookingCreated(BookingDto booking);
     Task BookingStatusChanged(int bookingId, string newStatus);
     Task BookingCancelled(int bookingId);

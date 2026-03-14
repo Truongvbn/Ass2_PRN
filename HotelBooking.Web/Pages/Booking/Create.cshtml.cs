@@ -35,6 +35,9 @@ public class CreateModel(
         [Required, Range(1, 20)]
         [Display(Name = "Number of Guests")]
         public int NumberOfGuests { get; set; } = 1;
+
+        [Display(Name = "Special Requests")]
+        public string? GuestNotes { get; set; }
     }
 
     public async Task OnGetAsync(int roomId)
@@ -52,7 +55,7 @@ public class CreateModel(
         if (!ModelState.IsValid) return Page();
 
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var dto = new CreateBookingDto { RoomId = Input.RoomId, CheckIn = Input.CheckIn, CheckOut = Input.CheckOut, NumberOfGuests = Input.NumberOfGuests };
+        var dto = new CreateBookingDto { RoomId = Input.RoomId, CheckIn = Input.CheckIn, CheckOut = Input.CheckOut, NumberOfGuests = Input.NumberOfGuests, GuestNotes = Input.GuestNotes };
         var result = await bookingService.CreateBookingAsync(dto, userId);
 
         if (result.IsSuccess)

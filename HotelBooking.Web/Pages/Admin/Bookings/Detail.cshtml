@@ -78,7 +78,60 @@
                 </div>
             </div>
 
-            <div class="form-actions">
+            @if (!string.IsNullOrEmpty(Model.Booking.GuestNotes))
+            {
+                <div class="form-row">
+                    <label class="detail-label">Guest Notes</label>
+                    <div class="detail-value">@Model.Booking.GuestNotes</div>
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(Model.Booking.CancellationReason))
+            {
+                <div class="form-row">
+                    <label class="detail-label">Cancellation / Rejection Reason</label>
+                    <div class="detail-value text-danger">@Model.Booking.CancellationReason</div>
+                </div>
+            }
+            @if (Model.Booking.PaymentDeadline.HasValue)
+            {
+                <div class="form-row">
+                    <label class="detail-label">Payment Deadline</label>
+                    <div class="detail-value">@Model.Booking.PaymentDeadline.Value.ToString("MMMM dd, yyyy HH:mm")</div>
+                </div>
+            }
+
+            <div class="form-actions mt-3">
+                @if (Model.Booking.Status == "Pending")
+                {
+                    <form method="post" asp-page-handler="Approve" asp-route-id="@Model.Booking.Id" class="d-inline">
+                        <button class="btn btn-success"><i class="fas fa-check"></i> Approve</button>
+                    </form>
+                    <form method="post" asp-page-handler="Reject" asp-route-id="@Model.Booking.Id" class="d-inline">
+                        <input type="text" name="RejectReason" placeholder="Reason" class="form-control d-inline-block" style="width:150px;" />
+                        <button class="btn btn-warning"><i class="fas fa-times"></i> Reject</button>
+                    </form>
+                }
+                @if (Model.Booking.Status == "Confirmed")
+                {
+                    <form method="post" asp-page-handler="CheckIn" asp-route-id="@Model.Booking.Id" class="d-inline">
+                        <button class="btn btn-success"><i class="fas fa-door-open"></i> Check-in</button>
+                    </form>
+                    <form method="post" asp-page-handler="NoShow" asp-route-id="@Model.Booking.Id" class="d-inline">
+                        <button class="btn btn-warning"><i class="fas fa-user-times"></i> No-show</button>
+                    </form>
+                }
+                @if (Model.Booking.Status == "CheckedIn")
+                {
+                    <form method="post" asp-page-handler="Complete" asp-route-id="@Model.Booking.Id" class="d-inline">
+                        <button class="btn btn-primary"><i class="fas fa-flag-checkered"></i> Complete</button>
+                    </form>
+                }
+                @if (new[] { "Pending", "AwaitingPayment", "Confirmed" }.Contains(Model.Booking.Status))
+                {
+                    <form method="post" asp-page-handler="Cancel" asp-route-id="@Model.Booking.Id" class="d-inline" onsubmit="return confirm('Cancel this booking?')">
+                        <button class="btn btn-danger"><i class="fas fa-times"></i> Cancel</button>
+                    </form>
+                }
                 <a href="/Admin/Bookings" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to List</a>
             </div>
         </div>
