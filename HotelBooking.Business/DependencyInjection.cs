@@ -21,7 +21,16 @@ public static class DependencyInjection
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<ITicketService, TicketService>();
         services.AddScoped<IPaymentService, PaymentService>();
-        services.AddScoped<IAiAssistantService, MockAiAssistantService>();
+
+        var aiProvider = configuration["AiAssistant:Provider"] ?? "Mock";
+        if (aiProvider.Equals("Gemini", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddHttpClient<IAiAssistantService, GeminiAiAssistantService>();
+        }
+        else
+        {
+            services.AddScoped<IAiAssistantService, MockAiAssistantService>();
+        }
 
         // Need an IAuthService implementation registered here. 
         // We'll create it.

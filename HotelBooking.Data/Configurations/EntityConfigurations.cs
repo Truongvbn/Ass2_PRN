@@ -14,7 +14,7 @@ public class RoomConfiguration : IEntityTypeConfiguration<Room>
         builder.Property(r => r.PricePerNight).HasPrecision(18, 2);
         builder.Property(r => r.Description).HasMaxLength(2000);
         builder.Property(r => r.ImageUrl).HasMaxLength(500);
-        builder.Property(r => r.Gallery).HasColumnType("nvarchar(max)").HasDefaultValue("[]");
+        builder.Property(r => r.Gallery).HasColumnType("text").HasDefaultValue("[]");
         builder.Property(r => r.Amenities).HasMaxLength(2000);
         builder.Property(r => r.RowVersion).IsRowVersion();
         builder.HasQueryFilter(r => !r.IsDeleted);
@@ -48,7 +48,7 @@ public class HotelConfiguration : IEntityTypeConfiguration<Hotel>
         builder.Property(h => h.PhoneNumber).HasMaxLength(30);
         builder.Property(h => h.Email).HasMaxLength(200);
         builder.Property(h => h.ImageUrl).HasMaxLength(500);
-        builder.Property(h => h.Gallery).HasColumnType("nvarchar(max)").HasDefaultValue("[]");
+        builder.Property(h => h.Gallery).HasColumnType("text").HasDefaultValue("[]");
         builder.Property(h => h.CreatedAt);
         builder.HasIndex(h => h.City);
     }
@@ -177,7 +177,7 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
 
         builder.HasIndex(r => r.RoomId);
         builder.HasIndex(r => new { r.RoomId, r.UserId }).IsUnique()
-            .HasFilter("[IsDeleted] = 0"); // 1 review per user per room
+            .HasFilter("\"IsDeleted\" = false"); // 1 review per user per room
     }
 }
 

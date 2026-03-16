@@ -230,7 +230,9 @@ public static class SeedData
 ["https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=80",
 "https://images.unsplash.com/photo-1499916078039-922301b0eb9b?auto=format&fit=crop&w=1200&q=80"]
 """,
-                Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\"]"
+                Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\"]",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             },
             new()
             {
@@ -245,7 +247,9 @@ public static class SeedData
 ["https://images.unsplash.com/photo-1512914890250-353c97c9e7e2?auto=format&fit=crop&w=1200&q=80",
 "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1200&q=80"]
 """,
-                Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\"]"
+                Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\"]",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             },
             new()
             {
@@ -260,7 +264,9 @@ public static class SeedData
 ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80",
 "https://images.unsplash.com/photo-1469796466635-455ede028aca?auto=format&fit=crop&w=1200&q=80"]
 """,
-                Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\"]"
+                Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\"]",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             },
             new()
             {
@@ -275,7 +281,9 @@ public static class SeedData
 ["https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80",
 "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80"]
 """,
-                Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Workspace\"]"
+                Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Workspace\"]",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             },
             new()
             {
@@ -290,7 +298,9 @@ public static class SeedData
 ["https://images.unsplash.com/photo-1512914890250-353c97c9e7e2?auto=format&fit=crop&w=1200&q=80",
 "https://images.unsplash.com/photo-1519823551271-876d8e87aa36?auto=format&fit=crop&w=1200&q=80"]
 """,
-                Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Living Room\"]"
+                Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\",\"Living Room\"]",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             },
         };
         if (!await context.Rooms.AnyAsync(r => r.HotelId == defaultHotel.Id))
@@ -320,7 +330,9 @@ public static class SeedData
 ["https://images.unsplash.com/photo-1505691723518-36a5ac3be353?auto=format&fit=crop&w=1200&q=80",
 "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1200&q=80"]
 """,
-                    Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\"]"
+                    Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\"]",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
                 },
                 new()
                 {
@@ -335,7 +347,9 @@ public static class SeedData
 ["https://images.unsplash.com/photo-1512914890250-353c97c9e7e2?auto=format&fit=crop&w=1200&q=80",
 "https://images.unsplash.com/photo-1499916078039-922301b0eb9b?auto=format&fit=crop&w=1200&q=80"]
 """,
-                    Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\"]"
+                    Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Mini Bar\"]",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
                 },
                 new()
                 {
@@ -350,7 +364,9 @@ public static class SeedData
 ["https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80",
 "https://images.unsplash.com/photo-1505691723518-36a5ac3be353?auto=format&fit=crop&w=1200&q=80"]
 """,
-                    Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Workspace\"]"
+                    Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Workspace\"]",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
                 },
                 new()
                 {
@@ -365,7 +381,9 @@ public static class SeedData
 ["https://images.unsplash.com/photo-1512914890250-353c97c9e7e2?auto=format&fit=crop&w=1200&q=80",
 "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80"]
 """,
-                    Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Living Room\"]"
+                    Amenities = "[\"WiFi\",\"TV\",\"Air Conditioning\",\"Living Room\"]",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
                 }
             };
             context.Rooms.AddRange(otherRooms);
@@ -388,32 +406,32 @@ public static class SeedData
                     {
                         RoomId = seedRooms[0].Id,
                         UserId = customer.Id,
-                        CheckIn = DateTime.Today.AddDays(-7),
-                        CheckOut = DateTime.Today.AddDays(-5),
+                        CheckIn = DateTime.UtcNow.Date.AddDays(-7),
+                        CheckOut = DateTime.UtcNow.Date.AddDays(-5),
                         NumberOfGuests = 2,
                         TotalPrice = seedRooms[0].PricePerNight * 2,
                         Status = BookingStatus.Completed,
-                        CheckedInAt = DateTime.Today.AddDays(-7),
-                        CheckedOutAt = DateTime.Today.AddDays(-5)
+                        CheckedInAt = DateTime.UtcNow.Date.AddDays(-7),
+                        CheckedOutAt = DateTime.UtcNow.Date.AddDays(-5)
                     },
                     new()
                     {
                         RoomId = seedRooms[1].Id,
                         UserId = customer2.Id,
-                        CheckIn = DateTime.Today.AddDays(5),
-                        CheckOut = DateTime.Today.AddDays(7),
+                        CheckIn = DateTime.UtcNow.Date.AddDays(5),
+                        CheckOut = DateTime.UtcNow.Date.AddDays(7),
                         NumberOfGuests = 2,
                         TotalPrice = seedRooms[1].PricePerNight * 2,
                         Status = BookingStatus.Confirmed,
-                        ConfirmedAt = DateTime.Today,
-                        PaymentDeadline = DateTime.Today.AddDays(1)
+                        ConfirmedAt = DateTime.UtcNow.Date,
+                        PaymentDeadline = DateTime.UtcNow.Date.AddDays(1)
                     },
                     new()
                     {
                         RoomId = seedRooms[2].Id,
                         UserId = customer3.Id,
-                        CheckIn = DateTime.Today.AddDays(12),
-                        CheckOut = DateTime.Today.AddDays(14),
+                        CheckIn = DateTime.UtcNow.Date.AddDays(12),
+                        CheckOut = DateTime.UtcNow.Date.AddDays(14),
                         NumberOfGuests = 3,
                         TotalPrice = seedRooms[2].PricePerNight * 2,
                         Status = BookingStatus.Pending
@@ -423,21 +441,21 @@ public static class SeedData
                 await context.SaveChangesAsync();
 
                 context.Payments.AddRange(
-                    new Payment { BookingId = bookings[0].Id, Amount = bookings[0].TotalPrice, Method = PaymentMethod.CreditCard, Status = PaymentStatus.Completed, PaidAt = DateTime.Today.AddDays(-6) },
-                    new Payment { BookingId = bookings[1].Id, Amount = bookings[1].TotalPrice, Method = PaymentMethod.BankTransfer, Status = PaymentStatus.Completed, PaidAt = DateTime.Today.AddDays(-1) }
+                    new Payment { BookingId = bookings[0].Id, Amount = bookings[0].TotalPrice, Method = PaymentMethod.CreditCard, Status = PaymentStatus.Completed, PaidAt = DateTime.UtcNow.Date.AddDays(-6) },
+                    new Payment { BookingId = bookings[1].Id, Amount = bookings[1].TotalPrice, Method = PaymentMethod.BankTransfer, Status = PaymentStatus.Completed, PaidAt = DateTime.UtcNow.Date.AddDays(-1) }
                 );
                 await context.SaveChangesAsync();
 
                 var reviews = new List<Review>
                 {
-                    new() { RoomId = seedRooms[0].Id, UserId = customer.Id, Rating = 5, Content = "Great location and very clean room. Staff was friendly and helpful." },
-                    new() { RoomId = seedRooms[0].Id, UserId = customer3.Id, Rating = 4, Content = "Nice stay overall. Good WiFi and comfortable bed." }
+                    new() { RoomId = seedRooms[0].Id, UserId = customer.Id, Rating = 5, Content = "Great location and very clean room. Staff was friendly and helpful.", CreatedAt = DateTime.UtcNow },
+                    new() { RoomId = seedRooms[0].Id, UserId = customer3.Id, Rating = 4, Content = "Nice stay overall. Good WiFi and comfortable bed.", CreatedAt = DateTime.UtcNow }
                 };
                 context.Reviews.AddRange(reviews);
                 await context.SaveChangesAsync();
 
                 context.ReviewComments.AddRange(
-                    new ReviewComment { ReviewId = reviews[0].Id, UserId = staff.Id, Content = "Thank you! We hope to welcome you again soon." }
+                    new ReviewComment { ReviewId = reviews[0].Id, UserId = staff.Id, Content = "Thank you! We hope to welcome you again soon.", CreatedAt = DateTime.UtcNow }
                 );
                 await context.SaveChangesAsync();
             }
@@ -447,11 +465,11 @@ public static class SeedData
         if (!await context.SupportTickets.AnyAsync())
         {
             context.SupportTickets.AddRange(
-                new SupportTicket { UserId = customer.Id, Category = TicketCategory.Room, Priority = TicketPriority.Medium, Subject = "Air conditioning noise", Description = "The AC in room 101 was making a buzzing noise during the night.", Status = TicketStatus.Resolved, AssignedToId = staff.Id },
-                new SupportTicket { UserId = customer.Id, Category = TicketCategory.Payment, Priority = TicketPriority.High, Subject = "Double charge on credit card", Description = "I was charged twice for my booking #3. Please investigate.", Status = TicketStatus.InProgress, AssignedToId = staff.Id },
-                new SupportTicket { UserId = customer.Id, Category = TicketCategory.Service, Priority = TicketPriority.Low, Subject = "Late checkout request", Description = "Can I get a late checkout at 2 PM for my upcoming stay?", Status = TicketStatus.Open },
-                new SupportTicket { UserId = customer2.Id, Category = TicketCategory.Other, Priority = TicketPriority.Medium, Subject = "Cannot update profile picture", Description = "The system gives an error when I try to upload a JPEG.", Status = TicketStatus.Open },
-                new SupportTicket { UserId = customer3.Id, Category = TicketCategory.Other, Priority = TicketPriority.Low, Subject = "Lost item", Description = "I think I left my sunglasses in room 201.", Status = TicketStatus.Closed, AssignedToId = admin.Id, ClosedAt = DateTime.Today.AddDays(-2) }
+                new SupportTicket { UserId = customer.Id, Category = TicketCategory.Room, Priority = TicketPriority.Medium, Subject = "Air conditioning noise", Description = "The AC in room 101 was making a buzzing noise during the night.", Status = TicketStatus.Resolved, AssignedToId = staff.Id, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                new SupportTicket { UserId = customer.Id, Category = TicketCategory.Payment, Priority = TicketPriority.High, Subject = "Double charge on credit card", Description = "I was charged twice for my booking #3. Please investigate.", Status = TicketStatus.InProgress, AssignedToId = staff.Id, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                new SupportTicket { UserId = customer.Id, Category = TicketCategory.Service, Priority = TicketPriority.Low, Subject = "Late checkout request", Description = "Can I get a late checkout at 2 PM for my upcoming stay?", Status = TicketStatus.Open, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                new SupportTicket { UserId = customer2.Id, Category = TicketCategory.Other, Priority = TicketPriority.Medium, Subject = "Cannot update profile picture", Description = "The system gives an error when I try to upload a JPEG.", Status = TicketStatus.Open, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                new SupportTicket { UserId = customer3.Id, Category = TicketCategory.Other, Priority = TicketPriority.Low, Subject = "Lost item", Description = "I think I left my sunglasses in room 201.", Status = TicketStatus.Closed, AssignedToId = admin.Id, ClosedAt = DateTime.UtcNow.Date.AddDays(-2), CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
             );
             await context.SaveChangesAsync();
         }
@@ -463,7 +481,7 @@ public static class SeedData
         var user = await userManager.FindByEmailAsync(email);
         if (user is null)
         {
-            user = new ApplicationUser { UserName = email, Email = email, FullName = fullName, EmailConfirmed = true };
+            user = new ApplicationUser { UserName = email, Email = email, FullName = fullName, EmailConfirmed = true, CreatedAt = DateTime.UtcNow };
             await userManager.CreateAsync(user, password);
             await userManager.AddToRoleAsync(user, role);
         }

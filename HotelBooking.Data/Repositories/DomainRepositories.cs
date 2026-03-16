@@ -28,11 +28,13 @@ public class RoomRepository : Repository<Room>, IRoomRepository
             query = query.Where(r => r.MaxOccupancy >= minOccupancy.Value);
         if (checkIn.HasValue && checkOut.HasValue)
         {
+            var ciUtc = DateTime.SpecifyKind(checkIn.Value.Date, DateTimeKind.Utc);
+            var coUtc = DateTime.SpecifyKind(checkOut.Value.Date, DateTimeKind.Utc);
             var activeStatuses = new[] { BookingStatus.Pending, BookingStatus.AwaitingPayment, BookingStatus.Confirmed, BookingStatus.CheckedIn, BookingStatus.Completed };
             query = query.Where(r => !r.Bookings.Any(b =>
                 activeStatuses.Contains(b.Status) &&
-                b.CheckIn < checkOut.Value &&
-                b.CheckOut > checkIn.Value));
+                b.CheckIn < coUtc &&
+                b.CheckOut > ciUtc));
         }
 
         return await query.Where(r => r.IsAvailable).OrderBy(r => r.PricePerNight).ToListAsync(ct);
@@ -60,11 +62,13 @@ public class RoomRepository : Repository<Room>, IRoomRepository
             query = query.Where(r => r.MaxOccupancy >= minOccupancy.Value);
         if (checkIn.HasValue && checkOut.HasValue)
         {
+            var ciUtc = DateTime.SpecifyKind(checkIn.Value.Date, DateTimeKind.Utc);
+            var coUtc = DateTime.SpecifyKind(checkOut.Value.Date, DateTimeKind.Utc);
             var activeStatuses = new[] { BookingStatus.Pending, BookingStatus.AwaitingPayment, BookingStatus.Confirmed, BookingStatus.CheckedIn, BookingStatus.Completed };
             query = query.Where(r => !r.Bookings.Any(b =>
                 activeStatuses.Contains(b.Status) &&
-                b.CheckIn < checkOut.Value &&
-                b.CheckOut > checkIn.Value));
+                b.CheckIn < coUtc &&
+                b.CheckOut > ciUtc));
         }
 
         return await query.Where(r => r.IsAvailable).OrderBy(r => r.PricePerNight).ToListAsync(ct);
@@ -89,12 +93,14 @@ public class BookingRepository : Repository<Booking>, IBookingRepository
     public async Task<bool> HasOverlappingBookingAsync(int roomId, DateTime checkIn, DateTime checkOut,
         int? excludeBookingId = null, CancellationToken ct = default)
     {
+        var ciUtc = DateTime.SpecifyKind(checkIn.Date, DateTimeKind.Utc);
+        var coUtc = DateTime.SpecifyKind(checkOut.Date, DateTimeKind.Utc);
         var activeStatuses = new[] { BookingStatus.Pending, BookingStatus.AwaitingPayment, BookingStatus.Confirmed, BookingStatus.CheckedIn, BookingStatus.Completed };
         var query = DbSet.Where(b =>
             b.RoomId == roomId &&
             activeStatuses.Contains(b.Status) &&
-            b.CheckIn < checkOut &&
-            b.CheckOut > checkIn);
+            b.CheckIn < coUtc &&
+            b.CheckOut > ciUtc);
 
         if (excludeBookingId.HasValue)
             query = query.Where(b => b.Id != excludeBookingId.Value);

@@ -26,11 +26,11 @@ public class CreateModel(
 
         [Required, DataType(DataType.Date)]
         [Display(Name = "Check-In Date")]
-        public DateTime CheckIn { get; set; } = DateTime.Today;
+        public DateTime CheckIn { get; set; } = DateTime.UtcNow.Date;
 
         [Required, DataType(DataType.Date)]
         [Display(Name = "Check-Out Date")]
-        public DateTime CheckOut { get; set; } = DateTime.Today.AddDays(1);
+        public DateTime CheckOut { get; set; } = DateTime.UtcNow.Date.AddDays(1);
 
         [Required, Range(1, 20)]
         [Display(Name = "Number of Guests")]
