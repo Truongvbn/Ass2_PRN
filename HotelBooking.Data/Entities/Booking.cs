@@ -23,7 +23,7 @@ public class Booking
     public int NumberOfGuests { get; set; }
     public decimal TotalPrice { get; set; }
     public BookingStatus Status { get; set; } = BookingStatus.Pending;
-    public byte[] RowVersion { get; set; } = [];
+    public uint RowVersion { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 

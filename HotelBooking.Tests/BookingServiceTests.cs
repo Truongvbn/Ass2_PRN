@@ -35,7 +35,7 @@ public class BookingServiceTests
     public async Task CreateBookingAsync_WhenRoomIsDeleted_ReturnsError()
     {
         // Arrange
-        var dto = new CreateBookingDto { RoomId = 1, CheckIn = DateTime.Today.AddDays(1), CheckOut = DateTime.Today.AddDays(3), NumberOfGuests = 2 };
+        var dto = new CreateBookingDto { RoomId = 1, CheckIn = DateTime.UtcNow.Date.AddDays(1), CheckOut = DateTime.UtcNow.Date.AddDays(3), NumberOfGuests = 2 };
         
         _mockRoomRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(new Room { Id = 1, IsDeleted = true, IsAvailable = true });
 
@@ -51,7 +51,7 @@ public class BookingServiceTests
     public async Task CreateBookingAsync_WhenDatesOverlap_ReturnsError()
     {
         // Arrange
-        var dto = new CreateBookingDto { RoomId = 1, CheckIn = DateTime.Today.AddDays(1), CheckOut = DateTime.Today.AddDays(5), NumberOfGuests = 2 };
+        var dto = new CreateBookingDto { RoomId = 1, CheckIn = DateTime.UtcNow.Date.AddDays(1), CheckOut = DateTime.UtcNow.Date.AddDays(5), NumberOfGuests = 2 };
         
         _mockRoomRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(new Room { Id = 1, PricePerNight = 100, MaxOccupancy = 2, IsAvailable = true });
         
@@ -70,7 +70,7 @@ public class BookingServiceTests
     public async Task CreateBookingAsync_ValidData_CalculatesPriceCorrectlyAndReturnsSuccess()
     {
         // Arrange
-        var dto = new CreateBookingDto { RoomId = 1, CheckIn = DateTime.Today, CheckOut = DateTime.Today.AddDays(4), NumberOfGuests = 2 }; // 4 nights
+        var dto = new CreateBookingDto { RoomId = 1, CheckIn = DateTime.UtcNow.Date, CheckOut = DateTime.UtcNow.Date.AddDays(4), NumberOfGuests = 2 }; // 4 nights
         
         _mockRoomRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(new Room { Id = 1, PricePerNight = 150, MaxOccupancy = 2, IsAvailable = true });
         _mockBookingRepo.Setup(r => r.HasOverlappingBookingAsync(1, dto.CheckIn, dto.CheckOut)).ReturnsAsync(false);

@@ -23,10 +23,14 @@ public class BookingService : IBookingService
 
     public async Task<ServiceResult<BookingDto>> CreateBookingAsync(CreateBookingDto dto, string userId, CancellationToken ct = default)
     {
+        // Ensure UTC for PostgreSQL
+        var checkInUtc = DateTime.SpecifyKind(dto.CheckIn.Date, DateTimeKind.Utc);
+        var checkOutUtc = DateTime.SpecifyKind(dto.CheckOut.Date, DateTimeKind.Utc);
+
         // Validate dates
-        if (dto.CheckIn.Date < DateTime.Today)
+        if (checkInUtc < DateTime.UtcNow.Date)
             return ServiceResult<BookingDto>.Failure("Check-in date cannot be in the past", "INVALID_DATE");
-        if (dto.CheckOut <= dto.CheckIn)
+        if (checkOutUtc <= checkInUtc)
             return ServiceResult<BookingDto>.Failure("Check-out must be after check-in", "INVALID_DATE");
         if (dto.NumberOfGuests <= 0)
             return ServiceResult<BookingDto>.Failure("Number of guests must be greater than 0", "VALIDATION");
@@ -39,19 +43,19 @@ public class BookingService : IBookingService
             return ServiceResult<BookingDto>.Failure($"Room max occupancy is {room.MaxOccupancy}", "EXCEEDS_OCCUPANCY");
 
         // Check overlapping bookings
-        if (await _bookingRepo.HasOverlappingBookingAsync(dto.RoomId, dto.CheckIn, dto.CheckOut, ct: ct))
+        if (await _bookingRepo.HasOverlappingBookingAsync(dto.RoomId, checkInUtc, checkOutUtc, ct: ct))
             return ServiceResult<BookingDto>.Failure("Room is already booked for these dates", "BOOKING_OVERLAP");
 
         // Calculate price (server-side, never trust client)
-        var nights = (dto.CheckOut.Date - dto.CheckIn.Date).Days;
+        var nights = (checkOutUtc - checkInUtc).Days;
         var totalPrice = room.PricePerNight * nights;
 
         var booking = new Booking
         {
             RoomId = dto.RoomId,
             UserId = userId,
-            CheckIn = dto.CheckIn.Date,
-            CheckOut = dto.CheckOut.Date,
+            CheckIn = checkInUtc,
+            CheckOut = checkOutUtc,
             NumberOfGuests = dto.NumberOfGuests,
             TotalPrice = totalPrice,
             Status = BookingStatus.Pending,
@@ -206,7 +210,7 @@ public class BookingService : IBookingService
         if (booking is null) return ServiceResult.Failure("Booking not found", "NOT_FOUND");
         if (booking.Status != BookingStatus.Confirmed)
             return ServiceResult.Failure("Only confirmed bookings can be checked in", "INVALID_STATE");
-        if (booking.CheckIn.Date > DateTime.Today)
+        if (booking.CheckIn.Date > DateTime.UtcNow.Date)
             return ServiceResult.Failure("Check-in date has not been reached yet", "INVALID_STATE");
 
         booking.Status = BookingStatus.CheckedIn;
@@ -226,7 +230,7 @@ public class BookingService : IBookingService
         if (booking is null) return ServiceResult.Failure("Booking not found", "NOT_FOUND");
         if (booking.Status != BookingStatus.Confirmed)
             return ServiceResult.Failure("Only confirmed bookings can be marked as no-show", "INVALID_STATE");
-        if (booking.CheckIn.Date >= DateTime.Today)
+        if (booking.CheckIn.Date >= DateTime.UtcNow.Date)
             return ServiceResult.Failure("No-show can only be marked after the check-in date", "INVALID_STATE");
 
         booking.Status = BookingStatus.NoShow;

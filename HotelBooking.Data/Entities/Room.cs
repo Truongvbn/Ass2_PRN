@@ -14,7 +14,7 @@ public class Room
     public string Amenities { get; set; } = "[]"; // JSON array
     public bool IsAvailable { get; set; } = true;
     public bool IsDeleted { get; set; }
-    public byte[] RowVersion { get; set; } = [];
+    public uint RowVersion { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
