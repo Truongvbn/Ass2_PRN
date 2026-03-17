@@ -1794,42 +1794,96 @@ select.form-control {
   font-weight: 600;
 }
 
-/* ── AI Chat Widget ── */
-.ai-chat-widget {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  margin-top: 2rem;
-  box-shadow: var(--shadow-sm);
+/* ── AI Chat Floating Widget ── */
+.ai-chat-floating {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
-.ai-chat-widget h4 {
+.ai-chat-toggle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--white);
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.ai-chat-toggle:hover {
+  transform: scale(1.05);
+  background: var(--navy-light);
+}
+
+.ai-chat-window {
+  width: 350px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
   margin-bottom: 1rem;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.ai-chat-window.active {
+  display: flex;
+}
+
+.ai-chat-header {
+  background: var(--navy);
+  color: var(--white);
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ai-chat-header h5 {
+  margin: 0;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--navy);
 }
 
-.ai-messages {
-  height: 200px;
+.ai-chat-close {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.8);
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.ai-chat-messages {
+  height: 350px;
   overflow-y: auto;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  background: var(--bg-light);
-  border-radius: var(--radius-md);
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
+  background: #F9FAFB;
 }
 
 .ai-message {
-  padding: 0.6rem 1rem;
-  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 1.2rem;
   font-size: 0.9rem;
   max-width: 85%;
   line-height: 1.4;
+  word-wrap: break-word;
 }
 
 .ai-bubble {
@@ -1837,6 +1891,7 @@ select.form-control {
   color: var(--text-dark);
   align-self: flex-start;
   border-bottom-left-radius: 0.2rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   border: 1px solid var(--border);
 }
 
@@ -1853,23 +1908,82 @@ select.form-control {
   opacity: 0.7;
 }
 
-.ai-bubble.error {
-  background: #FEF2F2;
-  color: #B91C1C;
-  border-color: #FCA5A5;
+.markdown-body {
+  word-break: break-word;
 }
 
-.ai-input-row {
+.markdown-body p {
+  margin-bottom: 0.5rem;
+}
+
+.markdown-body p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body ul, .markdown-body ol {
+  margin-bottom: 0.5rem;
+  padding-left: 1.25rem;
+}
+
+.markdown-body li {
+  margin-bottom: 0.25rem;
+}
+
+.markdown-body strong {
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.ai-chat-footer {
+  padding: 1rem;
+  border-top: 1px solid var(--border);
   display: flex;
   gap: 0.5rem;
 }
 
-.ai-input-row .form-control {
+.ai-chat-footer input {
   flex: 1;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+.ai-chat-footer button {
+  background: var(--navy);
+  color: var(--white);
+  border: none;
+  width: 38px;
   height: 38px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ── Responsive ── */
+@media (max-width: 576px) {
+  .ai-chat-window {
+    width: calc(100vw - 2rem);
+    right: 1rem;
+  }
+  .ai-chat-floating {
+    right: 1rem;
+    bottom: 1rem;
+  }
+}
+
+/* ── AI Chat Widget (Old, keeping for backward compat if needed) ── */
+.ai-chat-widget {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-top: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
 @media (max-width: 768px) {
   .form-row {
     grid-template-columns: 1fr;

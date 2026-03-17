@@ -58,8 +58,10 @@ public class BookingService : IBookingService
             CheckOut = checkOutUtc,
             NumberOfGuests = dto.NumberOfGuests,
             TotalPrice = totalPrice,
-            Status = BookingStatus.Pending,
+            Status = BookingStatus.AwaitingPayment,
             GuestNotes = dto.GuestNotes,
+            ConfirmedAt = DateTime.UtcNow,
+            PaymentDeadline = DateTime.UtcNow.AddHours(24),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -68,7 +70,8 @@ public class BookingService : IBookingService
         var created = await _bookingRepo.GetWithDetailsAsync(booking.Id, ct);
         var bookingDto = _mapper.Map<BookingDto>(created!);
 
-        await _notifier.NewBookingRequest(bookingDto);
+        // Notify all clients that this room is now locked (first-come-first-serve)
+        await _notifier.RoomLocked(dto.RoomId, room.Name);
         await _notifier.BookingCreated(bookingDto);
 
         return ServiceResult<BookingDto>.Success(bookingDto);
@@ -243,7 +246,7 @@ public class BookingService : IBookingService
         return ServiceResult.Success();
     }
 
-    public async Task<ServiceResult> CompleteBookingAsync(int id, CancellationToken ct = default)
+    public async Task<ServiceResult> CompleteBookingAsync(int id, CheckoutBookingDto? checkoutDto = null, CancellationToken ct = default)
     {
         var booking = await _bookingRepo.GetByIdAsync(id, ct);
         if (booking is null) return ServiceResult.Failure("Booking not found", "NOT_FOUND");
@@ -253,6 +256,16 @@ public class BookingService : IBookingService
         booking.Status = BookingStatus.Completed;
         booking.CheckedOutAt = DateTime.UtcNow;
         booking.UpdatedAt = DateTime.UtcNow;
+
+        if (checkoutDto != null)
+        {
+            booking.ExtraChargeAmount = checkoutDto.ExtraChargeAmount;
+            booking.ExtraChargeDescription = checkoutDto.ExtraChargeDescription;
+            booking.IsExtraChargePaid = checkoutDto.ExtraChargeAmount <= 0;
+            booking.LostAndFoundNotes = checkoutDto.LostAndFoundNotes;
+            booking.LostAndFoundImageUrl = checkoutDto.LostAndFoundImageUrl;
+        }
+
         await _bookingRepo.UpdateAsync(booking, ct);
 
         await _notifier.StayCompleted(id, booking.UserId);

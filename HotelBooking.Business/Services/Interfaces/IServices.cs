@@ -26,7 +26,7 @@ public interface IBookingService
     Task<ServiceResult> AdminCancelBookingAsync(int id, string? reason = null, CancellationToken ct = default);
     Task<ServiceResult> CheckInAsync(int id, CancellationToken ct = default);
     Task<ServiceResult> MarkNoShowAsync(int id, CancellationToken ct = default);
-    Task<ServiceResult> CompleteBookingAsync(int id, CancellationToken ct = default);
+    Task<ServiceResult> CompleteBookingAsync(int id, CheckoutBookingDto? checkoutDto = null, CancellationToken ct = default);
 }
 
 public interface IHotelService
@@ -72,5 +72,12 @@ public interface ITicketService
 public interface IAiAssistantService
 {
     Task<ServiceResult<IReadOnlyList<RoomListDto>>> RecommendRoomsAsync(RoomPreferenceDto preferences, CancellationToken ct = default);
-    Task<ServiceResult<string>> AnswerQuestionAsync(string question, int? roomId, CancellationToken ct = default);
+    Task<ServiceResult<AiResponseDto>> AnswerQuestionAsync(string question, int? roomId, CancellationToken ct = default);
+}
+
+public class AiResponseDto
+{
+    public string Answer { get; set; } = string.Empty;
+    public string? Action { get; set; }
+    public string? ActionData { get; set; }
 }

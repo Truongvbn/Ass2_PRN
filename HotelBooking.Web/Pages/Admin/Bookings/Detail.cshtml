@@ -122,9 +122,9 @@
                 }
                 @if (Model.Booking.Status == "CheckedIn")
                 {
-                    <form method="post" asp-page-handler="Complete" asp-route-id="@Model.Booking.Id" class="d-inline">
-                        <button class="btn btn-primary"><i class="fas fa-flag-checkered"></i> Complete</button>
-                    </form>
+                    <button type="button" class="btn btn-primary" onclick="document.getElementById('checkout-modal').style.display='block'">
+                        <i class="fas fa-flag-checkered"></i> Process Check-out
+                    </button>
                 }
                 @if (new[] { "Pending", "AwaitingPayment", "Confirmed" }.Contains(Model.Booking.Status))
                 {
@@ -137,3 +137,50 @@
         </div>
     }
 </div>
+
+@if (Model.Booking?.Status == "CheckedIn")
+{
+    <div id="checkout-modal" class="modal-backdrop" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; overflow-y:auto;">
+        <div class="modal-container" style="background:#fff; max-width:600px; margin:5% auto; padding:2rem; border-radius:var(--radius-lg); position:relative; box-shadow:var(--shadow-lg);\ cartoons-container">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom:1px solid var(--border); padding-bottom:1rem;">
+                <h3 style="margin:0;"><i class="fas fa-sign-out-alt"></i> Guest Check-out</h3>
+                <button type="button" onclick="document.getElementById('checkout-modal').style.display='none'" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+
+            <form method="post" asp-page-handler="Complete" asp-route-id="@Model.Booking.Id">
+                <div class="form-section">
+                    <h4 style="margin-bottom:1rem; color:var(--navy);"><i class="fas fa-receipt"></i> Additional Charges</h4>
+                    <div class="form-group">
+                        <label asp-for="CheckoutDto.ExtraChargeDescription">Description (Food, drinks, etc.)</label>
+                        <textarea asp-for="CheckoutDto.ExtraChargeDescription" class="form-control" rows="2" placeholder="e.g. 2x Minibar water, 1x Extra breakfast"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CheckoutDto.ExtraChargeAmount">Amount ($)</label>
+                        <input asp-for="CheckoutDto.ExtraChargeAmount" type="number" step="0.01" min="0" class="form-control" value="0" />
+                    </div>
+                </div>
+
+                <div class="form-section mt-4">
+                    <h4 style="margin-bottom:1rem; color:var(--navy);"><i class="fas fa-box-open"></i> Lost & Found</h4>
+                    <div class="form-group">
+                        <label asp-for="CheckoutDto.LostAndFoundNotes">Items Found in Room</label>
+                        <textarea asp-for="CheckoutDto.LostAndFoundNotes" class="form-control" rows="2" placeholder="Describe any items left behind by the guest..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CheckoutDto.LostAndFoundImageUrl">Evidence Image URL</label>
+                        <input asp-for="CheckoutDto.LostAndFoundImageUrl" class="form-control" placeholder="https://..." />
+                        <small class="text-muted">Link to a photo of the items found.</small>
+                    </div>
+                </div>
+
+                <div style="margin-top:2rem; padding-top:1rem; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:1rem;">
+                    <button type="button" class="btn btn-outline" onclick="document.getElementById('checkout-modal').style.display='none'">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-check-circle"></i> Confirm Check-out</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts {
+}

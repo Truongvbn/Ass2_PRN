@@ -30,8 +30,12 @@
                     <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> @Model.ErrorMessage</div>
                 }
 
-                <form method="post">
+                <form method="post" id="booking-form" data-room-id="@Model.RoomId">
                     <input type="hidden" asp-for="Input.RoomId" />
+
+                    <div id="room-locked-banner" class="alert alert-danger" style="display:none">
+                        <i class="fas fa-ban"></i> This room was just booked by someone else. Please <a href="/Rooms">browse other rooms</a>.
+                    </div>
 
                     <div class="form-row">
                         <div class="form-group">

@@ -1,6 +1,6 @@
 using HotelBooking.Business.DTOs;
 using HotelBooking.Business.Services.Interfaces;
-using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR; 
 
 namespace HotelBooking.Web.Hubs;
 
@@ -46,6 +46,9 @@ public class BookingHubNotifier(IHubContext<BookingHub> hub) : IBookingHubNotifi
 
     public Task BookingCancelled(int bookingId)
         => hub.Clients.All.SendAsync("BookingCancelled", bookingId);
+
+    public Task RoomLocked(int roomId, string roomName)
+        => hub.Clients.All.SendAsync("RoomLocked", roomId, roomName);
 }
 
 public class ReviewHubNotifier(IHubContext<ReviewHub> hub) : IReviewHubNotifier

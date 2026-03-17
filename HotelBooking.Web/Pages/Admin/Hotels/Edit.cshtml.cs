@@ -20,6 +20,8 @@ public class EditModel(IHotelService hotelService) : PageModel
         public string Description { get; set; } = "";
         public string Address { get; set; } = "";
         public string City { get; set; } = "";
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
         public string PhoneNumber { get; set; } = "";
         public string Email { get; set; } = "";
         public string ImageUrl { get; set; } = "";
@@ -37,8 +39,11 @@ public class EditModel(IHotelService hotelService) : PageModel
         {
             Id = h.Id,
             Name = h.Name,
+            Description = h.Description,
             City = h.City,
             Address = h.Address,
+            Latitude = h.Latitude,
+            Longitude = h.Longitude,
             PhoneNumber = h.PhoneNumber,
             Email = h.Email,
             ImageUrl = h.ImageUrl,
@@ -58,6 +63,8 @@ public class EditModel(IHotelService hotelService) : PageModel
             Description = Input.Description,
             Address = Input.Address,
             City = Input.City,
+            Latitude = Input.Latitude,
+            Longitude = Input.Longitude,
             PhoneNumber = Input.PhoneNumber,
             Email = Input.Email,
             ImageUrl = Input.ImageUrl,

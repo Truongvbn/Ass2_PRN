@@ -54,6 +54,28 @@
         @RenderBody()
     </main>
 
+    <!-- Floating AI Chatbot -->
+    <div class="ai-chat-floating" id="ai-chat-floating">
+        <div class="ai-chat-window" id="ai-chat-window">
+            <div class="ai-chat-header">
+                <h5><i class="fas fa-robot"></i> AI Concierge</h5>
+                <button class="ai-chat-close" onclick="toggleAiChat()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="ai-chat-messages" id="floating-chat-messages">
+                <div class="ai-message ai-bubble markdown-body">
+                    <p>Hello! I'm your <strong>Grand Azure AI Concierge</strong>. How can I help you today?</p>
+                </div>
+            </div>
+            <div class="ai-chat-footer">
+                <input type="text" id="floating-chat-input" placeholder="Type your message..." />
+                <button onclick="sendFloatingAiMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+        <button class="ai-chat-toggle" onclick="toggleAiChat()" title="Talk to AI Concierge">
+            <i class="fas fa-comment-dots"></i>
+        </button>
+    </div>
+
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-brand">
@@ -76,6 +98,73 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        function toggleAiChat() {
+            const window = document.getElementById('ai-chat-window');
+            window.classList.toggle('active');
+            if (window.classList.contains('active')) {
+                document.getElementById('floating-chat-input').focus();
+            }
+        }
+
+        async function sendFloatingAiMessage() {
+            const input = document.getElementById('floating-chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const msgs = document.getElementById('floating-chat-messages');
+            msgs.innerHTML += `<div class="ai-message user-bubble">${message}</div>`;
+            input.value = '';
+            input.disabled = true;
+
+            const thinkingId = 'thinking-' + Date.now();
+            msgs.innerHTML += `<div id="${thinkingId}" class="ai-message ai-bubble thinking">AI is thinking...</div>`;
+            msgs.scrollTop = msgs.scrollHeight;
+
+            try {
+                // Determine roomId if on a detail page
+                let roomId = null;
+                const urlParams = new URLSearchParams(window.location.search);
+                if (window.location.pathname.toLowerCase().includes('/rooms/detail')) {
+                    roomId = urlParams.get('id');
+                }
+
+                const endpoint = roomId 
+                    ? `/api/ai/answer?question=${encodeURIComponent(message)}&roomId=${roomId}`
+                    : `/api/ai/answer?question=${encodeURIComponent(message)}`;
+
+                const res = await fetch(endpoint);
+                const data = await res.json();
+
+                const thinkingBubble = document.getElementById(thinkingId);
+                if (thinkingBubble) thinkingBubble.remove();
+
+                const formattedAnswer = marked.parse(data.answer || 'I apologize, I could not generate a response.');
+                msgs.innerHTML += `<div class="ai-message ai-bubble markdown-body">${formattedAnswer}</div>`;
+
+                // Handle AI actions
+                if (data.action === 'REDIRECT_BOOKING') {
+                    const roomId = data.actionData || '0';
+                    setTimeout(() => {
+                        window.location.href = `/Booking/Create?roomId=${roomId}`;
+                    }, 2000); // Redirect after 2 seconds so the user can read the message
+                }
+            } catch (err) {
+                const thinkingBubble = document.getElementById(thinkingId);
+                if (thinkingBubble) thinkingBubble.remove();
+                msgs.innerHTML += `<div class="ai-message ai-bubble error">Sorry, I'm having trouble connecting right now.</div>`;
+            } finally {
+                input.disabled = false;
+                input.focus();
+                msgs.scrollTop = msgs.scrollHeight;
+            }
+        }
+
+        document.getElementById('floating-chat-input')?.addEventListener('keydown', e => {
+            if (e.key === 'Enter') sendFloatingAiMessage();
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

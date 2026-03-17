@@ -241,13 +241,12 @@ else
                 <!-- AI Chat Widget -->
                 <div class="ai-chat-widget">
                     <h4><i class="fas fa-robot"></i> AI Concierge</h4>
-                    <div id="ai-chat-messages" class="ai-messages">
-                        <div class="ai-message ai-bubble">Hi! Ask me anything about this room.</div>
-                    </div>
-                    <div class="ai-input-row">
-                        <input type="text" id="ai-question" class="form-control" placeholder="Ask a question..." />
-                        <button onclick="askAI(@room.Id)" class="btn btn-sm btn-primary">
-                            <i class="fas fa-paper-plane"></i>
+                    <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 0.75rem;">
+                        You can also use the floating chat icon at the bottom right to talk to me anywhere!
+                    </p>
+                    <div class="form-actions">
+                        <button onclick="toggleAiChat()" class="btn btn-primary btn-full">
+                            <i class="fas fa-comment-dots"></i> Open AI Concierge
                         </button>
                     </div>
                 </div>
@@ -311,43 +310,6 @@ else
     window.addEventListener('click', function(event) {
         const modal = document.getElementById('edit-review-modal');
         if (event.target === modal) closeEditReviewModal();
-    });
-    async function askAI(roomId) {
-        const qInput = document.getElementById('ai-question');
-        const q = qInput.value.trim();
-        if (!q) return;
-        
-        const msgs = document.getElementById('ai-chat-messages');
-        msgs.innerHTML += `<div class="ai-message user-bubble">${q}</div>`;
-        qInput.value = '';
-        qInput.disabled = true;
-
-        // Add thinking bubble
-        const thinkingId = 'thinking-' + Date.now();
-        msgs.innerHTML += `<div id="${thinkingId}" class="ai-message ai-bubble thinking">AI is thinking...</div>`;
-        msgs.scrollTop = msgs.scrollHeight;
-
-        try {
-            const res = await fetch(`/api/ai/answer?question=${encodeURIComponent(q)}&roomId=${roomId}`);
-            const data = await res.json();
-            
-            // Remove thinking bubble
-            const thinkingBubble = document.getElementById(thinkingId);
-            if (thinkingBubble) thinkingBubble.remove();
-
-            msgs.innerHTML += `<div class="ai-message ai-bubble">${data.answer || 'Sorry, I could not answer that.'}</div>`;
-        } catch (err) {
-            const thinkingBubble = document.getElementById(thinkingId);
-            if (thinkingBubble) thinkingBubble.remove();
-            msgs.innerHTML += `<div class="ai-message ai-bubble error">Error connecting to AI service.</div>`;
-        } finally {
-            qInput.disabled = false;
-            qInput.focus();
-            msgs.scrollTop = msgs.scrollHeight;
-        }
-    }
-    document.getElementById('ai-question')?.addEventListener('keydown', e => {
-        if (e.key === 'Enter') askAI(@(Model.Room?.Id ?? 0));
     });
     </script>
 }

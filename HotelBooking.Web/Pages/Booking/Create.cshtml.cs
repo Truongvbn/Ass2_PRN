@@ -59,7 +59,7 @@ public class CreateModel(
         var result = await bookingService.CreateBookingAsync(dto, userId);
 
         if (result.IsSuccess)
-            return RedirectToPage("/Booking/Confirmation", new { id = result.Data!.Id });
+            return RedirectToPage("/Booking/Payment", new { id = result.Data!.Id });
 
         ErrorMessage = result.ErrorMessage;
         return Page();

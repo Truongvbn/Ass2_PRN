@@ -30,7 +30,7 @@ public class TicketServiceTests
     {
         // Arrange
         // Note: Customer cannot arbitrarily set their ticket to InProgress
-        _mockRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(new SupportTicket { Id = 1, UserId = "customer-1", Status = TicketStatus.Open });
+        _mockRepo.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(new SupportTicket { Id = 1, UserId = "customer-1", Status = TicketStatus.Open });
 
         // Act
         var result = await _service.UpdateTicketStatusAsync(1, "InProgress", "customer-1", isStaff: false);
@@ -45,7 +45,7 @@ public class TicketServiceTests
     {
         // Arrange
         // A Closed ticket cannot just be tossed directly to InProgress or Resolved
-        _mockRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(new SupportTicket { Id = 1, Status = TicketStatus.Closed });
+        _mockRepo.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(new SupportTicket { Id = 1, Status = TicketStatus.Closed });
 
         // Act
         var result = await _service.UpdateTicketStatusAsync(1, "InProgress", "staff-1", isStaff: true);
@@ -59,7 +59,7 @@ public class TicketServiceTests
     public async Task AssignTicketAsync_WhenTicketClosed_ReturnsError()
     {
         // Arrange
-        _mockRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(new SupportTicket { Id = 1, Status = TicketStatus.Closed });
+        _mockRepo.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(new SupportTicket { Id = 1, Status = TicketStatus.Closed });
 
         // Act
         var result = await _service.AssignTicketAsync(1, "staff-1");

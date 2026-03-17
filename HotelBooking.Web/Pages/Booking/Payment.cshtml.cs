@@ -17,6 +17,7 @@ public class PaymentModel(
 
     [BindProperty] public int BookingId { get; set; }
     [BindProperty] public string Method { get; set; } = "CreditCard";
+    [BindProperty(SupportsGet = true)] public bool Extra { get; set; }
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -28,6 +29,13 @@ public class PaymentModel(
 
         Booking = result.Data;
         BookingId = id;
+
+        if (Extra)
+        {
+            if (Booking!.Status != "Completed" || Booking.IsExtraChargePaid || Booking.ExtraChargeAmount <= 0)
+                return RedirectToPage("/Booking/MyBookings");
+            return Page();
+        }
 
         if (Booking!.Status != "AwaitingPayment")
             return RedirectToPage("/Booking/Confirmation", new { id });
@@ -53,6 +61,29 @@ public class PaymentModel(
 
         if (!bookingResult.IsSuccess)
             return RedirectToPage("/Booking/MyBookings");
+
+        if (Extra)
+        {
+            var booking = await bookingService.GetBookingByIdAsync(BookingId); // Get full entity access if needed or just update
+            // In a real app, we'd process the payment through a gateway first.
+            // For now, we update the extra charge status.
+            var updateResult = await bookingService.CompleteBookingAsync(BookingId, new CheckoutBookingDto
+            {
+                ExtraChargeAmount = bookingResult.Data!.ExtraChargeAmount,
+                ExtraChargeDescription = bookingResult.Data!.ExtraChargeDescription,
+                LostAndFoundNotes = bookingResult.Data!.LostAndFoundNotes,
+                LostAndFoundImageUrl = bookingResult.Data!.LostAndFoundImageUrl
+            });
+
+            if (updateResult.IsSuccess)
+            {
+                TempData["SuccessMessage"] = "Extra charges paid successfully!";
+                return RedirectToPage("/Booking/MyBookings");
+            }
+            ErrorMessage = updateResult.ErrorMessage;
+            Booking = bookingResult.Data;
+            return Page();
+        }
 
         var dto = new CreatePaymentDto { BookingId = BookingId, Method = Method };
         var result = await paymentService.ProcessPaymentAsync(dto);
