@@ -41,7 +41,7 @@ public class ReviewServiceTests
     {
         // Arrange
         var dto = new CreateReviewDto { RoomId = 1, Rating = 5, Content = "This room was absolutely fantastic!" };
-        _mockRoomRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(new Room { Id = 1 });
+        _mockRoomRepo.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(new Room { Id = 1 });
         
         // Mock user has zero completed bookings
         _mockBookingRepo.Setup(r => r.GetByUserAsync("user-1", It.IsAny<CancellationToken>()))
@@ -60,13 +60,13 @@ public class ReviewServiceTests
     {
         // Arrange
         var dto = new CreateReviewDto { RoomId = 1, Rating = 5, Content = "This room was absolutely fantastic!" };
-        _mockRoomRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(new Room { Id = 1 });
+        _mockRoomRepo.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(new Room { Id = 1 });
         
         _mockBookingRepo.Setup(r => r.GetByUserAsync("user-1", It.IsAny<CancellationToken>()))
                         .ReturnsAsync(new List<Booking> { new Booking { RoomId = 1, Status = BookingStatus.Completed } });
                         
         // Mock user already left a review
-        _mockReviewRepo.Setup(r => r.HasUserReviewedRoomAsync("user-1", 1)).ReturnsAsync(true);
+        _mockReviewRepo.Setup(r => r.HasUserReviewedRoomAsync("user-1", 1, It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         // Act
         var result = await _service.CreateReviewAsync(dto, "user-1");
@@ -80,7 +80,7 @@ public class ReviewServiceTests
     public async Task DeleteReviewAsync_ByNormalUserWhoDoesNotOwnIt_ReturnsError()
     {
         // Arrange
-        _mockReviewRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(new Review { Id = 1, UserId = "owner-id" });
+        _mockReviewRepo.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(new Review { Id = 1, UserId = "owner-id" });
 
         // Act (Admin flag = false)
         var result = await _service.DeleteReviewAsync(1, "hacker-user", isAdmin: false);
@@ -95,8 +95,8 @@ public class ReviewServiceTests
     {
         // Arrange
         var reviewToDel = new Review { Id = 1, UserId = "owner-id", IsDeleted = false };
-        _mockReviewRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(reviewToDel);
-        _mockReviewRepo.Setup(r => r.UpdateAsync(It.IsAny<Review>())).Returns(Task.CompletedTask);
+        _mockReviewRepo.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(reviewToDel);
+        _mockReviewRepo.Setup(r => r.UpdateAsync(It.IsAny<Review>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         // Act (Admin flag = true)
         var result = await _service.DeleteReviewAsync(1, "admin-user", isAdmin: true);

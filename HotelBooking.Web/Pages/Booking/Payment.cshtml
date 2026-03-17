@@ -52,7 +52,7 @@
                 </div>
                 <div class="summary-row highlight">
                     <span class="label">Total Amount</span>
-                    <span class="value">$@Model.Booking.TotalPrice.ToString("N2")</span>
+                    <span class="value">$@(Model.Extra ? Model.Booking.ExtraChargeAmount.ToString("N2") : Model.Booking.TotalPrice.ToString("N2"))</span>
                 </div>
             </div>
 
@@ -60,6 +60,7 @@
                 <h2><i class="fas fa-lock"></i> Payment Details</h2>
                 <form method="post">
                     <input type="hidden" asp-for="BookingId" />
+                    <input type="hidden" asp-for="Extra" />
 
                     <div class="form-group">
                         <label>Payment Method</label>
@@ -95,7 +96,7 @@
 
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary btn-lg btn-full">
-                            <i class="fas fa-lock"></i> Pay $@Model.Booking.TotalPrice.ToString("N2")
+                            <i class="fas fa-lock"></i> Pay $@(Model.Extra ? Model.Booking.ExtraChargeAmount.ToString("N2") : Model.Booking.TotalPrice.ToString("N2"))
                         </button>
                         <a href="/Booking/MyBookings" class="btn btn-outline">Cancel</a>
                     </div>

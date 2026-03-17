@@ -43,6 +43,17 @@
 
             <div class="form-row">
                 <div class="form-group">
+                    <label asp-for="Input.Latitude">Latitude</label>
+                    <input asp-for="Input.Latitude" type="number" step="any" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Longitude">Longitude</label>
+                    <input asp-for="Input.Longitude" type="number" step="any" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
                     <label asp-for="Input.PhoneNumber">Phone</label>
                     <input asp-for="Input.PhoneNumber" class="form-control" />
                 </div>

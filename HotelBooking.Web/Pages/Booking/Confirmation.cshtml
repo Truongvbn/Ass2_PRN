@@ -18,17 +18,11 @@
     @if (Model.Booking != null)
     {
         <div class="confirmation-card">
-            @if (Model.Booking.Status == "Pending")
-            {
-                <div class="confirmation-icon text-warning"><i class="fas fa-clock"></i></div>
-                <h1>Booking Request Submitted</h1>
-                <p class="confirmation-subtitle">Waiting for hotel approval. We'll notify you shortly.</p>
-            }
-            else if (Model.Booking.Status == "AwaitingPayment")
+            @if (Model.Booking.Status == "AwaitingPayment")
             {
                 <div class="confirmation-icon text-success"><i class="fas fa-check-circle"></i></div>
-                <h1>Approved! Complete Payment</h1>
-                <p class="confirmation-subtitle">Your booking has been approved. Please pay within 24 hours to confirm.</p>
+                <h1>Booking Submitted! Complete Payment</h1>
+                <p class="confirmation-subtitle">Your booking is reserved for 24 hours. Please pay to confirm your stay.</p>
             }
             else if (Model.Booking.Status == "Confirmed" || Model.Booking.Status == "CheckedIn")
             {

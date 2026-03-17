@@ -11,7 +11,7 @@ obj/
 .vs/
 *.rsuser
 launchSettings.json
-
+appsettings.json
 ## Build Results
 [Dd]ebug/
 [Rr]elease/

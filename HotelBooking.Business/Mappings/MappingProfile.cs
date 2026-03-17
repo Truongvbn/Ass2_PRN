@@ -56,7 +56,7 @@ public class MappingProfile : Profile
             );
 
         CreateMap<CreateHotelDto, Hotel>()
-            .ForMember(d => d.Gallery, o => o.Ignore());
+            .ForMember(d => d.Gallery, o => o.MapFrom(_ => "[]"));
 
         CreateMap<UpdateHotelDto, Hotel>()
             .ForMember(d => d.Gallery, o => o.Ignore());

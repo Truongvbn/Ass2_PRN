@@ -41,4 +41,11 @@ public class Booking
     public Room Room { get; set; } = null!;
     public ApplicationUser User { get; set; } = null!;
     public Payment? Payment { get; set; }
+
+    // Checkout Details
+    public decimal ExtraChargeAmount { get; set; } = 0;
+    public string? ExtraChargeDescription { get; set; }
+    public bool IsExtraChargePaid { get; set; } = true;
+    public string? LostAndFoundNotes { get; set; }
+    public string? LostAndFoundImageUrl { get; set; }
 }

@@ -47,10 +47,11 @@ public class MockAiAssistantService : IAiAssistantService
         return ServiceResult<IReadOnlyList<RoomListDto>>.Success(rooms.Take(5).ToList());
     }
 
-    public Task<ServiceResult<string>> AnswerQuestionAsync(string question, int? roomId, CancellationToken ct = default)
+    public Task<ServiceResult<AiResponseDto>> AnswerQuestionAsync(string question, int? roomId, CancellationToken ct = default)
     {
         // Mock responses
-        var answer = question.ToLower() switch
+        var response = new AiResponseDto();
+        response.Answer = question.ToLower() switch
         {
             var q when q.Contains("check-in") || q.Contains("checkin") =>
                 "Check-in time is 2:00 PM and check-out time is 12:00 PM. Early check-in and late check-out are available upon request.",
@@ -64,9 +65,17 @@ public class MockAiAssistantService : IAiAssistantService
                 "Complimentary high-speed WiFi is available throughout the hotel for all guests.",
             var q when q.Contains("cancel") =>
                 "Free cancellation is available up to 24 hours before check-in. Cancellations within 24 hours may incur a one-night charge.",
+            var q when q.Contains("book") || q.Contains("reserve") =>
+                "I'll take you to the booking page right away!",
             _ => "Thank you for your question! For detailed assistance, please create a support ticket or contact our front desk at +84 123 456 789."
         };
 
-        return Task.FromResult(ServiceResult<string>.Success(answer));
+        if (question.ToLower().Contains("book") || question.ToLower().Contains("reserve"))
+        {
+            response.Action = "REDIRECT_BOOKING";
+            response.ActionData = roomId?.ToString() ?? "0";
+        }
+
+        return Task.FromResult(ServiceResult<AiResponseDto>.Success(response));
     }
 }

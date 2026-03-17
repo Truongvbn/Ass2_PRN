@@ -50,9 +50,11 @@ public class DetailModel(IBookingService bookingService, IPaymentService payment
         return result.IsSuccess ? RedirectToPage(new { id }) : RedirectToPage(new { id, error = result.ErrorMessage });
     }
 
+    [BindProperty] public CheckoutBookingDto CheckoutDto { get; set; } = new();
+
     public async Task<IActionResult> OnPostCompleteAsync(int id)
     {
-        var result = await bookingService.CompleteBookingAsync(id);
+        var result = await bookingService.CompleteBookingAsync(id, CheckoutDto);
         return result.IsSuccess ? RedirectToPage(new { id }) : RedirectToPage(new { id, error = result.ErrorMessage });
     }
 

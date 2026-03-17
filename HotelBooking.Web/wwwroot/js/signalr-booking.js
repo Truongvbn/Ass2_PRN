@@ -30,7 +30,29 @@
 
     connection.on("NewBookingRequest", function () { showToast('New booking request received!', 'info'); });
 
-    connection.on("BookingApproved", function () { showToast('Your booking was approved! Please complete payment.', 'success'); });
+    connection.on("BookingApproved", function () { showToast('Your booking is ready! Please complete payment.', 'success'); });
+
+    // First-come-first-serve: disable the booking form if someone else just locked this room
+    connection.on("RoomLocked", function (roomId, roomName) {
+        const form = document.getElementById('booking-form');
+        if (form && parseInt(form.dataset.roomId, 10) === roomId) {
+            // Disable all inputs and the submit button
+            form.querySelectorAll('input, textarea, select, button[type="submit"]').forEach(el => {
+                el.disabled = true;
+            });
+            // Show the locked banner
+            const banner = document.getElementById('room-locked-banner');
+            if (banner) banner.style.display = '';
+            showToast(`Room "${roomName}" was just booked by someone else.`, 'danger');
+        } else {
+            // On other pages (room listing etc.) just update the badge
+            const card = document.getElementById(`room-${roomId}`);
+            if (card) {
+                const badge = card.querySelector('.room-badge');
+                if (badge) { badge.textContent = 'Unavailable'; badge.className = 'room-badge badge-unavailable'; }
+            }
+        }
+    });
 
     connection.on("BookingRejected", function (id, reason) { showToast(`Booking declined. ${reason || ''}`, 'danger'); });
 
