@@ -226,3 +226,262 @@ public class SupportTicketConfiguration : IEntityTypeConfiguration<SupportTicket
         builder.HasIndex(t => t.UserId);
     }
 }
+
+public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
+{
+    public void Configure(EntityTypeBuilder<Employee> builder)
+    {
+        builder.HasKey(e => e.Id);
+        builder.Property(e => e.FullName).HasMaxLength(200).IsRequired();
+        builder.Property(e => e.Gender).HasMaxLength(20);
+        builder.Property(e => e.PhoneNumber).HasMaxLength(30);
+        builder.Property(e => e.Email).HasMaxLength(200);
+        builder.Property(e => e.Address).HasMaxLength(500);
+        builder.Property(e => e.IdentityNumber).HasMaxLength(50);
+        builder.Property(e => e.Position).HasMaxLength(100);
+        builder.Property(e => e.BaseSalary).HasPrecision(18, 2);
+        builder.Property(e => e.EmploymentType).HasConversion<string>().HasMaxLength(20);
+        builder.Property(e => e.Status).HasConversion<string>().HasMaxLength(20);
+
+        builder.HasOne(e => e.Hotel)
+            .WithMany()
+            .HasForeignKey(e => e.HotelId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(e => e.User)
+            .WithMany()
+            .HasForeignKey(e => e.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(e => e.HotelId);
+        builder.HasIndex(e => e.UserId);
+        builder.HasIndex(e => e.Status);
+    }
+}
+
+public class WorkShiftConfiguration : IEntityTypeConfiguration<WorkShift>
+{
+    public void Configure(EntityTypeBuilder<WorkShift> builder)
+    {
+        builder.HasKey(ws => ws.Id);
+        builder.Property(ws => ws.Name).HasMaxLength(100).IsRequired();
+
+        builder.HasOne(ws => ws.Hotel)
+            .WithMany()
+            .HasForeignKey(ws => ws.HotelId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(ws => new { ws.HotelId, ws.IsActive });
+    }
+}
+
+public class EmployeeShiftAssignmentConfiguration : IEntityTypeConfiguration<EmployeeShiftAssignment>
+{
+    public void Configure(EntityTypeBuilder<EmployeeShiftAssignment> builder)
+    {
+        builder.HasKey(sa => sa.Id);
+        builder.Property(sa => sa.Status).HasConversion<string>().HasMaxLength(20);
+        builder.Property(sa => sa.Notes).HasMaxLength(1000);
+
+        builder.HasOne(sa => sa.Employee)
+            .WithMany(e => e.ShiftAssignments)
+            .HasForeignKey(sa => sa.EmployeeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(sa => sa.Hotel)
+            .WithMany()
+            .HasForeignKey(sa => sa.HotelId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(sa => sa.WorkShift)
+            .WithMany(ws => ws.ShiftAssignments)
+            .HasForeignKey(sa => sa.WorkShiftId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(sa => new { sa.HotelId, sa.ShiftDate });
+        builder.HasIndex(sa => new { sa.EmployeeId, sa.ShiftDate });
+    }
+}
+
+public class AttendanceRecordConfiguration : IEntityTypeConfiguration<AttendanceRecord>
+{
+    public void Configure(EntityTypeBuilder<AttendanceRecord> builder)
+    {
+        builder.HasKey(a => a.Id);
+        builder.Property(a => a.Status).HasConversion<string>().HasMaxLength(20);
+        builder.Property(a => a.Notes).HasMaxLength(1000);
+
+        builder.HasOne(a => a.Employee)
+            .WithMany(e => e.AttendanceRecords)
+            .HasForeignKey(a => a.EmployeeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(a => a.Hotel)
+            .WithMany()
+            .HasForeignKey(a => a.HotelId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(a => a.WorkShift)
+            .WithMany()
+            .HasForeignKey(a => a.WorkShiftId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(a => new { a.HotelId, a.ShiftDate });
+        builder.HasIndex(a => new { a.EmployeeId, a.ShiftDate });
+    }
+}
+
+public class PayrollPeriodConfiguration : IEntityTypeConfiguration<PayrollPeriod>
+{
+    public void Configure(EntityTypeBuilder<PayrollPeriod> builder)
+    {
+        builder.HasKey(p => p.Id);
+        builder.Property(p => p.Name).HasMaxLength(200).IsRequired();
+        builder.Property(p => p.Status).HasConversion<string>().HasMaxLength(20);
+
+        builder.HasOne(p => p.Hotel)
+            .WithMany()
+            .HasForeignKey(p => p.HotelId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(p => new { p.HotelId, p.StartDate, p.EndDate });
+        builder.HasIndex(p => p.Status);
+    }
+}
+
+public class PayrollEntryConfiguration : IEntityTypeConfiguration<PayrollEntry>
+{
+    public void Configure(EntityTypeBuilder<PayrollEntry> builder)
+    {
+        builder.HasKey(e => e.Id);
+        builder.Property(e => e.BaseSalary).HasPrecision(18, 2);
+        builder.Property(e => e.CalculatedSalary).HasPrecision(18, 2);
+        builder.Property(e => e.Notes).HasMaxLength(1000);
+
+        builder.HasOne(e => e.PayrollPeriod)
+            .WithMany(p => p.Entries)
+            .HasForeignKey(e => e.PayrollPeriodId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(e => e.Employee)
+            .WithMany(emp => emp.PayrollEntries)
+            .HasForeignKey(e => e.EmployeeId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(e => new { e.PayrollPeriodId, e.EmployeeId });
+    }
+}
+
+public class TrainingProgramConfiguration : IEntityTypeConfiguration<TrainingProgram>
+{
+    public void Configure(EntityTypeBuilder<TrainingProgram> builder)
+    {
+        builder.HasKey(t => t.Id);
+        builder.Property(t => t.Title).HasMaxLength(200).IsRequired();
+        builder.Property(t => t.Description).HasMaxLength(2000);
+
+        builder.HasOne(t => t.Hotel)
+            .WithMany()
+            .HasForeignKey(t => t.HotelId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(t => t.HotelId);
+    }
+}
+
+public class TrainingEnrollmentConfiguration : IEntityTypeConfiguration<TrainingEnrollment>
+{
+    public void Configure(EntityTypeBuilder<TrainingEnrollment> builder)
+    {
+        builder.HasKey(e => e.Id);
+        builder.Property(e => e.Status).HasConversion<string>().HasMaxLength(20);
+        builder.Property(e => e.Feedback).HasMaxLength(2000);
+
+        builder.HasOne(e => e.TrainingProgram)
+            .WithMany(t => t.Enrollments)
+            .HasForeignKey(e => e.TrainingProgramId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(e => e.Employee)
+            .WithMany(emp => emp.TrainingEnrollments)
+            .HasForeignKey(e => e.EmployeeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(e => new { e.TrainingProgramId, e.EmployeeId });
+    }
+}
+
+public class PerformanceReviewConfiguration : IEntityTypeConfiguration<PerformanceReview>
+{
+    public void Configure(EntityTypeBuilder<PerformanceReview> builder)
+    {
+        builder.HasKey(r => r.Id);
+        builder.Property(r => r.OverallRating);
+        builder.Property(r => r.Strengths).HasMaxLength(2000);
+        builder.Property(r => r.Improvements).HasMaxLength(2000);
+        builder.Property(r => r.Goals).HasMaxLength(2000);
+
+        builder.HasOne(r => r.Employee)
+            .WithMany(e => e.PerformanceReviews)
+            .HasForeignKey(r => r.EmployeeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(r => r.Reviewer)
+            .WithMany()
+            .HasForeignKey(r => r.ReviewerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(r => r.Hotel)
+            .WithMany()
+            .HasForeignKey(r => r.HotelId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(r => new { r.EmployeeId, r.ReviewDate });
+        builder.HasIndex(r => r.HotelId);
+    }
+}
+
+public class EmploymentContractConfiguration : IEntityTypeConfiguration<EmploymentContract>
+{
+    public void Configure(EntityTypeBuilder<EmploymentContract> builder)
+    {
+        builder.HasKey(c => c.Id);
+        builder.Property(c => c.ContractNumber).HasMaxLength(100).IsRequired();
+        builder.Property(c => c.ContractType).HasConversion<string>().HasMaxLength(20);
+        builder.Property(c => c.Status).HasConversion<string>().HasMaxLength(20);
+        builder.Property(c => c.BaseSalary).HasPrecision(18, 2);
+        builder.Property(c => c.FileUrl).HasMaxLength(500);
+
+        builder.HasOne(c => c.Employee)
+            .WithMany(e => e.Contracts)
+            .HasForeignKey(c => c.EmployeeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(c => c.Hotel)
+            .WithMany()
+            .HasForeignKey(c => c.HotelId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(c => new { c.HotelId, c.Status });
+        builder.HasIndex(c => c.EmployeeId);
+    }
+}
+
+public class InsuranceRecordConfiguration : IEntityTypeConfiguration<InsuranceRecord>
+{
+    public void Configure(EntityTypeBuilder<InsuranceRecord> builder)
+    {
+        builder.HasKey(i => i.Id);
+        builder.Property(i => i.ProviderName).HasMaxLength(200).IsRequired();
+        builder.Property(i => i.PolicyNumber).HasMaxLength(100).IsRequired();
+        builder.Property(i => i.Notes).HasMaxLength(2000);
+
+        builder.HasOne(i => i.Employee)
+            .WithMany(e => e.InsuranceRecords)
+            .HasForeignKey(i => i.EmployeeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(i => i.EmployeeId);
+    }
+}
+

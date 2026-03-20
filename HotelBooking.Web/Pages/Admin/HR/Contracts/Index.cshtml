@@ -1,0 +1,230 @@
+@page
+@model HotelBooking.Web.Pages.Admin.HR.Contracts.IndexModel
+@{
+    ViewData["Title"] = "Admin — Contracts & Insurance";
+}
+
+<div class="page-container">
+    <div class="page-header-row">
+        <div class="page-header">
+            <h1><i class="fas fa-file-contract"></i> Contracts & Insurance</h1>
+            <p>Ensure legal compliance for employees</p>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-@(Model.IsError ? "danger" : "success")">@Model.Message</div>
+    }
+
+    <div class="form-card">
+        <form method="get" class="filter-bar">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Hotel</label>
+                    <select name="hotelId" class="form-control">
+                        @foreach (var h in Model.Hotels)
+                        {
+                            if (Model.HotelId == h.Id)
+                            {
+                                <option value="@h.Id" selected="selected">@h.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@h.Id">@h.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Employee</label>
+                    <select name="employeeId" class="form-control">
+                        @foreach (var e in Model.Employees)
+                        {
+                            if (Model.EmployeeId == e.Id)
+                            {
+                                <option value="@e.Id" selected="selected">@e.FullName</option>
+                            }
+                            else
+                            {
+                                <option value="@e.Id">@e.FullName</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline"><i class="fas fa-filter"></i> Apply</button>
+        </form>
+    </div>
+
+    <div style="height: 16px;"></div>
+
+    <div class="form-card">
+        <h3>Create contract</h3>
+        <form method="post" asp-page-handler="CreateContract">
+            <input type="hidden" asp-for="ContractInput.EmployeeId" />
+            <input type="hidden" asp-for="ContractInput.HotelId" />
+
+            <div class="form-group">
+                <label asp-for="ContractInput.ContractNumber">Contract number</label>
+                <input asp-for="ContractInput.ContractNumber" class="form-control" />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="ContractInput.ContractType">Contract type</label>
+                    <select asp-for="ContractInput.ContractType" class="form-control">
+                        <option value="Indefinite">Indefinite</option>
+                        <option value="FixedTerm">FixedTerm</option>
+                        <option value="Probation">Probation</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ContractInput.Status">Status</label>
+                    <select asp-for="ContractInput.Status" class="form-control">
+                        <option value="Active">Active</option>
+                        <option value="Expired">Expired</option>
+                        <option value="Terminated">Terminated</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="ContractInput.StartDate">Start</label>
+                    <input asp-for="ContractInput.StartDate" type="date" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="ContractInput.EndDate">End</label>
+                    <input asp-for="ContractInput.EndDate" type="date" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ContractInput.BaseSalary">Base salary</label>
+                <input asp-for="ContractInput.BaseSalary" type="number" step="0.01" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-inline">
+                    <input asp-for="ContractInput.InsuranceIncluded" type="checkbox" />
+                    <span>Insurance included</span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ContractInput.FileUrl">File URL (optional)</label>
+                <input asp-for="ContractInput.FileUrl" class="form-control" />
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Create</button>
+            </div>
+        </form>
+    </div>
+
+    <div style="height: 16px;"></div>
+
+    <div class="form-card">
+        <h3>Create insurance record</h3>
+        <form method="post" asp-page-handler="CreateInsurance">
+            <input type="hidden" asp-for="InsuranceInput.EmployeeId" />
+            <input type="hidden" asp-for="InsuranceInput.HotelId" />
+
+            <div class="form-group">
+                <label asp-for="InsuranceInput.ProviderName">Provider name</label>
+                <input asp-for="InsuranceInput.ProviderName" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="InsuranceInput.PolicyNumber">Policy number</label>
+                <input asp-for="InsuranceInput.PolicyNumber" class="form-control" />
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="InsuranceInput.EffectiveDate">Effective</label>
+                    <input asp-for="InsuranceInput.EffectiveDate" type="date" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="InsuranceInput.ExpiryDate">Expiry</label>
+                    <input asp-for="InsuranceInput.ExpiryDate" type="date" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="InsuranceInput.Notes">Notes</label>
+                <input asp-for="InsuranceInput.Notes" class="form-control" />
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Create</button>
+            </div>
+        </form>
+    </div>
+
+    <div style="height: 16px;"></div>
+
+    <div class="admin-table-wrapper">
+        <h3>Contracts</h3>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Contract #</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Range</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model.Contracts)
+                {
+                    <tr>
+                        <td>@c.Id</td>
+                        <td>@c.ContractNumber</td>
+                        <td>@c.ContractType</td>
+                        <td>@c.Status</td>
+                        <td>@c.StartDate.ToString("yyyy-MM-dd") - @(c.EndDate?.ToString("yyyy-MM-dd") ?? "N/A")</td>
+                    </tr>
+                }
+                @if (Model.Contracts.Count == 0)
+                {
+                    <tr><td colspan="5" class="text-muted">No contracts.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div style="height: 16px;"></div>
+
+    <div class="admin-table-wrapper">
+        <h3>Insurance records</h3>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Provider</th>
+                    <th>Policy</th>
+                    <th>Effective</th>
+                    <th>Expiry</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var i in Model.InsuranceRecords)
+                {
+                    <tr>
+                        <td>@i.Id</td>
+                        <td>@i.ProviderName</td>
+                        <td>@i.PolicyNumber</td>
+                        <td>@i.EffectiveDate.ToString("yyyy-MM-dd")</td>
+                        <td>@(i.ExpiryDate?.ToString("yyyy-MM-dd") ?? "N/A")</td>
+                    </tr>
+                }
+                @if (Model.InsuranceRecords.Count == 0)
+                {
+                    <tr><td colspan="5" class="text-muted">No insurance records.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

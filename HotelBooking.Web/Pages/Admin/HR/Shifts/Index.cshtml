@@ -1,0 +1,91 @@
+@page
+@model HotelBooking.Web.Pages.Admin.HR.Shifts.IndexModel
+@{
+    ViewData["Title"] = "Admin — Work Shifts";
+}
+
+<div class="page-container">
+    <div class="page-header-row">
+        <div class="page-header">
+            <h1><i class="fas fa-clock"></i> Work Shifts</h1>
+            <p>Manage shift templates per hotel</p>
+        </div>
+        <a href="/Admin/HR/Shifts/Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Shift
+        </a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-@(Model.IsError ? "danger" : "success")">@Model.Message</div>
+    }
+
+    <form method="get" class="filter-bar">
+        <div class="form-group">
+            <label for="hotelId">Hotel</label>
+            <select id="hotelId" name="hotelId" class="form-control">
+                <option value="">All</option>
+                @foreach (var h in Model.Hotels)
+                {
+                    if (Model.SelectedHotelId == h.Id)
+                    {
+                        <option value="@h.Id" selected="selected">@h.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@h.Id">@h.Name</option>
+                    }
+                }
+            </select>
+        </div>
+        <button class="btn btn-outline" type="submit">
+            <i class="fas fa-filter"></i> Apply
+        </button>
+    </form>
+
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Shift</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Overnight</th>
+                    <th>Active</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model.Shifts)
+                {
+                    <tr>
+                        <td>@s.Id</td>
+                        <td>@s.Name</td>
+                        <td>@s.StartTime</td>
+                        <td>@s.EndTime</td>
+                        <td>@(s.IsOvernight ? "Yes" : "No")</td>
+                        <td>
+                            <span class="badge badge-@(s.IsActive ? "available" : "unavailable")">
+                                @(s.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td class="actions-cell">
+                            <a href="/Admin/HR/Shifts/Edit?id=@s.Id" class="btn btn-sm btn-outline">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="post" asp-page-handler="ToggleActive" class="inline-form"
+                                  onsubmit="return confirm('Toggle shift active status?')">
+                                <input type="hidden" name="id" value="@s.Id" />
+                                <button class="btn btn-sm btn-secondary" type="submit">
+                                    <i class="fas fa-toggle-on"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

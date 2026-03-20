@@ -269,3 +269,175 @@ public class PaymentRepository : Repository<Payment>, IPaymentRepository
     public async Task<Payment?> GetByBookingIdAsync(int bookingId, CancellationToken ct = default)
         => await DbSet.FirstOrDefaultAsync(p => p.BookingId == bookingId, ct);
 }
+
+// ── HR repositories ──
+public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
+{
+    public EmployeeRepository(HotelDbContext context) : base(context) { }
+
+    public async Task<IReadOnlyList<Employee>> GetByHotelAsync(int hotelId, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(e => e.Hotel)
+            .Where(e => e.HotelId == hotelId)
+            .OrderBy(e => e.FullName)
+            .ToListAsync(ct);
+
+    public async Task<Employee?> GetByUserIdAsync(string userId, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .FirstOrDefaultAsync(e => e.UserId == userId, ct);
+}
+
+public class WorkShiftRepository : Repository<WorkShift>, IWorkShiftRepository
+{
+    public WorkShiftRepository(HotelDbContext context) : base(context) { }
+
+    public async Task<IReadOnlyList<WorkShift>> GetByHotelAsync(int hotelId, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(ws => ws.Hotel)
+            .Where(ws => ws.HotelId == hotelId && ws.IsActive)
+            .OrderBy(ws => ws.StartTime)
+            .ToListAsync(ct);
+}
+
+public class EmployeeShiftAssignmentRepository : Repository<EmployeeShiftAssignment>, IEmployeeShiftAssignmentRepository
+{
+    public EmployeeShiftAssignmentRepository(HotelDbContext context) : base(context) { }
+
+    public async Task<IReadOnlyList<EmployeeShiftAssignment>> GetByHotelAndDateRangeAsync(
+        int hotelId, DateTime start, DateTime end, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(sa => sa.Employee)
+            .Include(sa => sa.Hotel)
+            .Include(sa => sa.WorkShift)
+            .Where(sa => sa.HotelId == hotelId && sa.ShiftDate.Date >= start.Date && sa.ShiftDate.Date <= end.Date)
+            .OrderBy(sa => sa.ShiftDate)
+            .ThenBy(sa => sa.WorkShift.StartTime)
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<EmployeeShiftAssignment>> GetByEmployeeAndDateRangeAsync(
+        int employeeId, DateTime start, DateTime end, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(sa => sa.Employee)
+            .Include(sa => sa.Hotel)
+            .Include(sa => sa.WorkShift)
+            .Where(sa => sa.EmployeeId == employeeId && sa.ShiftDate.Date >= start.Date && sa.ShiftDate.Date <= end.Date)
+            .OrderBy(sa => sa.ShiftDate)
+            .ThenBy(sa => sa.WorkShift.StartTime)
+            .ToListAsync(ct);
+}
+
+public class AttendanceRepository : Repository<AttendanceRecord>, IAttendanceRepository
+{
+    public AttendanceRepository(HotelDbContext context) : base(context) { }
+
+    public async Task<IReadOnlyList<AttendanceRecord>> GetByHotelAndDateRangeAsync(
+        int hotelId, DateTime start, DateTime end, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(a => a.Employee)
+            .Include(a => a.Hotel)
+            .Include(a => a.WorkShift)
+            .Where(a => a.HotelId == hotelId && a.ShiftDate.Date >= start.Date && a.ShiftDate.Date <= end.Date)
+            .OrderBy(a => a.ShiftDate)
+            .ThenBy(a => a.Employee.FullName)
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<AttendanceRecord>> GetByEmployeeAndDateRangeAsync(
+        int employeeId, DateTime start, DateTime end, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(a => a.Employee)
+            .Include(a => a.Hotel)
+            .Include(a => a.WorkShift)
+            .Where(a => a.EmployeeId == employeeId && a.ShiftDate.Date >= start.Date && a.ShiftDate.Date <= end.Date)
+            .OrderBy(a => a.ShiftDate)
+            .ToListAsync(ct);
+}
+
+public class PayrollPeriodRepository : Repository<PayrollPeriod>, IPayrollPeriodRepository
+{
+    public PayrollPeriodRepository(HotelDbContext context) : base(context) { }
+
+    public async Task<IReadOnlyList<PayrollPeriod>> GetByHotelAsync(int hotelId, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(p => p.Hotel)
+            .Where(p => p.HotelId == hotelId)
+            .OrderByDescending(p => p.StartDate)
+            .ToListAsync(ct);
+
+    public async Task<PayrollPeriod?> GetWithEntriesAsync(int id, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(p => p.Hotel)
+            .Include(p => p.Entries)
+                .ThenInclude(e => e.Employee)
+            .FirstOrDefaultAsync(p => p.Id == id, ct);
+}
+
+public class TrainingProgramRepository : Repository<TrainingProgram>, ITrainingProgramRepository
+{
+    public TrainingProgramRepository(HotelDbContext context) : base(context) { }
+
+    public async Task<IReadOnlyList<TrainingProgram>> GetByHotelOrGlobalAsync(int? hotelId, CancellationToken ct = default)
+    {
+        var query = DbSet.AsNoTracking()
+            .Include(tp => tp.Hotel)
+            .AsQueryable();
+
+        if (hotelId.HasValue)
+        {
+            query = query.Where(tp => tp.HotelId == null || tp.HotelId == hotelId.Value);
+        }
+
+        return await query.OrderBy(tp => tp.StartDate).ToListAsync(ct);
+    }
+}
+
+public class TrainingEnrollmentRepository : Repository<TrainingEnrollment>, ITrainingEnrollmentRepository
+{
+    public TrainingEnrollmentRepository(HotelDbContext context) : base(context) { }
+
+    public async Task<IReadOnlyList<TrainingEnrollment>> GetByEmployeeAsync(int employeeId, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(e => e.TrainingProgram)
+            .Include(e => e.Employee)
+            .Where(e => e.EmployeeId == employeeId)
+            .OrderBy(e => e.TrainingProgram.StartDate)
+            .ToListAsync(ct);
+}
+
+public class PerformanceReviewRepository : Repository<PerformanceReview>, IPerformanceReviewRepository
+{
+    public PerformanceReviewRepository(HotelDbContext context) : base(context) { }
+
+    public async Task<IReadOnlyList<PerformanceReview>> GetByEmployeeAsync(int employeeId, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(r => r.Employee)
+            .Include(r => r.Hotel)
+            .Include(r => r.Reviewer)
+            .Where(r => r.EmployeeId == employeeId)
+            .OrderByDescending(r => r.ReviewDate)
+            .ToListAsync(ct);
+}
+
+public class EmploymentContractRepository : Repository<EmploymentContract>, IEmploymentContractRepository
+{
+    public EmploymentContractRepository(HotelDbContext context) : base(context) { }
+
+    public async Task<IReadOnlyList<EmploymentContract>> GetByEmployeeAsync(int employeeId, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(c => c.Employee)
+            .Include(c => c.Hotel)
+            .Where(c => c.EmployeeId == employeeId)
+            .OrderByDescending(c => c.StartDate)
+            .ToListAsync(ct);
+}
+
+public class InsuranceRecordRepository : Repository<InsuranceRecord>, IInsuranceRecordRepository
+{
+    public InsuranceRecordRepository(HotelDbContext context) : base(context) { }
+
+    public async Task<IReadOnlyList<InsuranceRecord>> GetByEmployeeAsync(int employeeId, CancellationToken ct = default)
+        => await DbSet.AsNoTracking()
+            .Include(i => i.Employee)
+            .Where(i => i.EmployeeId == employeeId)
+            .OrderByDescending(i => i.EffectiveDate)
+            .ToListAsync(ct);
+}

@@ -161,3 +161,327 @@ public record UpdateTicketStatusDto { public int Id { get; init; } public string
 
 // ── AI ──
 public record RoomPreferenceDto { public decimal? MaxBudget { get; init; } public int? GuestCount { get; init; } public List<string>? DesiredAmenities { get; init; } public DateTime? CheckIn { get; init; } public DateTime? CheckOut { get; init; } }
+
+// ── HR: Employee ──
+public record EmployeeListItemDto
+{
+    public int Id { get; init; }
+    public string UserId { get; init; } = "";
+    public string FullName { get; init; } = "";
+    public string Email { get; init; } = "";
+    public string PhoneNumber { get; init; } = "";
+    public string Position { get; init; } = "";
+    public string EmploymentType { get; init; } = "";
+    public string Status { get; init; } = "";
+    public int? HotelId { get; init; }
+    public string? HotelName { get; init; }
+}
+
+public record EmployeeDto
+{
+    public int Id { get; init; }
+    public string UserId { get; init; } = "";
+    public int? HotelId { get; init; }
+    public string? HotelName { get; init; }
+    public string FullName { get; init; } = "";
+    public DateTime DateOfBirth { get; init; }
+    public string Gender { get; init; } = "";
+    public string PhoneNumber { get; init; } = "";
+    public string Email { get; init; } = "";
+    public string Address { get; init; } = "";
+    public string IdentityNumber { get; init; } = "";
+    public string Position { get; init; } = "";
+    public DateTime HireDate { get; init; }
+    public string EmploymentType { get; init; } = "";
+    public string Status { get; init; } = "";
+    public decimal BaseSalary { get; init; }
+}
+
+public record CreateEmployeeDto
+{
+    public string UserId { get; init; } = "";
+    public int? HotelId { get; init; }
+    public string FullName { get; init; } = "";
+    public DateTime DateOfBirth { get; init; }
+    public string Gender { get; init; } = "";
+    public string PhoneNumber { get; init; } = "";
+    public string Email { get; init; } = "";
+    public string Address { get; init; } = "";
+    public string IdentityNumber { get; init; } = "";
+    public string Position { get; init; } = "";
+    public DateTime HireDate { get; init; }
+    public string EmploymentType { get; init; } = "";
+    public decimal BaseSalary { get; init; }
+}
+
+public record UpdateEmployeeDto
+{
+    public int Id { get; init; }
+    public int? HotelId { get; init; }
+    public string FullName { get; init; } = "";
+    public DateTime DateOfBirth { get; init; }
+    public string Gender { get; init; } = "";
+    public string PhoneNumber { get; init; } = "";
+    public string Email { get; init; } = "";
+    public string Address { get; init; } = "";
+    public string IdentityNumber { get; init; } = "";
+    public string Position { get; init; } = "";
+    public DateTime HireDate { get; init; }
+    public string EmploymentType { get; init; } = "";
+    public decimal BaseSalary { get; init; }
+    public string Status { get; init; } = "";
+}
+
+// ── HR: Shifts & Schedule ──
+public record WorkShiftDto
+{
+    public int Id { get; init; }
+    public int HotelId { get; init; }
+    public string HotelName { get; init; } = "";
+    public string Name { get; init; } = "";
+    public TimeSpan StartTime { get; init; }
+    public TimeSpan EndTime { get; init; }
+    public bool IsOvernight { get; init; }
+    public bool IsActive { get; init; }
+}
+
+public record CreateWorkShiftDto
+{
+    public int HotelId { get; init; }
+    public string Name { get; init; } = "";
+    public TimeSpan StartTime { get; init; }
+    public TimeSpan EndTime { get; init; }
+    public bool IsOvernight { get; init; }
+}
+
+public record UpdateWorkShiftDto
+{
+    public int Id { get; init; }
+    public string Name { get; init; } = "";
+    public TimeSpan StartTime { get; init; }
+    public TimeSpan EndTime { get; init; }
+    public bool IsOvernight { get; init; }
+    public bool IsActive { get; init; }
+}
+
+public record ShiftAssignmentDto
+{
+    public int Id { get; init; }
+    public int EmployeeId { get; init; }
+    public string EmployeeName { get; init; } = "";
+    public int HotelId { get; init; }
+    public string HotelName { get; init; } = "";
+    public int WorkShiftId { get; init; }
+    public string ShiftName { get; init; } = "";
+    public DateTime ShiftDate { get; init; }
+    public string Status { get; init; } = "";
+    public string? Notes { get; init; }
+}
+
+public record CreateShiftAssignmentDto
+{
+    public int EmployeeId { get; init; }
+    public int HotelId { get; init; }
+    public int WorkShiftId { get; init; }
+    public DateTime ShiftDate { get; init; }
+    public string? Notes { get; init; }
+}
+
+// ── HR: Attendance ──
+public record AttendanceDto
+{
+    public int Id { get; init; }
+    public int EmployeeId { get; init; }
+    public string EmployeeName { get; init; } = "";
+    public int HotelId { get; init; }
+    public string HotelName { get; init; } = "";
+    public DateTime ShiftDate { get; init; }
+    public int? WorkShiftId { get; init; }
+    public string? ShiftName { get; init; }
+    public DateTime? CheckInTime { get; init; }
+    public DateTime? CheckOutTime { get; init; }
+    public string Status { get; init; } = "";
+    public double HoursWorked { get; init; }
+    public string? Notes { get; init; }
+}
+
+public record RecordAttendanceDto
+{
+    public int EmployeeId { get; init; }
+    public int HotelId { get; init; }
+    public DateTime ShiftDate { get; init; }
+    public int? WorkShiftId { get; init; }
+    public DateTime? CheckInTime { get; init; }
+    public DateTime? CheckOutTime { get; init; }
+    public string? Notes { get; init; }
+}
+
+// ── HR: Payroll ──
+public record PayrollPeriodDto
+{
+    public int Id { get; init; }
+    public int HotelId { get; init; }
+    public string HotelName { get; init; } = "";
+    public string Name { get; init; } = "";
+    public DateTime StartDate { get; init; }
+    public DateTime EndDate { get; init; }
+    public string Status { get; init; } = "";
+}
+
+public record CreatePayrollPeriodDto
+{
+    public int HotelId { get; init; }
+    public string Name { get; init; } = "";
+    public DateTime StartDate { get; init; }
+    public DateTime EndDate { get; init; }
+}
+
+public record PayrollEntryDto
+{
+    public int Id { get; init; }
+    public int PayrollPeriodId { get; init; }
+    public int EmployeeId { get; init; }
+    public string EmployeeName { get; init; } = "";
+    public decimal BaseSalary { get; init; }
+    public double TotalHours { get; init; }
+    public decimal CalculatedSalary { get; init; }
+    public string? Notes { get; init; }
+}
+
+// ── HR: Training ──
+public record TrainingProgramDto
+{
+    public int Id { get; init; }
+    public int? HotelId { get; init; }
+    public string? HotelName { get; init; }
+    public string Title { get; init; } = "";
+    public string Description { get; init; } = "";
+    public DateTime StartDate { get; init; }
+    public DateTime EndDate { get; init; }
+    public bool IsMandatory { get; init; }
+}
+
+public record CreateTrainingProgramDto
+{
+    public int? HotelId { get; init; }
+    public string Title { get; init; } = "";
+    public string Description { get; init; } = "";
+    public DateTime StartDate { get; init; }
+    public DateTime EndDate { get; init; }
+    public bool IsMandatory { get; init; }
+}
+
+public record UpdateTrainingProgramDto
+{
+    public int Id { get; init; }
+    public int? HotelId { get; init; }
+    public string Title { get; init; } = "";
+    public string Description { get; init; } = "";
+    public DateTime StartDate { get; init; }
+    public DateTime EndDate { get; init; }
+    public bool IsMandatory { get; init; }
+}
+
+public record TrainingEnrollmentDto
+{
+    public int Id { get; init; }
+    public int TrainingProgramId { get; init; }
+    public string TrainingTitle { get; init; } = "";
+    public int EmployeeId { get; init; }
+    public string EmployeeName { get; init; } = "";
+    public string Status { get; init; } = "";
+    public double? Score { get; init; }
+    public string? Feedback { get; init; }
+}
+
+public record EnrollTrainingDto
+{
+    public int TrainingProgramId { get; init; }
+    public int EmployeeId { get; init; }
+}
+
+// ── HR: Performance ──
+public record PerformanceReviewDto
+{
+    public int Id { get; init; }
+    public int EmployeeId { get; init; }
+    public string EmployeeName { get; init; } = "";
+    public string ReviewerId { get; init; } = "";
+    public string ReviewerName { get; init; } = "";
+    public int HotelId { get; init; }
+    public string HotelName { get; init; } = "";
+    public DateTime ReviewDate { get; init; }
+    public DateTime PeriodStart { get; init; }
+    public DateTime PeriodEnd { get; init; }
+    public int OverallRating { get; init; }
+    public string Strengths { get; init; } = "";
+    public string Improvements { get; init; } = "";
+    public string Goals { get; init; } = "";
+}
+
+public record CreatePerformanceReviewDto
+{
+    public int EmployeeId { get; init; }
+    public int HotelId { get; init; }
+    public DateTime ReviewDate { get; init; }
+    public DateTime PeriodStart { get; init; }
+    public DateTime PeriodEnd { get; init; }
+    public int OverallRating { get; init; }
+    public string Strengths { get; init; } = "";
+    public string Improvements { get; init; } = "";
+    public string Goals { get; init; } = "";
+}
+
+// ── HR: Legal & Insurance ──
+public record EmploymentContractDto
+{
+    public int Id { get; init; }
+    public int EmployeeId { get; init; }
+    public string EmployeeName { get; init; } = "";
+    public int HotelId { get; init; }
+    public string HotelName { get; init; } = "";
+    public string ContractNumber { get; init; } = "";
+    public string ContractType { get; init; } = "";
+    public DateTime StartDate { get; init; }
+    public DateTime? EndDate { get; init; }
+    public decimal BaseSalary { get; init; }
+    public bool InsuranceIncluded { get; init; }
+    public string Status { get; init; } = "";
+    public string? FileUrl { get; init; }
+}
+
+public record CreateEmploymentContractDto
+{
+    public int EmployeeId { get; init; }
+    public int HotelId { get; init; }
+    public string ContractNumber { get; init; } = "";
+    public string ContractType { get; init; } = "";
+    public DateTime StartDate { get; init; }
+    public DateTime? EndDate { get; init; }
+    public decimal BaseSalary { get; init; }
+    public bool InsuranceIncluded { get; init; }
+    public string Status { get; init; } = "";
+    public string? FileUrl { get; init; }
+}
+
+public record InsuranceRecordDto
+{
+    public int Id { get; init; }
+    public int EmployeeId { get; init; }
+    public string EmployeeName { get; init; } = "";
+    public string ProviderName { get; init; } = "";
+    public string PolicyNumber { get; init; } = "";
+    public DateTime EffectiveDate { get; init; }
+    public DateTime? ExpiryDate { get; init; }
+    public string? Notes { get; init; }
+}
+
+public record CreateInsuranceRecordDto
+{
+    public int EmployeeId { get; init; }
+    public string ProviderName { get; init; } = "";
+    public string PolicyNumber { get; init; } = "";
+    public DateTime EffectiveDate { get; init; }
+    public DateTime? ExpiryDate { get; init; }
+    public string? Notes { get; init; }
+}

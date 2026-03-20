@@ -1,0 +1,71 @@
+@page
+@model HotelBooking.Web.Pages.Admin.HR.Schedule.AssignModel
+@{
+    ViewData["Title"] = "Admin — Assign Shifts";
+}
+
+<div class="page-container">
+    <div class="page-header">
+        <a href="/Admin/HR/Schedule/ByHotel" class="back-link"><i class="fas fa-arrow-left"></i> Schedule</a>
+        <h1><i class="fas fa-user-clock"></i> Assign Shift</h1>
+    </div>
+
+    <div class="form-card">
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+
+        <form method="post">
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.HotelId">Hotel</label>
+                    <select asp-for="Input.HotelId" class="form-control">
+                        @foreach (var h in Model.Hotels)
+                        {
+                            <option value="@h.Id">@h.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.ShiftDate">Shift date</label>
+                    <input asp-for="Input.ShiftDate" type="date" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.EmployeeId">Employee</label>
+                    <select asp-for="Input.EmployeeId" class="form-control">
+                        @foreach (var e in Model.Employees)
+                        {
+                            <option value="@e.Id">@e.FullName</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.WorkShiftId">Shift template</label>
+                    <select asp-for="Input.WorkShiftId" class="form-control">
+                        @foreach (var s in Model.Shifts)
+                        {
+                            <option value="@s.Id">@s.Name (@s.StartTime-@s.EndTime)</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.Notes">Notes</label>
+                <input asp-for="Input.Notes" class="form-control" />
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Assign</button>
+                <a href="/Admin/HR/Schedule/ByHotel" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+

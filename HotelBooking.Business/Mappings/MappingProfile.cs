@@ -87,6 +87,109 @@ public class MappingProfile : Profile
             .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.ToString()))
             .ForMember(d => d.Priority, o => o.MapFrom(s => s.Priority.ToString()))
             .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()));
+
+        // HR: Employee
+        CreateMap<Employee, EmployeeListItemDto>()
+            .ForMember(d => d.HotelName, o => o.MapFrom(s => s.Hotel != null ? s.Hotel.Name : null))
+            .ForMember(d => d.EmploymentType, o => o.MapFrom(s => s.EmploymentType.ToString()))
+            .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()));
+
+        CreateMap<Employee, EmployeeDto>()
+            .ForMember(d => d.HotelName, o => o.MapFrom(s => s.Hotel != null ? s.Hotel.Name : null))
+            .ForMember(d => d.EmploymentType, o => o.MapFrom(s => s.EmploymentType.ToString()))
+            .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()));
+
+        CreateMap<CreateEmployeeDto, Employee>()
+            .ForMember(d => d.EmploymentType, o => o.MapFrom(s => Enum.Parse<EmploymentType>(s.EmploymentType, true)))
+            .ForMember(d => d.Status, o => o.MapFrom(_ => EmployeeStatus.Active));
+
+        CreateMap<UpdateEmployeeDto, Employee>()
+            .ForMember(d => d.EmploymentType, o => o.MapFrom(s => Enum.Parse<EmploymentType>(s.EmploymentType, true)))
+            .ForMember(d => d.Status, o => o.MapFrom(s => Enum.Parse<EmployeeStatus>(s.Status, true)))
+            .ForMember(d => d.UpdatedAt, o => o.MapFrom(_ => DateTime.UtcNow));
+
+        // HR: WorkShift
+        CreateMap<WorkShift, WorkShiftDto>()
+            .ForMember(d => d.HotelName, o => o.MapFrom(s => s.Hotel != null ? s.Hotel.Name : ""));
+
+        CreateMap<CreateWorkShiftDto, WorkShift>();
+        CreateMap<UpdateWorkShiftDto, WorkShift>();
+
+        // HR: ShiftAssignment
+        CreateMap<EmployeeShiftAssignment, ShiftAssignmentDto>()
+            .ForMember(d => d.EmployeeName, o => o.MapFrom(s => s.Employee != null ? s.Employee.FullName : ""))
+            .ForMember(d => d.HotelName, o => o.MapFrom(s => s.Hotel != null ? s.Hotel.Name : ""))
+            .ForMember(d => d.ShiftName, o => o.MapFrom(s => s.WorkShift != null ? s.WorkShift.Name : ""))
+            .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()));
+
+        CreateMap<CreateShiftAssignmentDto, EmployeeShiftAssignment>()
+            .ForMember(d => d.Status, o => o.MapFrom(_ => ShiftAssignmentStatus.Planned));
+
+        // HR: Attendance
+        CreateMap<AttendanceRecord, AttendanceDto>()
+            .ForMember(d => d.EmployeeName, o => o.MapFrom(s => s.Employee != null ? s.Employee.FullName : ""))
+            .ForMember(d => d.HotelName, o => o.MapFrom(s => s.Hotel != null ? s.Hotel.Name : ""))
+            .ForMember(d => d.ShiftName, o => o.MapFrom(s => s.WorkShift != null ? s.WorkShift.Name : null))
+            .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()));
+
+        CreateMap<RecordAttendanceDto, AttendanceRecord>()
+            .ForMember(d => d.Status, o => o.Ignore())
+            .ForMember(d => d.HoursWorked, o => o.Ignore());
+
+        // HR: Payroll
+        CreateMap<PayrollPeriod, PayrollPeriodDto>()
+            .ForMember(d => d.HotelName, o => o.MapFrom(s => s.Hotel != null ? s.Hotel.Name : ""))
+            .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()));
+
+        CreateMap<CreatePayrollPeriodDto, PayrollPeriod>()
+            .ForMember(d => d.Status, o => o.MapFrom(_ => PayrollStatus.Open))
+            .ForMember(d => d.CreatedAt, o => o.MapFrom(_ => DateTime.UtcNow))
+            .ForMember(d => d.UpdatedAt, o => o.MapFrom(_ => DateTime.UtcNow));
+
+        CreateMap<PayrollEntry, PayrollEntryDto>()
+            .ForMember(d => d.EmployeeName, o => o.MapFrom(s => s.Employee != null ? s.Employee.FullName : ""));
+
+        // HR: Training
+        CreateMap<TrainingProgram, TrainingProgramDto>()
+            .ForMember(d => d.HotelName, o => o.MapFrom(s => s.Hotel != null ? s.Hotel.Name : null));
+
+        CreateMap<CreateTrainingProgramDto, TrainingProgram>();
+
+        CreateMap<UpdateTrainingProgramDto, TrainingProgram>()
+            .ForMember(d => d.Id, o => o.Ignore())
+            .ForMember(d => d.IsMandatory, o => o.MapFrom(s => s.IsMandatory));
+
+        CreateMap<TrainingEnrollment, TrainingEnrollmentDto>()
+            .ForMember(d => d.TrainingTitle, o => o.MapFrom(s => s.TrainingProgram != null ? s.TrainingProgram.Title : ""))
+            .ForMember(d => d.EmployeeName, o => o.MapFrom(s => s.Employee != null ? s.Employee.FullName : ""))
+            .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()));
+
+        CreateMap<EnrollTrainingDto, TrainingEnrollment>()
+            .ForMember(d => d.Status, o => o.MapFrom(_ => TrainingEnrollmentStatus.Enrolled));
+
+        // HR: Performance
+        CreateMap<PerformanceReview, PerformanceReviewDto>()
+            .ForMember(d => d.EmployeeName, o => o.MapFrom(s => s.Employee != null ? s.Employee.FullName : ""))
+            .ForMember(d => d.ReviewerName, o => o.MapFrom(s => s.Reviewer != null ? s.Reviewer.FullName : ""))
+            .ForMember(d => d.HotelName, o => o.MapFrom(s => s.Hotel != null ? s.Hotel.Name : ""));
+
+        CreateMap<CreatePerformanceReviewDto, PerformanceReview>();
+
+        // HR: Legal & Insurance
+        CreateMap<EmploymentContract, EmploymentContractDto>()
+            .ForMember(d => d.EmployeeName, o => o.MapFrom(s => s.Employee != null ? s.Employee.FullName : ""))
+            .ForMember(d => d.HotelName, o => o.MapFrom(s => s.Hotel != null ? s.Hotel.Name : ""))
+            .ForMember(d => d.ContractType, o => o.MapFrom(s => s.ContractType.ToString()))
+            .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()));
+
+        CreateMap<CreateEmploymentContractDto, EmploymentContract>()
+            .ForMember(d => d.ContractType, o => o.MapFrom(s => Enum.Parse<ContractType>(s.ContractType, true)))
+            .ForMember(d => d.Status, o => o.MapFrom(s => Enum.Parse<ContractStatus>(s.Status, true)));
+
+        CreateMap<InsuranceRecord, InsuranceRecordDto>()
+            .ForMember(d => d.EmployeeName, o => o.MapFrom(s => s.Employee != null ? s.Employee.FullName : ""));
+
+        CreateMap<CreateInsuranceRecordDto, InsuranceRecord>();
     }
 
     private static string[] DeserializeGallery(string? gallery)

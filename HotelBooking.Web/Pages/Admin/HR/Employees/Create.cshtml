@@ -1,0 +1,113 @@
+@page
+@model HotelBooking.Web.Pages.Admin.HR.Employees.CreateModel
+@{
+    ViewData["Title"] = "Admin — Add Employee";
+}
+
+<div class="page-container">
+    <div class="page-header">
+        <a href="/Admin/HR/Employees" class="back-link"><i class="fas fa-arrow-left"></i> Employees</a>
+        <h1><i class="fas fa-user-plus"></i> Add Employee</h1>
+    </div>
+
+    <div class="form-card">
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+
+        <form method="post">
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.UserId">Staff account</label>
+                    <select asp-for="Input.UserId" class="form-control">
+                        <option value="">Select staff</option>
+                        @foreach (var u in Model.StaffUsers)
+                        {
+                            <option value="@u.Id">@u.FullName (@u.Email)</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Input.UserId" class="field-error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.HotelId">Hotel</label>
+                    <select asp-for="Input.HotelId" class="form-control">
+                        <option value="">Select hotel</option>
+                        @foreach (var h in Model.Hotels)
+                        {
+                            <option value="@h.Id">@h.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.FullName">Full name</label>
+                    <input asp-for="Input.FullName" class="form-control" />
+                    <span asp-validation-for="Input.FullName" class="field-error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Position">Position</label>
+                    <input asp-for="Input.Position" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.DateOfBirth">Date of birth</label>
+                    <input asp-for="Input.DateOfBirth" type="date" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Gender">Gender</label>
+                    <input asp-for="Input.Gender" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.PhoneNumber">Phone</label>
+                    <input asp-for="Input.PhoneNumber" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Email">Email</label>
+                    <input asp-for="Input.Email" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.Address">Address</label>
+                <input asp-for="Input.Address" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.IdentityNumber">Identity number</label>
+                <input asp-for="Input.IdentityNumber" class="form-control" />
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.HireDate">Hire date</label>
+                    <input asp-for="Input.HireDate" type="date" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.EmploymentType">Employment type</label>
+                    <input asp-for="Input.EmploymentType" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.BaseSalary">Base salary</label>
+                <input asp-for="Input.BaseSalary" type="number" step="0.01" class="form-control" />
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Employee</button>
+                <a href="/Admin/HR/Employees" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+

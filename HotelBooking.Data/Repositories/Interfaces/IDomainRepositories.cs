@@ -69,3 +69,61 @@ public interface IPaymentRepository : IRepository<Payment>
 {
     Task<Payment?> GetByBookingIdAsync(int bookingId, CancellationToken ct = default);
 }
+
+// ── HR: Employee & Scheduling ──
+public interface IEmployeeRepository : IRepository<Employee>
+{
+    Task<IReadOnlyList<Employee>> GetByHotelAsync(int hotelId, CancellationToken ct = default);
+    Task<Employee?> GetByUserIdAsync(string userId, CancellationToken ct = default);
+}
+
+public interface IWorkShiftRepository : IRepository<WorkShift>
+{
+    Task<IReadOnlyList<WorkShift>> GetByHotelAsync(int hotelId, CancellationToken ct = default);
+}
+
+public interface IEmployeeShiftAssignmentRepository : IRepository<EmployeeShiftAssignment>
+{
+    Task<IReadOnlyList<EmployeeShiftAssignment>> GetByHotelAndDateRangeAsync(int hotelId, DateTime start, DateTime end, CancellationToken ct = default);
+    Task<IReadOnlyList<EmployeeShiftAssignment>> GetByEmployeeAndDateRangeAsync(int employeeId, DateTime start, DateTime end, CancellationToken ct = default);
+}
+
+public interface IAttendanceRepository : IRepository<AttendanceRecord>
+{
+    Task<IReadOnlyList<AttendanceRecord>> GetByHotelAndDateRangeAsync(int hotelId, DateTime start, DateTime end, CancellationToken ct = default);
+    Task<IReadOnlyList<AttendanceRecord>> GetByEmployeeAndDateRangeAsync(int employeeId, DateTime start, DateTime end, CancellationToken ct = default);
+}
+
+// ── HR: Payroll ──
+public interface IPayrollPeriodRepository : IRepository<PayrollPeriod>
+{
+    Task<IReadOnlyList<PayrollPeriod>> GetByHotelAsync(int hotelId, CancellationToken ct = default);
+    Task<PayrollPeriod?> GetWithEntriesAsync(int id, CancellationToken ct = default);
+}
+
+// ── HR: Training & Performance ──
+public interface ITrainingProgramRepository : IRepository<TrainingProgram>
+{
+    Task<IReadOnlyList<TrainingProgram>> GetByHotelOrGlobalAsync(int? hotelId, CancellationToken ct = default);
+}
+
+public interface ITrainingEnrollmentRepository : IRepository<TrainingEnrollment>
+{
+    Task<IReadOnlyList<TrainingEnrollment>> GetByEmployeeAsync(int employeeId, CancellationToken ct = default);
+}
+
+public interface IPerformanceReviewRepository : IRepository<PerformanceReview>
+{
+    Task<IReadOnlyList<PerformanceReview>> GetByEmployeeAsync(int employeeId, CancellationToken ct = default);
+}
+
+// ── HR: Legal & Insurance ──
+public interface IEmploymentContractRepository : IRepository<EmploymentContract>
+{
+    Task<IReadOnlyList<EmploymentContract>> GetByEmployeeAsync(int employeeId, CancellationToken ct = default);
+}
+
+public interface IInsuranceRecordRepository : IRepository<InsuranceRecord>
+{
+    Task<IReadOnlyList<InsuranceRecord>> GetByEmployeeAsync(int employeeId, CancellationToken ct = default);
+}

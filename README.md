@@ -247,6 +247,22 @@ Get personalized room recommendations + AI-generated answers
 
 ---
 
+#### Admin > HR Management (`/Admin/HR`)
+- **Employees (CRUD)**: `/Admin/HR/Employees` (Create, Update, Detail, Deactivate)
+- **Shifts (Templates)**: `/Admin/HR/Shifts` (Create, Update, Active/Inactive toggle)
+- **Schedule & Assignments**:
+  - `/Admin/HR/Schedule/ByHotel` (view assignments by hotel + date range)
+  - `/Admin/HR/Schedule/Assign` (assign a shift to an employee on a specific date)
+- **Attendance**: `/Admin/HR/Attendance` (record check-in/out and view attendance list)
+- **Payroll (Simple)**: `/Admin/HR/Payroll`
+  - Create payroll periods and run `Calculate → Approve → Mark Paid`
+  - Payroll is intentionally simplified: calculated from attendance hours vs `BaseSalary` (no overtime/allowances/tax)
+- **Training & Enrollments**: `/Admin/HR/Training/Programs`, `/Admin/HR/Training/Enroll`
+- **Performance Reviews**: `/Admin/HR/Performance/Reviews`
+- **Contracts & Insurance**: `/Admin/HR/Contracts` (employment contracts + basic insurance records)
+
+---
+
 ## Technology Stack
 
 | Layer | Technology |

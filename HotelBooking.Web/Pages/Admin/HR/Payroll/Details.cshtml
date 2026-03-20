@@ -1,0 +1,107 @@
+@page
+@model HotelBooking.Web.Pages.Admin.HR.Payroll.DetailsModel
+@{
+    ViewData["Title"] = "Admin — Payroll Details";
+}
+
+<div class="page-container">
+    <div class="page-header">
+        <a href="/Admin/HR/Payroll/Periods?hotelId=@Model.HotelId" class="back-link"><i class="fas fa-arrow-left"></i> Payroll</a>
+        <h1><i class="fas fa-list"></i> Payroll Details</h1>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-@(Model.IsError ? "danger" : "success")">@Model.Message</div>
+    }
+
+    @if (Model.Period is null)
+    {
+        <div class="alert alert-danger">Payroll period not found.</div>
+    }
+    else
+    {
+        <div class="detail-card">
+            <div class="detail-row"><strong>ID:</strong> @Model.Period.Id</div>
+            <div class="detail-row"><strong>Name:</strong> @Model.Period.Name</div>
+            <div class="detail-row"><strong>Range:</strong> @Model.Period.StartDate.ToString("yyyy-MM-dd") - @Model.Period.EndDate.ToString("yyyy-MM-dd")</div>
+            <div class="detail-row"><strong>Status:</strong> @Model.Period.Status</div>
+        </div>
+
+        <div style="height: 16px;"></div>
+
+        <div class="form-card">
+            <div class="form-actions">
+                @if (Model.Period.Status is "Open" or "Calculated")
+                {
+                    <form method="post" asp-page-handler="Calculate" class="inline-form" style="display:inline-block">
+                        <input type="hidden" name="id" value="@Model.Period.Id" />
+                        <input type="hidden" name="hotelId" value="@Model.HotelId" />
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-calculator"></i> Calculate
+                        </button>
+                    </form>
+                }
+
+                @if (Model.Period.Status is "Calculated")
+                {
+                    <form method="post" asp-page-handler="Approve" class="inline-form" style="display:inline-block; margin-left: 8px;">
+                        <input type="hidden" name="id" value="@Model.Period.Id" />
+                        <input type="hidden" name="hotelId" value="@Model.HotelId" />
+                        <button type="submit" class="btn btn-secondary">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                    </form>
+                }
+
+                @if (Model.Period.Status is "Approved")
+                {
+                    <form method="post" asp-page-handler="MarkPaid" class="inline-form" style="display:inline-block; margin-left: 8px;">
+                        <input type="hidden" name="id" value="@Model.Period.Id" />
+                        <input type="hidden" name="hotelId" value="@Model.HotelId" />
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-money-check"></i> Mark Paid
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+
+        <div style="height: 16px;"></div>
+
+        <div class="admin-table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Employee</th>
+                        <th>Base salary</th>
+                        <th>Total hours</th>
+                        <th>Calculated salary</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model.Entries)
+                    {
+                        <tr>
+                            <td>@e.Id</td>
+                            <td>@e.EmployeeName</td>
+                            <td>@e.BaseSalary.ToString("N0")</td>
+                            <td>@e.TotalHours.ToString("0.##")</td>
+                            <td>@e.CalculatedSalary.ToString("N0")</td>
+                            <td>@(string.IsNullOrWhiteSpace(e.Notes) ? "-" : e.Notes)</td>
+                        </tr>
+                    }
+                    @if (Model.Entries.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="6" class="text-muted">No entries yet.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+

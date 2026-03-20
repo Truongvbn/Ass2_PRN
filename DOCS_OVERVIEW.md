@@ -63,6 +63,15 @@ Main entities (in `HotelBooking.Data/Entities`):
   - Navigation: `Hotel`, `RoomType`, `Bookings`, `Reviews`
 - `Booking`, `Payment`, `Review`, `ReviewComment`, `SupportTicket`, `HotelStaff`, `RoomType`
 
+- **HR module (new):**
+  - `Employee` (staff profile) + `EmployeeShiftAssignment` (lịch phân ca)
+  - `WorkShift` (template ca theo khách sạn)
+  - `AttendanceRecord` (check-in/out theo ngày/ca)
+  - `PayrollPeriod`, `PayrollEntry` (tính lương đơn giản theo chấm công)
+  - `TrainingProgram`, `TrainingEnrollment` (đào tạo & enroll)
+  - `PerformanceReview` (đánh giá hiệu suất)
+  - `EmploymentContract`, `InsuranceRecord` (metadata pháp lý & bảo hiểm)
+
 Persistence details:
 
 - Fluent configuration lives in `Configurations/EntityConfigurations.cs`.
@@ -166,6 +175,7 @@ Key Razor pages (under `HotelBooking.Web/Pages`):
 
 - **Admin / staff:**
   - `/Admin/Rooms` (CRUD), `/Admin/Bookings`, `/Admin/Tickets`, `/Admin/Hotels`
+  - `/Admin/HR/*`: `/Admin/HR/Employees`, `/Admin/HR/Shifts`, `/Admin/HR/Schedule/ByHotel`, `/Admin/HR/Attendance`, `/Admin/HR/Payroll/Periods`, `/Admin/HR/Training/Programs`, `/Admin/HR/Performance/Reviews`, `/Admin/HR/Contracts`
 
 Layout file: `Pages/Shared/_Layout.cshtml`
 

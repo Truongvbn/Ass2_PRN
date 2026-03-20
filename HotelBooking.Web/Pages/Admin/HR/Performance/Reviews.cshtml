@@ -1,0 +1,144 @@
+@page
+@model HotelBooking.Web.Pages.Admin.HR.Performance.ReviewsModel
+@{
+    ViewData["Title"] = "Admin — Performance Reviews";
+}
+
+<div class="page-container">
+    <div class="page-header-row">
+        <div class="page-header">
+            <h1><i class="fas fa-star"></i> Performance Reviews</h1>
+            <p>Create and view performance evaluations</p>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-@(Model.IsError ? "danger" : "success")">@Model.Message</div>
+    }
+
+    <div class="form-card">
+        <form method="get" class="filter-bar">
+            <div class="form-group">
+                <label for="hotelId">Hotel</label>
+                <select id="hotelId" name="hotelId" class="form-control">
+                    @foreach (var h in Model.Hotels)
+                    {
+                        if (Model.HotelId == h.Id)
+                        {
+                            <option value="@h.Id" selected="selected">@h.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@h.Id">@h.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="employeeId">Employee</label>
+                <select id="employeeId" name="employeeId" class="form-control">
+                    <option value="">Select</option>
+                    @foreach (var e in Model.Employees)
+                    {
+                        if (Model.EmployeeId == e.Id)
+                        {
+                            <option value="@e.Id" selected="selected">@e.FullName</option>
+                        }
+                        else
+                        {
+                            <option value="@e.Id">@e.FullName</option>
+                        }
+                    }
+                </select>
+            </div>
+            <button type="submit" class="btn btn-outline">
+                <i class="fas fa-filter"></i> Apply
+            </button>
+        </form>
+    </div>
+
+    <div style="height: 16px;"></div>
+
+    <div class="form-card">
+        <h3>Create review</h3>
+        <form method="post" asp-page-handler="Create">
+            <input type="hidden" asp-for="Input.HotelId" />
+            <input type="hidden" asp-for="Input.EmployeeId" />
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.ReviewDate">Review date</label>
+                    <input asp-for="Input.ReviewDate" type="date" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.OverallRating">Overall rating (1-5)</label>
+                    <input asp-for="Input.OverallRating" type="number" min="1" max="5" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.PeriodStart">Period start</label>
+                    <input asp-for="Input.PeriodStart" type="date" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.PeriodEnd">Period end</label>
+                    <input asp-for="Input.PeriodEnd" type="date" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.Strengths">Strengths</label>
+                <input asp-for="Input.Strengths" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Improvements">Improvements</label>
+                <input asp-for="Input.Improvements" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Goals">Goals</label>
+                <input asp-for="Input.Goals" class="form-control" />
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save review
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div style="height: 16px;"></div>
+
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Date</th>
+                    <th>Rating</th>
+                    <th>Strengths</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.Reviews)
+                {
+                    <tr>
+                        <td>@r.Id</td>
+                        <td>@r.ReviewDate.ToString("yyyy-MM-dd")</td>
+                        <td>@r.OverallRating</td>
+                        <td>@(string.IsNullOrWhiteSpace(r.Strengths) ? "-" : r.Strengths)</td>
+                    </tr>
+                }
+                @if (Model.Reviews.Count == 0)
+                {
+                    <tr>
+                        <td colspan="4" class="text-muted">No reviews yet.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

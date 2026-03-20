@@ -1,0 +1,117 @@
+@page
+@model HotelBooking.Web.Pages.Admin.HR.Attendance.IndexModel
+@{
+    ViewData["Title"] = "Admin — Attendance";
+}
+
+<div class="page-container">
+    <div class="page-header-row">
+        <div class="page-header">
+            <h1><i class="fas fa-clipboard-check"></i> Attendance</h1>
+            <p>Record attendance and review payroll inputs</p>
+        </div>
+        <a class="btn btn-primary"
+           href="/Admin/HR/Attendance/Record?hotelId=@(Model.HotelId ?? Model.Hotels.FirstOrDefault()?.Id)&employeeId=@(Model.EmployeeId ?? Model.Employees.FirstOrDefault()?.Id ?? 0)&shiftDate=@DateTime.UtcNow.ToString("yyyy-MM-dd")">
+            <i class="fas fa-plus"></i> Record
+        </a>
+    </div>
+
+    <form method="get" class="filter-bar">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="hotelId">Hotel</label>
+                <select id="hotelId" name="hotelId" class="form-control">
+                    @foreach (var h in Model.Hotels)
+                    {
+                        if (Model.HotelId == h.Id)
+                        {
+                            <option value="@h.Id" selected="selected">@h.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@h.Id">@h.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="employeeId">Employee</label>
+                <select id="employeeId" name="employeeId" class="form-control">
+                    <option value="">All</option>
+                    @foreach (var e in Model.Employees)
+                    {
+                        if (Model.EmployeeId == e.Id)
+                        {
+                            <option value="@e.Id" selected="selected">@e.FullName</option>
+                        }
+                        else
+                        {
+                            <option value="@e.Id">@e.FullName</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="startDate">Start</label>
+                <input id="startDate" name="startDate" type="date" class="form-control" value="@(Model.StartDate?.ToString("yyyy-MM-dd"))" />
+            </div>
+            <div class="form-group">
+                <label for="endDate">End</label>
+                <input id="endDate" name="endDate" type="date" class="form-control" value="@(Model.EndDate?.ToString("yyyy-MM-dd"))" />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-outline">
+            <i class="fas fa-filter"></i> Apply
+        </button>
+    </form>
+
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Employee</th>
+                    <th>Date</th>
+                    <th>Shift</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Status</th>
+                    <th>Hours</th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.Records)
+                {
+                    <tr>
+                        <td>@r.Id</td>
+                        <td>@r.EmployeeName</td>
+                        <td>@r.ShiftDate.ToString("yyyy-MM-dd")</td>
+                        <td>@(string.IsNullOrWhiteSpace(r.ShiftName) ? "-" : r.ShiftName)</td>
+                        <td>@(r.CheckInTime?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                        <td>@(r.CheckOutTime?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                        <td>@r.Status</td>
+                        <td>@r.HoursWorked.ToString("0.##")</td>
+                        <td>@(string.IsNullOrWhiteSpace(r.Notes) ? "-" : r.Notes)</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline"
+                               href="/Admin/HR/Attendance/Record?hotelId=@r.HotelId&employeeId=@r.EmployeeId&shiftDate=@r.ShiftDate.ToString("yyyy-MM-dd")">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+                @if (Model.Records.Count == 0)
+                {
+                    <tr>
+                        <td colspan="10" class="text-muted">No records in range.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

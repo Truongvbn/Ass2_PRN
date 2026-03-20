@@ -17,6 +17,17 @@ public class HotelDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<ReviewComment> ReviewComments => Set<ReviewComment>();
     public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
+    public DbSet<Employee> Employees => Set<Employee>();
+    public DbSet<WorkShift> WorkShifts => Set<WorkShift>();
+    public DbSet<EmployeeShiftAssignment> EmployeeShiftAssignments => Set<EmployeeShiftAssignment>();
+    public DbSet<AttendanceRecord> AttendanceRecords => Set<AttendanceRecord>();
+    public DbSet<PayrollPeriod> PayrollPeriods => Set<PayrollPeriod>();
+    public DbSet<PayrollEntry> PayrollEntries => Set<PayrollEntry>();
+    public DbSet<TrainingProgram> TrainingPrograms => Set<TrainingProgram>();
+    public DbSet<TrainingEnrollment> TrainingEnrollments => Set<TrainingEnrollment>();
+    public DbSet<PerformanceReview> PerformanceReviews => Set<PerformanceReview>();
+    public DbSet<EmploymentContract> EmploymentContracts => Set<EmploymentContract>();
+    public DbSet<InsuranceRecord> InsuranceRecords => Set<InsuranceRecord>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

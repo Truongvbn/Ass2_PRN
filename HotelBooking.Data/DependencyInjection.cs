@@ -36,6 +36,18 @@ public static class DependencyInjection
         services.AddScoped<ITicketRepository, TicketRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
 
+        // ── HR repositories ──
+        services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+        services.AddScoped<IWorkShiftRepository, WorkShiftRepository>();
+        services.AddScoped<IEmployeeShiftAssignmentRepository, EmployeeShiftAssignmentRepository>();
+        services.AddScoped<IAttendanceRepository, AttendanceRepository>();
+        services.AddScoped<IPayrollPeriodRepository, PayrollPeriodRepository>();
+        services.AddScoped<ITrainingProgramRepository, TrainingProgramRepository>();
+        services.AddScoped<ITrainingEnrollmentRepository, TrainingEnrollmentRepository>();
+        services.AddScoped<IPerformanceReviewRepository, PerformanceReviewRepository>();
+        services.AddScoped<IEmploymentContractRepository, EmploymentContractRepository>();
+        services.AddScoped<IInsuranceRecordRepository, InsuranceRecordRepository>();
+
         return services;
     }
 }

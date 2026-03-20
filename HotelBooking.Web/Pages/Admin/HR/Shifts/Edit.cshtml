@@ -1,0 +1,65 @@
+@page
+@model HotelBooking.Web.Pages.Admin.HR.Shifts.EditModel
+@{
+    ViewData["Title"] = "Admin — Edit Shift";
+}
+
+<div class="page-container">
+    <div class="page-header">
+        <a href="/Admin/HR/Shifts/Index?hotelId=@Model.Input.HotelId" class="back-link"><i class="fas fa-arrow-left"></i> Shifts</a>
+        <h1><i class="fas fa-edit"></i> Edit Shift</h1>
+    </div>
+
+    <div class="form-card">
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+
+        <form method="post">
+            <input type="hidden" asp-for="Input.Id" />
+            <input type="hidden" asp-for="Input.HotelId" />
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.Name">Name</label>
+                    <input asp-for="Input.Name" class="form-control" />
+                    <span asp-validation-for="Input.Name" class="field-error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.IsActive">Active</label>
+                    <select asp-for="Input.IsActive" class="form-control">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.StartTime">Start time</label>
+                    <input asp-for="Input.StartTime" type="time" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.EndTime">End time</label>
+                    <input asp-for="Input.EndTime" type="time" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-inline">
+                    <input asp-for="Input.IsOvernight" type="checkbox" />
+                    <span>Is overnight</span>
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+                <a href="/Admin/HR/Shifts/Index?hotelId=@Model.Input.HotelId" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+

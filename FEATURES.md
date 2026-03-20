@@ -175,6 +175,38 @@ Open → InProgress → Resolved → Closed
 
 ---
 
+## 📌 Luồng 4: Quản lý Nhân sự (HR) — Multi-hotel
+
+### Flow (tổng quan)
+```
+Admin/Staff
+→ Quản lý hồ sơ nhân viên
+→ Tạo ca chuẩn + phân ca theo ngày
+→ Chấm công (check-in/out theo ca/ngày)
+→ Tạo kỳ lương → Calculate → Approve → Mark Paid
+→ Quản lý đào tạo + enroll
+→ Đánh giá hiệu suất (performance review)
+→ Quản lý hợp đồng & bảo hiểm
+```
+
+### Tính năng đã triển khai (Admin/Staff)
+| # | Tính năng | Trang |
+|---|-----------|-------|
+| 1 | Quản lý nhân viên (CRUD + deactivate) | `/Admin/HR/Employees` |
+| 2 | Quản lý ca làm việc (templates + active/inactive) | `/Admin/HR/Shifts` |
+| 3 | Lịch làm việc theo khách sạn + phân ca | `/Admin/HR/Schedule/ByHotel`, `/Admin/HR/Schedule/Assign` |
+| 4 | Chấm công theo ngày/ca | `/Admin/HR/Attendance`, `/Admin/HR/Attendance/Record` |
+| 5 | Quản lý kỳ lương + bảng lương | `/Admin/HR/Payroll/Periods`, `/Admin/HR/Payroll/Details` |
+| 6 | Đào tạo + enroll cho nhân viên | `/Admin/HR/Training/Programs`, `/Admin/HR/Training/Enroll` |
+| 7 | Đánh giá hiệu suất | `/Admin/HR/Performance/Reviews` |
+| 8 | Hợp đồng & bảo hiểm (metadata) | `/Admin/HR/Contracts` |
+
+### Business rules đã enforce
+- **Multi-hotel scope**: Admin xem toàn hệ thống; Staff chỉ thao tác với các khách sạn được assign (`HotelStaff`) và được re-check ở handlers POST.
+- **Payroll đơn giản (theo plan)**:
+  - Không triển khai tăng ca/phụ cấp phức tạp, không tính thuế/allowance.
+  - Lương tính từ giờ công/chấm công theo ca + `BaseSalary`.
+
 ## 📌 Tính năng bổ sung
 
 ### 🤖 AI Concierge (Recommendation Engine)

@@ -75,6 +75,71 @@ public interface IAiAssistantService
     Task<ServiceResult<AiResponseDto>> AnswerQuestionAsync(string question, int? roomId, CancellationToken ct = default);
 }
 
+// ── HR Services ──
+public interface IEmployeeService
+{
+    Task<ServiceResult<IReadOnlyList<EmployeeListItemDto>>> GetEmployeesByHotelAsync(int hotelId, CancellationToken ct = default);
+    Task<ServiceResult<EmployeeDto>> GetEmployeeByIdAsync(int id, CancellationToken ct = default);
+    Task<ServiceResult<EmployeeDto>> CreateEmployeeAsync(CreateEmployeeDto dto, CancellationToken ct = default);
+    Task<ServiceResult<EmployeeDto>> UpdateEmployeeAsync(UpdateEmployeeDto dto, CancellationToken ct = default);
+    Task<ServiceResult> DeactivateEmployeeAsync(int id, CancellationToken ct = default);
+}
+
+public interface IShiftService
+{
+    Task<ServiceResult<IReadOnlyList<WorkShiftDto>>> GetShiftsByHotelAsync(int hotelId, CancellationToken ct = default);
+    Task<ServiceResult<WorkShiftDto>> CreateShiftAsync(CreateWorkShiftDto dto, CancellationToken ct = default);
+    Task<ServiceResult<WorkShiftDto>> UpdateShiftAsync(UpdateWorkShiftDto dto, CancellationToken ct = default);
+    Task<ServiceResult<WorkShiftDto>> GetShiftByIdAsync(int id, CancellationToken ct = default);
+    Task<ServiceResult> ToggleShiftActiveAsync(int id, bool isActive, CancellationToken ct = default);
+
+    Task<ServiceResult<IReadOnlyList<ShiftAssignmentDto>>> GetScheduleByHotelAsync(int hotelId, DateTime start, DateTime end, CancellationToken ct = default);
+    Task<ServiceResult<IReadOnlyList<ShiftAssignmentDto>>> GetScheduleByEmployeeAsync(int employeeId, DateTime start, DateTime end, CancellationToken ct = default);
+    Task<ServiceResult<ShiftAssignmentDto>> AssignShiftAsync(CreateShiftAssignmentDto dto, CancellationToken ct = default);
+}
+
+public interface IAttendanceService
+{
+    Task<ServiceResult<AttendanceDto>> RecordAttendanceAsync(RecordAttendanceDto dto, CancellationToken ct = default);
+    Task<ServiceResult<IReadOnlyList<AttendanceDto>>> GetAttendanceByHotelAsync(int hotelId, DateTime start, DateTime end, CancellationToken ct = default);
+    Task<ServiceResult<IReadOnlyList<AttendanceDto>>> GetAttendanceByEmployeeAsync(int employeeId, DateTime start, DateTime end, CancellationToken ct = default);
+}
+
+public interface IPayrollService
+{
+    Task<ServiceResult<IReadOnlyList<PayrollPeriodDto>>> GetPayrollPeriodsByHotelAsync(int hotelId, CancellationToken ct = default);
+    Task<ServiceResult<PayrollPeriodDto>> CreatePayrollPeriodAsync(CreatePayrollPeriodDto dto, CancellationToken ct = default);
+    Task<ServiceResult> CalculatePayrollAsync(int payrollPeriodId, CancellationToken ct = default);
+    Task<ServiceResult<IReadOnlyList<PayrollEntryDto>>> GetPayrollEntriesAsync(int payrollPeriodId, CancellationToken ct = default);
+    Task<ServiceResult> ApprovePayrollAsync(int payrollPeriodId, CancellationToken ct = default);
+    Task<ServiceResult> MarkPayrollPaidAsync(int payrollPeriodId, CancellationToken ct = default);
+}
+
+public interface ITrainingService
+{
+    Task<ServiceResult<IReadOnlyList<TrainingProgramDto>>> GetTrainingProgramsAsync(int? hotelId, CancellationToken ct = default);
+    Task<ServiceResult<TrainingProgramDto>> CreateTrainingProgramAsync(CreateTrainingProgramDto dto, CancellationToken ct = default);
+    Task<ServiceResult<TrainingProgramDto>> GetTrainingProgramByIdAsync(int id, CancellationToken ct = default);
+    Task<ServiceResult<TrainingProgramDto>> UpdateTrainingProgramAsync(UpdateTrainingProgramDto dto, CancellationToken ct = default);
+    Task<ServiceResult<IReadOnlyList<TrainingEnrollmentDto>>> GetEnrollmentsByEmployeeAsync(int employeeId, CancellationToken ct = default);
+    Task<ServiceResult<TrainingEnrollmentDto>> EnrollEmployeeAsync(EnrollTrainingDto dto, CancellationToken ct = default);
+}
+
+public interface IPerformanceService
+{
+    Task<ServiceResult<IReadOnlyList<PerformanceReviewDto>>> GetReviewsByEmployeeAsync(int employeeId, CancellationToken ct = default);
+    Task<ServiceResult<PerformanceReviewDto>> CreateReviewAsync(CreatePerformanceReviewDto dto, string reviewerId, CancellationToken ct = default);
+}
+
+public interface ILegalComplianceService
+{
+    Task<ServiceResult<IReadOnlyList<EmploymentContractDto>>> GetContractsByEmployeeAsync(int employeeId, CancellationToken ct = default);
+    Task<ServiceResult<EmploymentContractDto>> CreateContractAsync(CreateEmploymentContractDto dto, CancellationToken ct = default);
+
+    Task<ServiceResult<IReadOnlyList<InsuranceRecordDto>>> GetInsuranceByEmployeeAsync(int employeeId, CancellationToken ct = default);
+    Task<ServiceResult<InsuranceRecordDto>> CreateInsuranceRecordAsync(CreateInsuranceRecordDto dto, CancellationToken ct = default);
+}
+
 public class AiResponseDto
 {
     public string Answer { get; set; } = string.Empty;

@@ -1,0 +1,84 @@
+@page
+@model HotelBooking.Web.Pages.Admin.HR.Schedule.ByHotelModel
+@{
+    ViewData["Title"] = "Admin — Schedule By Hotel";
+}
+
+<div class="page-container">
+    <div class="page-header-row">
+        <div class="page-header">
+            <h1><i class="fas fa-calendar-alt"></i> Staff Schedule</h1>
+            <p>View shift assignments by hotel and date range</p>
+        </div>
+        <a class="btn btn-primary" href="/Admin/HR/Schedule/Assign?hotelId=@(Model.HotelId ?? Model.Hotels.FirstOrDefault()?.Id)">
+            <i class="fas fa-plus"></i> Assign Shift
+        </a>
+    </div>
+
+    <form method="get" class="filter-bar">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="hotelId">Hotel</label>
+                <select id="hotelId" name="hotelId" class="form-control">
+                    @foreach (var h in Model.Hotels)
+                    {
+                        if (Model.HotelId == h.Id)
+                        {
+                            <option value="@h.Id" selected="selected">@h.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@h.Id">@h.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="startDate">Start</label>
+                <input id="startDate" name="startDate" type="date" class="form-control" value="@(Model.StartDate?.ToString("yyyy-MM-dd"))" />
+            </div>
+            <div class="form-group">
+                <label for="endDate">End</label>
+                <input id="endDate" name="endDate" type="date" class="form-control" value="@(Model.EndDate?.ToString("yyyy-MM-dd"))" />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-outline">
+            <i class="fas fa-filter"></i> Apply
+        </button>
+    </form>
+
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Employee</th>
+                    <th>Shift</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var a in Model.Assignments)
+                {
+                    <tr>
+                        <td>@a.Id</td>
+                        <td>@a.EmployeeName</td>
+                        <td>@a.ShiftName</td>
+                        <td>@a.ShiftDate.ToString("yyyy-MM-dd")</td>
+                        <td>@a.Status</td>
+                        <td>@(string.IsNullOrWhiteSpace(a.Notes) ? "-" : a.Notes)</td>
+                    </tr>
+                }
+                @if (Model.Assignments.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="text-muted">No assignments in range.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

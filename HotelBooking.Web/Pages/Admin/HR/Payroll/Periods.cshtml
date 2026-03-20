@@ -1,0 +1,107 @@
+@page
+@model HotelBooking.Web.Pages.Admin.HR.Payroll.PeriodsModel
+@{
+    ViewData["Title"] = "Admin — Payroll Periods";
+}
+
+<div class="page-container">
+    <div class="page-header-row">
+        <div class="page-header">
+            <h1><i class="fas fa-file-invoice-dollar"></i> Payroll</h1>
+            <p>Create and manage payroll periods</p>
+        </div>
+    </div>
+
+    <div class="form-card">
+        <form method="get" class="filter-bar">
+            <div class="form-group">
+                <label for="hotelId">Hotel</label>
+                <select id="hotelId" name="hotelId" class="form-control">
+                    @foreach (var h in Model.Hotels)
+                    {
+                        if (Model.HotelId == h.Id)
+                        {
+                            <option value="@h.Id" selected="selected">@h.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@h.Id">@h.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+            <button type="submit" class="btn btn-outline">
+                <i class="fas fa-filter"></i> Apply
+            </button>
+        </form>
+    </div>
+
+    <div style="height: 16px;"></div>
+
+    <div class="form-card">
+        <h3>Create new payroll period</h3>
+        <form method="post">
+            <input type="hidden" asp-for="Input.HotelId" />
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.Name">Name</label>
+                    <input asp-for="Input.Name" class="form-control" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Input.StartDate">Start date</label>
+                    <input asp-for="Input.StartDate" type="date" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.EndDate">End date</label>
+                    <input asp-for="Input.EndDate" type="date" class="form-control" />
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" asp-page-handler="Create" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Create
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div style="height: 16px;"></div>
+
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Range</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model.Periods)
+                {
+                    <tr>
+                        <td>@p.Id</td>
+                        <td>@p.Name</td>
+                        <td>@p.StartDate.ToString("yyyy-MM-dd") - @p.EndDate.ToString("yyyy-MM-dd")</td>
+                        <td>@p.Status</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline" href="/Admin/HR/Payroll/Details?id=@p.Id&hotelId=@Model.SelectedHotelId">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+                @if (Model.Periods.Count == 0)
+                {
+                    <tr>
+                        <td colspan="5" class="text-muted">No payroll periods.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

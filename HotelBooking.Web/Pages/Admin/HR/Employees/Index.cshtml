@@ -1,0 +1,95 @@
+@page
+@model HotelBooking.Web.Pages.Admin.HR.Employees.IndexModel
+@{
+    ViewData["Title"] = "Admin — Employees";
+}
+
+<div class="page-container">
+    <div class="page-header-row">
+        <div class="page-header">
+            <h1><i class="fas fa-users"></i> Employee Management</h1>
+            <p>Admin panel — manage hotel staff profiles</p>
+        </div>
+        <a href="/Admin/HR/Employees/Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Employee
+        </a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-@(Model.IsError ? "danger" : "success")">@Model.Message</div>
+    }
+
+    <form method="get" class="filter-bar">
+        <div class="form-group">
+            <label for="hotelId">Hotel</label>
+            <select id="hotelId" name="hotelId" class="form-control">
+                <option value="">All</option>
+                @foreach (var h in Model.Hotels)
+                {
+                    if (Model.SelectedHotelId == h.Id)
+                    {
+                        <option value="@h.Id" selected="selected">@h.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@h.Id">@h.Name</option>
+                    }
+                }
+            </select>
+        </div>
+        <button class="btn btn-outline" type="submit">
+            <i class="fas fa-filter"></i> Apply
+        </button>
+    </form>
+
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Hotel</th>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Employment</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in Model.Employees)
+                {
+                    <tr>
+                        <td>@e.Id</td>
+                        <td>@e.HotelName</td>
+                        <td>@e.FullName</td>
+                        <td>@e.Position</td>
+                        <td>@e.EmploymentType</td>
+                        <td>
+                            <span class="badge badge-@(e.Status == "Active" ? "available" : "unavailable")">
+                                @e.Status
+                            </span>
+                        </td>
+                        <td class="actions-cell">
+                            <a href="/Admin/HR/Employees/Detail?id=@e.Id" class="btn btn-sm btn-outline">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="/Admin/HR/Employees/Edit?id=@e.Id" class="btn btn-sm btn-outline">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="post" asp-page-handler="Deactivate"
+                                  onsubmit="return confirm('Deactivate this employee?')"
+                                  class="inline-form">
+                                <input type="hidden" name="id" value="@e.Id" />
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="fas fa-user-slash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

@@ -1,0 +1,65 @@
+@page
+@model HotelBooking.Web.Pages.Admin.HR.Employees.DetailModel
+@{
+    ViewData["Title"] = "Admin — Employee Detail";
+}
+
+<div class="page-container">
+    <div class="page-header">
+        <a href="/Admin/HR/Employees" class="back-link"><i class="fas fa-arrow-left"></i> Employees</a>
+        <h1><i class="fas fa-user"></i> Employee Detail</h1>
+    </div>
+
+    @if (Model.Employee is null)
+    {
+        <div class="alert alert-danger">Employee not found.</div>
+    }
+    else
+    {
+        <div class="detail-card">
+            <div class="detail-row">
+                <strong>ID:</strong> @Model.Employee.Id
+            </div>
+            <div class="detail-row">
+                <strong>Full name:</strong> @Model.Employee.FullName
+            </div>
+            <div class="detail-row">
+                <strong>Position:</strong> @Model.Employee.Position
+            </div>
+            <div class="detail-row">
+                <strong>Employment:</strong> @Model.Employee.EmploymentType
+            </div>
+            <div class="detail-row">
+                <strong>Status:</strong> @Model.Employee.Status
+            </div>
+            <div class="detail-row">
+                <strong>Hotel:</strong> @(Model.Employee.HotelName ?? "N/A")
+            </div>
+            <div class="detail-row">
+                <strong>Base salary:</strong> @Model.Employee.BaseSalary.ToString("N0")
+            </div>
+            <div class="detail-row">
+                <strong>Phone:</strong> @Model.Employee.PhoneNumber
+            </div>
+            <div class="detail-row">
+                <strong>Email:</strong> @Model.Employee.Email
+            </div>
+            <div class="detail-row">
+                <strong>Date of birth:</strong> @Model.Employee.DateOfBirth.ToString("yyyy-MM-dd")
+            </div>
+            <div class="detail-row">
+                <strong>Hire date:</strong> @Model.Employee.HireDate.ToString("yyyy-MM-dd")
+            </div>
+            <div class="detail-row">
+                <strong>Identity number:</strong> @Model.Employee.IdentityNumber
+            </div>
+
+            <div class="detail-actions">
+                <a class="btn btn-primary" href="/Admin/HR/Employees/Edit?id=@Model.Employee.Id">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
