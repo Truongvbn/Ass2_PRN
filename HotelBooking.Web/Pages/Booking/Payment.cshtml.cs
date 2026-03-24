@@ -32,8 +32,9 @@ public class PaymentModel(
 
         if (Extra)
         {
-            if (Booking!.Status != "Completed" || Booking.IsExtraChargePaid || Booking.ExtraChargeAmount <= 0)
+            if (Booking!.IsExtraChargePaid || Booking.ExtraChargeAmount <= 0)
                 return RedirectToPage("/Booking/MyBookings");
+            // Allow paying extra even before marking completed
             return Page();
         }
 
@@ -64,23 +65,13 @@ public class PaymentModel(
 
         if (Extra)
         {
-            var booking = await bookingService.GetBookingByIdAsync(BookingId); // Get full entity access if needed or just update
-            // In a real app, we'd process the payment through a gateway first.
-            // For now, we update the extra charge status.
-            var updateResult = await bookingService.CompleteBookingAsync(BookingId, new CheckoutBookingDto
-            {
-                ExtraChargeAmount = bookingResult.Data!.ExtraChargeAmount,
-                ExtraChargeDescription = bookingResult.Data!.ExtraChargeDescription,
-                LostAndFoundNotes = bookingResult.Data!.LostAndFoundNotes,
-                LostAndFoundImageUrl = bookingResult.Data!.LostAndFoundImageUrl
-            });
-
-            if (updateResult.IsSuccess)
+            var payExtra = await paymentService.PayExtraAsync(BookingId);
+            if (payExtra.IsSuccess)
             {
                 TempData["SuccessMessage"] = "Extra charges paid successfully!";
-                return RedirectToPage("/Booking/MyBookings");
+                return RedirectToPage("/Booking/Confirmation", new { id = BookingId });
             }
-            ErrorMessage = updateResult.ErrorMessage;
+            ErrorMessage = payExtra.ErrorMessage;
             Booking = bookingResult.Data;
             return Page();
         }

@@ -45,6 +45,21 @@
         </form>
     </div>
 
+    <div class="form-card" style="margin-top:12px;">
+        <form method="post" asp-page-handler="Promote">
+            <input type="hidden" asp-for="Promote.HotelId" value="@Model.Input.HotelId" />
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Promote.Email">Promote User to Staff (by email)</label>
+                    <input asp-for="Promote.Email" class="form-control" placeholder="user@example.com" />
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-outline" type="submit"><i class="fas fa-user-tie"></i> Promote to Staff</button>
+            </div>
+        </form>
+    </div>
+
     <div class="admin-table-wrapper" style="margin-top:16px;">
         <table class="admin-table">
             <thead>

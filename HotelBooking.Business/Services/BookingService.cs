@@ -253,10 +253,7 @@ public class BookingService : IBookingService
         if (booking.Status != BookingStatus.CheckedIn)
             return ServiceResult.Failure("Only checked-in bookings can be completed", "INVALID_STATE");
 
-        booking.Status = BookingStatus.Completed;
-        booking.CheckedOutAt = DateTime.UtcNow;
-        booking.UpdatedAt = DateTime.UtcNow;
-
+        // Apply checkout details
         if (checkoutDto != null)
         {
             booking.ExtraChargeAmount = checkoutDto.ExtraChargeAmount;
@@ -265,6 +262,21 @@ public class BookingService : IBookingService
             booking.LostAndFoundNotes = checkoutDto.LostAndFoundNotes;
             booking.LostAndFoundImageUrl = checkoutDto.LostAndFoundImageUrl;
         }
+
+        // If there are unpaid extras, require payment before marking completed
+        if (booking.ExtraChargeAmount > 0 && !booking.IsExtraChargePaid)
+        {
+            booking.PaymentDeadline = DateTime.UtcNow.AddHours(24);
+            booking.CheckedOutAt = null; // finalize after payment
+            booking.UpdatedAt = DateTime.UtcNow;
+            await _bookingRepo.UpdateAsync(booking, ct);
+            await _notifier.BookingStatusChanged(id, "ExtraPaymentRequired");
+            return ServiceResult.Success();
+        }
+
+        booking.Status = BookingStatus.Completed;
+        booking.CheckedOutAt = DateTime.UtcNow;
+        booking.UpdatedAt = DateTime.UtcNow;
 
         await _bookingRepo.UpdateAsync(booking, ct);
 

@@ -61,6 +61,48 @@ public class StaffModel(IHotelService hotelService, UserManager<ApplicationUser>
         return Page();
     }
 
+    [BindProperty] public PromoteInput Promote { get; set; } = new();
+    public class PromoteInput
+    {
+        public int HotelId { get; set; }
+        public string Email { get; set; } = "";
+    }
+
+    public async Task<IActionResult> OnPostPromoteAsync()
+    {
+        await LoadAsync(Promote.HotelId);
+        if (string.IsNullOrWhiteSpace(Promote.Email))
+        {
+            Message = "Email is required";
+            IsError = true;
+            return Page();
+        }
+        var user = await userManager.FindByEmailAsync(Promote.Email);
+        if (user is null)
+        {
+            Message = "User not found";
+            IsError = true;
+            return Page();
+        }
+        var isStaff = await userManager.IsInRoleAsync(user, "Staff");
+        if (!isStaff)
+        {
+            var addRes = await userManager.AddToRoleAsync(user, "Staff");
+            if (!addRes.Succeeded)
+            {
+                Message = "Failed to add Staff role";
+                IsError = true;
+                return Page();
+            }
+            var isCustomer = await userManager.IsInRoleAsync(user, "Customer");
+            if (isCustomer) await userManager.RemoveFromRoleAsync(user, "Customer");
+        }
+        Message = "User promoted to Staff.";
+        IsError = false;
+        await LoadAsync(Promote.HotelId);
+        return Page();
+    }
+
     private async Task LoadAsync(int hotelId)
     {
         var hotelResult = await hotelService.GetHotelByIdAsync(hotelId);

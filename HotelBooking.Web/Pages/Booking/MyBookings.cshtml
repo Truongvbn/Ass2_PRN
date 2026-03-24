@@ -97,34 +97,34 @@
                         {
                             <span class="text-success small"><i class="fas fa-undo"></i> Refund $@((booking.RefundAmount ?? 0).ToString("N2")) on @booking.RefundedAt!.Value.ToString("MMM dd")</span>
                         }
+                        <div class="completed-info mt-2 mb-2 p-2 rounded bg-light border">
+                            @if (booking.ExtraChargeAmount > 0)
+                            {
+                                <div class="text-danger small">
+                                    <strong><i class="fas fa-exclamation-circle"></i> Extra Charges:</strong> $@booking.ExtraChargeAmount.ToString("N2") (@booking.ExtraChargeDescription)
+                                    @if (!booking.IsExtraChargePaid)
+                                    {
+                                        <a href="/Booking/Payment?id=@booking.Id&extra=true" class="btn btn-xs btn-outline-danger ml-2">Pay Now</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-success ml-2">Paid</span>
+                                    }
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(booking.LostAndFoundNotes))
+                            {
+                                <div class="text-warning small mt-1">
+                                    <strong><i class="fas fa-box-open"></i> Lost & Found:</strong> @booking.LostAndFoundNotes
+                                    @if (!string.IsNullOrEmpty(booking.LostAndFoundImageUrl))
+                                    {
+                                        <a href="@booking.LostAndFoundImageUrl" target="_blank" class="ml-1"><i class="fas fa-image"></i> View Photo</a>
+                                    }
+                                </div>
+                            }
+                        </div>
                         @if (booking.Status == "Completed")
                         {
-                            <div class="completed-info mt-2 mb-2 p-2 rounded bg-light border">
-                                @if (booking.ExtraChargeAmount > 0)
-                                {
-                                    <div class="text-danger small">
-                                        <strong><i class="fas fa-exclamation-circle"></i> Extra Charges:</strong> $@booking.ExtraChargeAmount.ToString("N2") (@booking.ExtraChargeDescription)
-                                        @if (!booking.IsExtraChargePaid)
-                                        {
-                                            <a href="/Booking/Payment?id=@booking.Id&extra=true" class="btn btn-xs btn-outline-danger ml-2">Pay Now</a>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge badge-success ml-2">Paid</span>
-                                        }
-                                    </div>
-                                }
-                                @if (!string.IsNullOrEmpty(booking.LostAndFoundNotes))
-                                {
-                                    <div class="text-warning small mt-1">
-                                        <strong><i class="fas fa-box-open"></i> Lost & Found:</strong> @booking.LostAndFoundNotes
-                                        @if (!string.IsNullOrEmpty(booking.LostAndFoundImageUrl))
-                                        {
-                                            <a href="@booking.LostAndFoundImageUrl" target="_blank" class="ml-1"><i class="fas fa-image"></i> View Photo</a>
-                                        }
-                                    </div>
-                                }
-                            </div>
                             <a href="/Rooms/Detail?id=@booking.RoomId#reviews-section" class="btn btn-sm btn-outline">
                                 <i class="fas fa-star"></i> Write Review
                             </a>

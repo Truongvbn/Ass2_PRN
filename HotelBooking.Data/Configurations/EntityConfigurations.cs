@@ -94,6 +94,7 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
         builder.Property(b => b.TotalPrice).HasPrecision(18, 2);
         builder.Property(b => b.Status).HasConversion<string>().HasMaxLength(20);
         builder.Property(b => b.RowVersion).IsRowVersion();
+        builder.HasQueryFilter(b => !b.Room.IsDeleted);
 
         builder.Property(b => b.GuestNotes).HasMaxLength(2000);
         builder.Property(b => b.AdminNotes).HasMaxLength(2000);
@@ -121,6 +122,7 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
     {
         builder.HasKey(p => p.Id);
         builder.Property(p => p.Amount).HasPrecision(18, 2);
+        builder.HasQueryFilter(p => !p.Booking.Room.IsDeleted);
         var paymentMethodConverter = new ValueConverter<PaymentMethod, string>(
             v => v.ToString(),
             v => PaymentMethodLegacyConversion.FromDb(v));

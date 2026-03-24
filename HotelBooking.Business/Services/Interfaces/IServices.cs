@@ -47,6 +47,7 @@ public interface IPaymentService
     Task<ServiceResult<PaymentDto>> ProcessPaymentAsync(CreatePaymentDto dto, CancellationToken ct = default);
     Task<ServiceResult<PaymentDto>> GetPaymentByBookingAsync(int bookingId, CancellationToken ct = default);
     Task<ServiceResult> RefundAsync(int bookingId, decimal? amount = null, string? reason = null, CancellationToken ct = default);
+    Task<ServiceResult> PayExtraAsync(int bookingId, CancellationToken ct = default);
 }
 
 public interface IReviewService

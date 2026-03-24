@@ -27,6 +27,10 @@ public static class DependencyInjection
         {
             services.AddHttpClient<IAiAssistantService, GeminiAiAssistantService>();
         }
+          else if (aiProvider.Equals("OpenAI", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddHttpClient<IAiAssistantService, OpenAiAssistantService>();
+        }
         else
         {
             services.AddScoped<IAiAssistantService, MockAiAssistantService>();

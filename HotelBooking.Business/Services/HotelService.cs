@@ -108,6 +108,16 @@ public class HotelService : IHotelService
         var user = await _userManager.FindByIdAsync(dto.UserId);
         if (user is null) return ServiceResult.Failure("User not found", "NOT_FOUND");
 
+        // Ensure the user has the Staff role; remove Customer role if present
+        var isStaff = await _userManager.IsInRoleAsync(user, "Staff");
+        if (!isStaff)
+        {
+            var addRes = await _userManager.AddToRoleAsync(user, "Staff");
+            if (!addRes.Succeeded) return ServiceResult.Failure("Failed to add Staff role", "IDENTITY");
+            var isCustomer = await _userManager.IsInRoleAsync(user, "Customer");
+            if (isCustomer) await _userManager.RemoveFromRoleAsync(user, "Customer");
+        }
+
         var existing = await _hotelStaffRepo.GetAssignmentAsync(dto.HotelId, dto.UserId, ct);
         if (existing is not null) return ServiceResult.Failure("User is already assigned to this hotel", "DUPLICATE");
 

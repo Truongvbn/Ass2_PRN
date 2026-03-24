@@ -94,4 +94,26 @@ public class PaymentService : IPaymentService
 
         return ServiceResult.Success();
     }
+
+    // Process post-stay extra charges; no new Payment record created in this simplified flow.
+    public async Task<ServiceResult> PayExtraAsync(int bookingId, CancellationToken ct = default)
+    {
+        var booking = await _bookingRepo.GetByIdAsync(bookingId, ct);
+        if (booking is null) return ServiceResult.Failure("Booking not found", "NOT_FOUND");
+        if (booking.ExtraChargeAmount <= 0) return ServiceResult.Failure("No extra charges to pay", "VALIDATION");
+        if (booking.IsExtraChargePaid) return ServiceResult.Failure("Extra charges already paid", "ALREADY_PAID");
+
+        // Mark extra charges as paid and finalize checkout
+        booking.IsExtraChargePaid = true;
+        booking.Status = BookingStatus.Completed;
+        booking.CheckedOutAt ??= DateTime.UtcNow;
+        booking.UpdatedAt = DateTime.UtcNow;
+        await _bookingRepo.UpdateAsync(booking, ct);
+
+        await _notifier.PaymentReceived(booking.Id);
+        await _notifier.StayCompleted(booking.Id, booking.UserId);
+        await _notifier.BookingStatusChanged(booking.Id, BookingStatus.Completed.ToString());
+
+        return ServiceResult.Success();
+    }
 }

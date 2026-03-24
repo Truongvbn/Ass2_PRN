@@ -8,9 +8,9 @@ Hướng dẫn cài đặt môi trường và chạy ứng dụng web **Grand Az
 
 | Thành phần | Yêu cầu |
 |------------|--------|
-| **.NET** | .NET 10 SDK — [Tải tại đây](https://dotnet.microsoft.com/download) |
+| **.NET** | .NET 8 SDK — [Tải tại đây](https://dotnet.microsoft.com/download) |
 | **Node.js** | Phiên bản 18 trở lên (để build giao diện bản đồ React) — [Tải tại đây](https://nodejs.org/) |
-| **Cơ sở dữ liệu** | SQL Server LocalDB (đi kèm Visual Studio hoặc [SQL Server Express](https://www.microsoft.com/sql-server/sql-server-downloads)) |
+| **Cơ sở dữ liệu** | SQL Server LocalDB (đi kèm Visual Studio hoặc [SQL Server Express](https://www.microsoft.com/sql-server/sql-server-downloads)) | thay = supabase 
 
 Kiểm tra nhanh:
 ```powershell

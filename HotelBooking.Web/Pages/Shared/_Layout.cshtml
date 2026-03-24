@@ -150,6 +150,32 @@
                         window.location.href = `/Booking/Create?roomId=${roomId}`;
                     }, 2000); // Redirect after 2 seconds so the user can read the message
                 }
+                if (data.action === 'REDIRECT_PAYMENT') {
+                    // actionData may be roomId or a JSON string { roomId, checkIn, checkOut, guests }
+                    let roomIdForPay = null, checkIn = null, checkOut = null, guests = null;
+                    try {
+                        const parsed = typeof data.actionData === 'string' ? JSON.parse(data.actionData) : data.actionData;
+                        roomIdForPay = parsed?.roomId ?? parsed;
+                        checkIn = parsed?.checkIn ?? null;
+                        checkOut = parsed?.checkOut ?? null;
+                        guests = parsed?.guests ?? null;
+                    } catch {
+                        roomIdForPay = data.actionData || null;
+                    }
+                    if (!roomIdForPay) return;
+                    const form = new FormData();
+                    form.append('roomId', roomIdForPay);
+                    if (checkIn) form.append('checkIn', checkIn);
+                    if (checkOut) form.append('checkOut', checkOut);
+                    if (guests) form.append('guests', guests);
+                    const resp = await fetch('/api/ai/quick-book', { method: 'POST', body: form });
+                    const jb = await resp.json();
+                    if (resp.ok && jb.paymentUrl) {
+                        setTimeout(() => { window.location.href = jb.paymentUrl; }, 1500);
+                    } else {
+                        msgs.innerHTML += `<div class="ai-message ai-bubble error">Unable to create booking automatically: ${jb.error || 'Unknown error'}</div>`;
+                    }
+                }
             } catch (err) {
                 const thinkingBubble = document.getElementById(thinkingId);
                 if (thinkingBubble) thinkingBubble.remove();
