@@ -30,7 +30,7 @@ public class RoomRepository : Repository<Room>, IRoomRepository
         {
             var ciUtc = DateTime.SpecifyKind(checkIn.Value.Date, DateTimeKind.Utc);
             var coUtc = DateTime.SpecifyKind(checkOut.Value.Date, DateTimeKind.Utc);
-            var activeStatuses = new[] { BookingStatus.Pending, BookingStatus.AwaitingPayment, BookingStatus.Confirmed, BookingStatus.CheckedIn, BookingStatus.Completed };
+            var activeStatuses = new[] { BookingStatus.Pending, BookingStatus.AwaitingPayment, BookingStatus.Confirmed, BookingStatus.CheckedIn, BookingStatus.AwaitingExtraPayment, BookingStatus.Completed };
             query = query.Where(r => !r.Bookings.Any(b =>
                 activeStatuses.Contains(b.Status) &&
                 b.CheckIn < coUtc &&
@@ -64,7 +64,7 @@ public class RoomRepository : Repository<Room>, IRoomRepository
         {
             var ciUtc = DateTime.SpecifyKind(checkIn.Value.Date, DateTimeKind.Utc);
             var coUtc = DateTime.SpecifyKind(checkOut.Value.Date, DateTimeKind.Utc);
-            var activeStatuses = new[] { BookingStatus.Pending, BookingStatus.AwaitingPayment, BookingStatus.Confirmed, BookingStatus.CheckedIn, BookingStatus.Completed };
+            var activeStatuses = new[] { BookingStatus.Pending, BookingStatus.AwaitingPayment, BookingStatus.Confirmed, BookingStatus.CheckedIn, BookingStatus.AwaitingExtraPayment, BookingStatus.Completed };
             query = query.Where(r => !r.Bookings.Any(b =>
                 activeStatuses.Contains(b.Status) &&
                 b.CheckIn < coUtc &&
@@ -95,7 +95,7 @@ public class BookingRepository : Repository<Booking>, IBookingRepository
     {
         var ciUtc = DateTime.SpecifyKind(checkIn.Date, DateTimeKind.Utc);
         var coUtc = DateTime.SpecifyKind(checkOut.Date, DateTimeKind.Utc);
-        var activeStatuses = new[] { BookingStatus.Pending, BookingStatus.AwaitingPayment, BookingStatus.Confirmed, BookingStatus.CheckedIn, BookingStatus.Completed };
+        var activeStatuses = new[] { BookingStatus.Pending, BookingStatus.AwaitingPayment, BookingStatus.Confirmed, BookingStatus.CheckedIn, BookingStatus.AwaitingExtraPayment, BookingStatus.Completed };
         var query = DbSet.Where(b =>
             b.RoomId == roomId &&
             activeStatuses.Contains(b.Status) &&

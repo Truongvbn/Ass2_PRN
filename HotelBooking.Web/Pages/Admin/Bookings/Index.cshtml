@@ -75,18 +75,20 @@
                             }
                             @if (b.Status == "CheckedIn")
                             {
-                                <form method="post" asp-page-handler="Complete" class="inline-form">
-                                    <input type="hidden" name="bookingId" value="@b.Id" />
-                                    <button class="btn btn-sm btn-primary"><i class="fas fa-flag-checkered"></i> Complete</button>
-                                </form>
+                                <a href="/Admin/Bookings/Detail?id=@b.Id" class="btn btn-sm btn-primary"><i class="fas fa-flag-checkered"></i> Check-out</a>
                             }
                             @if (b.Status == "Pending" || b.Status == "AwaitingPayment" || b.Status == "Confirmed")
                             {
                                 <form method="post" asp-page-handler="Cancel" class="inline-form"
                                       onsubmit="return confirm('Are you sure you want to cancel this booking?')">
                                     <input type="hidden" name="bookingId" value="@b.Id" />
+                                    <input type="text" name="RejectReason" placeholder="Cancellation reason" class="form-control form-control-sm d-inline-block" style="width:170px;" required />
                                     <button class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Cancel</button>
                                 </form>
+                            }
+                            @if (b.Status == "AwaitingExtraPayment")
+                            {
+                                <span class="text-warning small">Awaiting extra payment</span>
                             }
                         </td>
                     </tr>

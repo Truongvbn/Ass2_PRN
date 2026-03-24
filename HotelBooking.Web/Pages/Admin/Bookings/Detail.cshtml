@@ -129,8 +129,13 @@
                 @if (new[] { "Pending", "AwaitingPayment", "Confirmed" }.Contains(Model.Booking.Status))
                 {
                     <form method="post" asp-page-handler="Cancel" asp-route-id="@Model.Booking.Id" class="d-inline" onsubmit="return confirm('Cancel this booking?')">
+                        <input type="text" name="RejectReason" placeholder="Cancellation reason" class="form-control d-inline-block" style="width:180px;" required />
                         <button class="btn btn-danger"><i class="fas fa-times"></i> Cancel</button>
                     </form>
+                }
+                @if (Model.Booking.Status == "AwaitingExtraPayment")
+                {
+                    <span class="text-warning small"><i class="fas fa-exclamation-triangle"></i> Awaiting guest payment for extra charges</span>
                 }
                 <a href="/Admin/Bookings" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to List</a>
             </div>

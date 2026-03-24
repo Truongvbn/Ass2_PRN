@@ -23,18 +23,39 @@ public class MyBookingsModel(
         if (result.IsSuccess) Bookings = result.Data!;
     }
 
-    public async Task<IActionResult> OnPostCancelAsync(int bookingId)
+    public async Task<IActionResult> OnPostCancelAsync(int bookingId, string cancelReason)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        if (string.IsNullOrWhiteSpace(cancelReason))
+        {
+            Message = "Cancellation reason is required.";
+            IsError = true;
+            var r0 = await bookingService.GetUserBookingsAsync(userId);
+            if (r0.IsSuccess) Bookings = r0.Data!;
+            return Page();
+        }
+
         var bookingsResult = await bookingService.GetUserBookingsAsync(userId);
         var booking = bookingsResult.Data?.FirstOrDefault(b => b.Id == bookingId);
         if (booking?.Status == "Confirmed")
         {
-            var refundResult = await paymentService.RefundAsync(bookingId, reason: "Cancelled by guest");
+            var isCheckInDay = booking.CheckIn.Date == DateTime.UtcNow.Date;
+            var refundAmount = isCheckInDay ? booking.TotalPrice * 0.5m : booking.TotalPrice;
+            var refundResult = await paymentService.RefundAsync(bookingId, amount: refundAmount, reason: cancelReason.Trim());
             if (!refundResult.IsSuccess) { Message = refundResult.ErrorMessage; IsError = true; Bookings = bookingsResult.Data ?? []; return Page(); }
         }
-        var result = await bookingService.CancelBookingAsync(bookingId, userId);
-        Message = result.IsSuccess ? "Booking cancelled successfully." : result.ErrorMessage;
+        var result = await bookingService.CancelBookingAsync(bookingId, userId, cancelReason.Trim());
+        if (result.IsSuccess && booking?.Status == "Confirmed")
+        {
+            var isCheckInDay = booking.CheckIn.Date == DateTime.UtcNow.Date;
+            Message = isCheckInDay
+                ? "Booking cancelled. 50% refund processed (same-day cancellation)."
+                : "Booking cancelled. Full refund processed.";
+        }
+        else
+        {
+            Message = result.IsSuccess ? "Booking cancelled successfully." : result.ErrorMessage;
+        }
         IsError = !result.IsSuccess;
 
         bookingsResult = await bookingService.GetUserBookingsAsync(userId);

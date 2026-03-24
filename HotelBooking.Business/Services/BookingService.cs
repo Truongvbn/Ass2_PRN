@@ -177,8 +177,11 @@ public class BookingService : IBookingService
         if (booking.Status is not (BookingStatus.Pending or BookingStatus.AwaitingPayment or BookingStatus.Confirmed))
             return ServiceResult.Failure("This booking cannot be cancelled in its current state", "INVALID_STATE");
 
+        if (string.IsNullOrWhiteSpace(reason))
+            return ServiceResult.Failure("Cancellation reason is required", "VALIDATION");
+
         booking.Status = BookingStatus.Cancelled;
-        booking.CancellationReason = reason;
+        booking.CancellationReason = reason.Trim();
         booking.CancelledAt = DateTime.UtcNow;
         booking.UpdatedAt = DateTime.UtcNow;
         await _bookingRepo.UpdateAsync(booking, ct);
@@ -196,8 +199,11 @@ public class BookingService : IBookingService
         if (booking.Status is not (BookingStatus.Pending or BookingStatus.AwaitingPayment or BookingStatus.Confirmed))
             return ServiceResult.Failure("This booking cannot be cancelled in its current state", "INVALID_STATE");
 
+        if (string.IsNullOrWhiteSpace(reason))
+            return ServiceResult.Failure("Cancellation reason is required", "VALIDATION");
+
         booking.Status = BookingStatus.Cancelled;
-        booking.CancellationReason = reason ?? booking.CancellationReason;
+        booking.CancellationReason = reason.Trim();
         booking.CancelledAt = DateTime.UtcNow;
         booking.UpdatedAt = DateTime.UtcNow;
         await _bookingRepo.UpdateAsync(booking, ct);
@@ -267,10 +273,11 @@ public class BookingService : IBookingService
         if (booking.ExtraChargeAmount > 0 && !booking.IsExtraChargePaid)
         {
             booking.PaymentDeadline = DateTime.UtcNow.AddHours(24);
-            booking.CheckedOutAt = null; // finalize after payment
+            booking.Status = BookingStatus.AwaitingExtraPayment;
+            booking.CheckedOutAt = DateTime.UtcNow;
             booking.UpdatedAt = DateTime.UtcNow;
             await _bookingRepo.UpdateAsync(booking, ct);
-            await _notifier.BookingStatusChanged(id, "ExtraPaymentRequired");
+            await _notifier.BookingStatusChanged(id, BookingStatus.AwaitingExtraPayment.ToString());
             return ServiceResult.Success();
         }
 

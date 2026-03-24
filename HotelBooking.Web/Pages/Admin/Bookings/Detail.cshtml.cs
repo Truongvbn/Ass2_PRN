@@ -60,13 +60,16 @@ public class DetailModel(IBookingService bookingService, IPaymentService payment
 
     public async Task<IActionResult> OnPostCancelAsync(int id)
     {
+        if (string.IsNullOrWhiteSpace(RejectReason))
+            return RedirectToPage(new { id, error = "Cancellation reason is required." });
+
         var bResult = await bookingService.GetBookingByIdAsync(id);
         if (bResult.IsSuccess && bResult.Data?.Status == "Confirmed")
         {
-            var refundResult = await paymentService.RefundAsync(id, reason: RejectReason ?? "Cancelled by admin");
+            var refundResult = await paymentService.RefundAsync(id, reason: RejectReason.Trim());
             if (!refundResult.IsSuccess) return RedirectToPage(new { id, error = refundResult.ErrorMessage });
         }
-        var result = await bookingService.AdminCancelBookingAsync(id, RejectReason);
+        var result = await bookingService.AdminCancelBookingAsync(id, RejectReason.Trim());
         return result.IsSuccess ? RedirectToPage(new { id }) : RedirectToPage(new { id, error = result.ErrorMessage });
     }
 }

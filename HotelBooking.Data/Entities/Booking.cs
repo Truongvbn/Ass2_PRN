@@ -6,6 +6,7 @@ public enum BookingStatus
     AwaitingPayment, // Hotel approved, waiting for guest to pay
     Confirmed,       // Paid and locked in
     CheckedIn,       // Guest physically checked in
+    AwaitingExtraPayment, // Checked out, but extra charges require payment
     Completed,       // Stay finished, checked out
     Cancelled,       // Cancelled by guest or admin
     Rejected,        // Hotel declined the request

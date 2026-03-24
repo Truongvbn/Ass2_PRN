@@ -46,14 +46,24 @@ public class IndexModel(IBookingService bookingService, IPaymentService paymentS
         var scoped = await GetScopedBookingsAsync();
         var booking = scoped.FirstOrDefault(b => b.Id == bookingId);
         if (booking is null) return Forbid();
+        if (string.IsNullOrWhiteSpace(RejectReason))
+        {
+            Message = "Cancellation reason is required.";
+            IsError = true;
+            await OnGetAsync();
+            return Page();
+        }
 
         if (booking?.Status == "Confirmed")
         {
-            var refundResult = await paymentService.RefundAsync(bookingId, reason: RejectReason ?? "Cancelled by admin");
+            var refundResult = await paymentService.RefundAsync(bookingId, reason: RejectReason.Trim());
             if (!refundResult.IsSuccess) { Message = refundResult.ErrorMessage; IsError = true; await OnGetAsync(); return Page(); }
         }
-        var result = await bookingService.AdminCancelBookingAsync(bookingId, RejectReason);
-        Message = result.IsSuccess ? "Booking cancelled." : result.ErrorMessage;
+        var result = await bookingService.AdminCancelBookingAsync(bookingId, RejectReason.Trim());
+        if (result.IsSuccess && booking?.Status == "Confirmed")
+            Message = "Booking cancelled. Full refund processed.";
+        else
+            Message = result.IsSuccess ? "Booking cancelled." : result.ErrorMessage;
         IsError = !result.IsSuccess;
         await OnGetAsync();
         return Page();
@@ -83,8 +93,25 @@ public class IndexModel(IBookingService bookingService, IPaymentService paymentS
     {
         if (!await CanAccessBookingAsync(bookingId)) return Forbid();
         var result = await bookingService.CompleteBookingAsync(bookingId);
-        Message = result.IsSuccess ? "Booking completed." : result.ErrorMessage;
-        IsError = !result.IsSuccess;
+        if (result.IsSuccess)
+        {
+            var b = await bookingService.GetBookingByIdAsync(bookingId, userId: null);
+            if (b.IsSuccess && b.Data?.Status == "AwaitingExtraPayment")
+            {
+                Message = "Check-out recorded. Awaiting guest payment for extra charges.";
+                IsError = false;
+            }
+            else
+            {
+                Message = "Booking completed.";
+                IsError = false;
+            }
+        }
+        else
+        {
+            Message = result.ErrorMessage;
+            IsError = true;
+        }
         await OnGetAsync();
         return Page();
     }

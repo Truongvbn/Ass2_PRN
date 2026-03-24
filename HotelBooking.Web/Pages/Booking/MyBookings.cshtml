@@ -65,33 +65,25 @@
                             <a href="/Booking/Payment?id=@booking.Id" class="btn btn-sm btn-success">
                                 <i class="fas fa-credit-card"></i> Pay Now
                             </a>
-                            <form method="post" asp-page-handler="Cancel" class="d-inline"
-                                  onsubmit="return confirm('Are you sure you want to cancel this booking?')">
-                                <input type="hidden" name="bookingId" value="@booking.Id" />
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-times"></i> Cancel
-                                </button>
-                            </form>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="openCancelModal(@booking.Id)">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
                         }
                         @if (booking.Status == "Pending")
                         {
-                            <form method="post" asp-page-handler="Cancel" class="d-inline"
-                                  onsubmit="return confirm('Are you sure you want to cancel this booking?')">
-                                <input type="hidden" name="bookingId" value="@booking.Id" />
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-times"></i> Cancel
-                                </button>
-                            </form>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="openCancelModal(@booking.Id)">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
                         }
                         @if (booking.Status == "Confirmed")
                         {
-                            <form method="post" asp-page-handler="Cancel" class="d-inline"
-                                  onsubmit="return confirm('Cancel? A full refund will be processed.')">
-                                <input type="hidden" name="bookingId" value="@booking.Id" />
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-times"></i> Cancel
-                                </button>
-                            </form>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="openCancelModal(@booking.Id)">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        }
+                        @if (booking.Status == "AwaitingExtraPayment")
+                        {
+                            <span class="text-warning small"><i class="fas fa-exclamation-triangle"></i> Awaiting extra payment</span>
                         }
                         @if (booking.RefundedAt.HasValue && booking.RefundAmount > 0)
                         {
@@ -139,4 +131,38 @@
 
 @section Scripts {
     <script src="~/js/signalr-booking.js"></script>
+    <script>
+        function openCancelModal(bookingId) {
+            document.getElementById('cancel-booking-id').value = bookingId;
+            document.getElementById('cancel-reason').value = '';
+            document.getElementById('cancel-modal').style.display = 'block';
+            setTimeout(() => document.getElementById('cancel-reason').focus(), 50);
+        }
+        function closeCancelModal() {
+            document.getElementById('cancel-modal').style.display = 'none';
+        }
+    </script>
 }
+
+<div id="cancel-modal" class="modal-backdrop" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; overflow-y:auto;">
+    <div class="modal-container" style="background:#fff; max-width:600px; margin:5% auto; padding:2rem; border-radius:var(--radius-lg); position:relative; box-shadow:var(--shadow-lg);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom:1px solid var(--border); padding-bottom:1rem;">
+            <h3 style="margin:0;"><i class="fas fa-times-circle"></i> Cancel Booking</h3>
+            <button type="button" onclick="closeCancelModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+        </div>
+        <form method="post" asp-page-handler="Cancel">
+            <input type="hidden" name="bookingId" id="cancel-booking-id" value="" />
+            <div class="form-group">
+                <label for="cancel-reason">Reason</label>
+                <textarea id="cancel-reason" name="cancelReason" class="form-control" rows="3" placeholder="Please provide a reason for cancellation..." required></textarea>
+            </div>
+            <div style="margin-top:1rem;" class="text-muted small">
+                Same-day cancellation (on check-in day) refunds 50%. Earlier cancellations refund 100%.
+            </div>
+            <div style="margin-top:2rem; display:flex; justify-content:flex-end; gap:1rem;">
+                <button type="button" class="btn btn-outline" onclick="closeCancelModal()">Close</button>
+                <button type="submit" class="btn btn-danger"><i class="fas fa-times"></i> Confirm Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
