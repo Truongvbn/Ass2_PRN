@@ -9,9 +9,12 @@ obj/
 
 ## Visual Studio
 .vs/
+.vscode/
 *.rsuser
 launchSettings.json
 appsettings.json
+appsettings.*.json
+!appsettings.example.json
 ## Build Results
 [Dd]ebug/
 [Rr]elease/
