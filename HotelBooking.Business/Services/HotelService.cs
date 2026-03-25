@@ -13,17 +13,20 @@ public class HotelService : IHotelService
     private readonly IHotelStaffRepository _hotelStaffRepo;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IMapper _mapper;
+    private readonly IBookingHubNotifier _notifier;
 
     public HotelService(
         IHotelRepository hotelRepo,
         IHotelStaffRepository hotelStaffRepo,
         UserManager<ApplicationUser> userManager,
-        IMapper mapper)
+        IMapper mapper,
+        IBookingHubNotifier notifier)
     {
         _hotelRepo = hotelRepo;
         _hotelStaffRepo = hotelStaffRepo;
         _userManager = userManager;
         _mapper = mapper;
+        _notifier = notifier;
     }
 
     public async Task<ServiceResult<IReadOnlyList<HotelDto>>> GetAllHotelsAsync(CancellationToken ct = default)
@@ -131,6 +134,8 @@ public class HotelService : IHotelService
             Role = role,
             AssignedAt = DateTime.UtcNow
         }, ct);
+
+        await _notifier.RolePromoted(dto.UserId);
 
         return ServiceResult.Success();
     }

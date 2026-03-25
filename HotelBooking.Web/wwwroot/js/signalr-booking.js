@@ -80,6 +80,11 @@
         updateBadge(`#booking-row-${bookingId}`, newStatus);
         showToast(`Booking #${bookingId} status: ${newStatus}`, 'info');
     });
+    
+    connection.on("RolePromoted", function () {
+        showToast('Your account was upgraded to Staff. Refreshing...', 'success');
+        setTimeout(() => location.reload(), 800);
+    });
 
     function showToast(msg, type) {
         const toast = document.createElement('div');

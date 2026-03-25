@@ -25,7 +25,7 @@
                     <a href="/Tickets" class="nav-link"><i class="fas fa-headset"></i> Support</a>
                     @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
                     {
-                        <a href="/Admin/Rooms" class="nav-link nav-admin"><i class="fas fa-cog"></i> Bookings</a>
+                        <a href="/Admin/Bookings" class="nav-link nav-admin"><i class="fas fa-cog"></i> Bookings</a>
                     }
                     @if (User.IsInRole("Admin"))
                     {

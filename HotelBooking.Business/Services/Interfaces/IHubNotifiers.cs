@@ -18,6 +18,7 @@ public interface IBookingHubNotifier
     Task BookingStatusChanged(int bookingId, string newStatus);
     Task BookingCancelled(int bookingId);
     Task RoomLocked(int roomId, string roomName);
+    Task RolePromoted(string userId);
 }
 
 public interface IReviewHubNotifier

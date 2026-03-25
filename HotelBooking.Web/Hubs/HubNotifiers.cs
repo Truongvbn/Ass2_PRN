@@ -49,6 +49,9 @@ public class BookingHubNotifier(IHubContext<BookingHub> hub) : IBookingHubNotifi
 
     public Task RoomLocked(int roomId, string roomName)
         => hub.Clients.All.SendAsync("RoomLocked", roomId, roomName);
+
+    public Task RolePromoted(string userId)
+        => hub.Clients.User(userId).SendAsync("RolePromoted");
 }
 
 public class ReviewHubNotifier(IHubContext<ReviewHub> hub) : IReviewHubNotifier

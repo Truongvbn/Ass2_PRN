@@ -47,6 +47,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
+app.UseMiddleware<HotelBooking.Web.Middleware.StaffRoleSyncMiddleware>();
 app.UseAuthorization();
 app.MapRazorPages();
 app.MapControllers();
