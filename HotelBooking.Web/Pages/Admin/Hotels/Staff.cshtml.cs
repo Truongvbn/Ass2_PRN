@@ -66,6 +66,8 @@ public class StaffModel(IHotelService hotelService, UserManager<ApplicationUser>
     {
         public int HotelId { get; set; }
         public string Email { get; set; } = "";
+        public bool AssignNow { get; set; } = true;
+        public string Role { get; set; } = "Receptionist";
     }
 
     public async Task<IActionResult> OnPostPromoteAsync()
@@ -84,21 +86,43 @@ public class StaffModel(IHotelService hotelService, UserManager<ApplicationUser>
             IsError = true;
             return Page();
         }
-        var isStaff = await userManager.IsInRoleAsync(user, "Staff");
-        if (!isStaff)
+        if (Promote.AssignNow)
         {
-            var addRes = await userManager.AddToRoleAsync(user, "Staff");
-            if (!addRes.Succeeded)
+            var assignRes = await hotelService.AssignStaffAsync(new AssignStaffDto
             {
-                Message = "Failed to add Staff role";
+                HotelId = Promote.HotelId,
+                UserId = user.Id,
+                Role = Promote.Role
+            });
+            if (!assignRes.IsSuccess)
+            {
+                Message = assignRes.ErrorMessage ?? "Failed to promote and assign staff.";
                 IsError = true;
                 return Page();
             }
-            var isCustomer = await userManager.IsInRoleAsync(user, "Customer");
-            if (isCustomer) await userManager.RemoveFromRoleAsync(user, "Customer");
+            Message = "User promoted and assigned to hotel.";
+            IsError = false;
+            await LoadAsync(Promote.HotelId);
+            return Page();
         }
-        Message = "User promoted to Staff.";
-        IsError = false;
+        else
+        {
+            var isStaff = await userManager.IsInRoleAsync(user, "Staff");
+            if (!isStaff)
+            {
+                var addRes = await userManager.AddToRoleAsync(user, "Staff");
+                if (!addRes.Succeeded)
+                {
+                    Message = "Failed to add Staff role";
+                    IsError = true;
+                    return Page();
+                }
+                var isCustomer = await userManager.IsInRoleAsync(user, "Customer");
+                if (isCustomer) await userManager.RemoveFromRoleAsync(user, "Customer");
+            }
+            Message = "User promoted to Staff.";
+            IsError = false;
+        }
         await LoadAsync(Promote.HotelId);
         return Page();
     }
