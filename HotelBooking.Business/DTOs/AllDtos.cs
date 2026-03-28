@@ -161,3 +161,32 @@ public record UpdateTicketStatusDto { public int Id { get; init; } public string
 
 // ── AI ──
 public record RoomPreferenceDto { public decimal? MaxBudget { get; init; } public int? GuestCount { get; init; } public List<string>? DesiredAmenities { get; init; } public DateTime? CheckIn { get; init; } public DateTime? CheckOut { get; init; } }
+
+// ── Reporting ──
+public record FinancialReportDto
+{
+    public decimal TotalRevenue { get; init; }
+    public decimal BookingRevenue { get; init; }
+    public decimal ExtraChargeRevenue { get; init; }
+    public decimal RefundAmount { get; init; }
+    public int TotalBookings { get; init; }
+    public int CompletedBookings { get; init; }
+    public int CancelledBookings { get; init; }
+    public List<DailyRevenueDto> DailyRevenues { get; init; } = new();
+    public List<HotelFinancialReportDto> HotelReports { get; init; } = new();
+}
+
+public record DailyRevenueDto
+{
+    public DateTime Date { get; init; }
+    public decimal Revenue { get; init; }
+    public int BookingCount { get; init; }
+}
+
+public record HotelFinancialReportDto
+{
+    public int HotelId { get; init; }
+    public string HotelName { get; init; } = "";
+    public decimal TotalRevenue { get; init; }
+    public int BookingCount { get; init; }
+}

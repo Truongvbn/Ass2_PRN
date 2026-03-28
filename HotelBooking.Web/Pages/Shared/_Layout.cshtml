@@ -26,6 +26,7 @@
                     @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
                     {
                         <a href="/Admin/Bookings" class="nav-link nav-admin"><i class="fas fa-cog"></i> Bookings</a>
+                        <a href="/Reports/Financial" class="nav-link nav-admin"><i class="fas fa-chart-line"></i> Reports</a>
                     }
                     @if (User.IsInRole("Admin"))
                     {

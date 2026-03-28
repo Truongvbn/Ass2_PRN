@@ -21,6 +21,7 @@ public static class DependencyInjection
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<ITicketService, TicketService>();
         services.AddScoped<IPaymentService, PaymentService>();
+        services.AddScoped<IReportingService, ReportingService>();
 
         var aiProvider = configuration["AiAssistant:Provider"] ?? "Mock";
         if (aiProvider.Equals("Gemini", StringComparison.OrdinalIgnoreCase))

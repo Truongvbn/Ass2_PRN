@@ -76,6 +76,12 @@ public interface IAiAssistantService
     Task<ServiceResult<AiResponseDto>> AnswerQuestionAsync(string question, int? roomId, CancellationToken ct = default);
 }
 
+public interface IReportingService
+{
+    Task<ServiceResult<FinancialReportDto>> GetAdminFinancialReportAsync(DateTime startDate, DateTime endDate, CancellationToken ct = default);
+    Task<ServiceResult<FinancialReportDto>> GetHotelFinancialReportAsync(int hotelId, DateTime startDate, DateTime endDate, CancellationToken ct = default);
+}
+
 public class AiResponseDto
 {
     public string Answer { get; set; } = string.Empty;

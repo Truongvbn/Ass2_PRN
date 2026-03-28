@@ -2,6 +2,7 @@ using AutoMapper;
 using FluentAssertions;
 using HotelBooking.Business.DTOs;
 using HotelBooking.Business.Services;
+using HotelBooking.Business.Services.Interfaces;
 using HotelBooking.Data.Entities;
 using HotelBooking.Data.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +16,7 @@ public class HotelServiceTests
     private readonly Mock<IHotelStaffRepository> _hotelStaffRepo = new();
     private readonly Mock<UserManager<ApplicationUser>> _userManager;
     private readonly Mock<IMapper> _mapper = new();
+    private readonly Mock<IBookingHubNotifier> _notifier = new();
 
     private readonly HotelService _service;
 
@@ -29,7 +31,8 @@ public class HotelServiceTests
             _hotelRepo.Object,
             _hotelStaffRepo.Object,
             _userManager.Object,
-            _mapper.Object);
+            _mapper.Object,
+            _notifier.Object);
     }
 
     [Fact]
